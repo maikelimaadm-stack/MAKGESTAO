@@ -281,7 +281,7 @@ export default function useMapRenderer(mapInstanceRef) {
         || iconesConfig.find(ic => ic.tipo_entidade === 'Ponto' && ic.categoria?.toUpperCase().trim() === ponto.tipo?.toUpperCase().trim());
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0 }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 20, fillColor: cfg?.cor_padrao || ponto.cor || '#0066ff', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3 };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 16, fillColor: cfg?.cor_padrao || ponto.cor || '#0066ff', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3 };
 
       if (markersRef.current.has(key)) {
         const marker = markersRef.current.get(key);
@@ -292,14 +292,14 @@ export default function useMapRenderer(mapInstanceRef) {
         marker.setTitle(ponto.nome);
         marker._ponto = ponto;
         marker.setIcon(icon);
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 40);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 30);
         markerStateCache.set(key, nextState);
         return;
       }
 
       const marker = new google.maps.Marker({ position: { lat: coords.lat, lng: coords.lng }, map, icon, title: ponto.nome, clickable: true, zIndex: 800 });
       marker._ponto = ponto;
-      if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 40);
+      if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 30);
       marker.addListener('click', () => {
         if (typeof onClickPonto === 'function') {
           onClickPonto(marker._ponto || ponto);
@@ -357,7 +357,7 @@ export default function useMapRenderer(mapInstanceRef) {
       const iconUrl = cfg?.icone_url || null;
       const icon = iconUrl
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0 }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 20, fillColor: cfg?.cor_padrao || '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3 };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 16, fillColor: cfg?.cor_padrao || '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3 };
 
       if (markersRef.current.has(key)) {
         const marker = markersRef.current.get(key);
@@ -366,13 +366,13 @@ export default function useMapRenderer(mapInstanceRef) {
         marker.setPosition({ lat: coords.lat, lng: coords.lng });
         marker.setTitle(ponto.nome_ponto);
         marker.setIcon(icon);
-        if (iconUrl) applyMarkerIconPreservingAspectRatio(marker, iconUrl, 40);
+        if (iconUrl) applyMarkerIconPreservingAspectRatio(marker, iconUrl, 30);
         markerStateCache.set(key, nextState);
         return;
       }
 
       const marker = new google.maps.Marker({ position: { lat: coords.lat, lng: coords.lng }, map, icon, title: ponto.nome_ponto, zIndex: 500 });
-      if (iconUrl) applyMarkerIconPreservingAspectRatio(marker, iconUrl, 40);
+      if (iconUrl) applyMarkerIconPreservingAspectRatio(marker, iconUrl, 30);
       marker.addListener('click', () => onClick(ponto));
       markerStateCache.set(key, JSON.stringify({ lat: coords.lat, lng: coords.lng, title: ponto.nome_ponto, iconUrl: iconUrl || '', category: categoriaPonto }));
       markersRef.current.set(key, marker);
@@ -436,7 +436,7 @@ export default function useMapRenderer(mapInstanceRef) {
       }
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0, labelOrigin: new google.maps.Point(0, 0) }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 22, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 18, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
       const totalAlertas = lotesNaArea.reduce((sum, l) => sum + (l.alertas?.length || 0), 0);
 
       // Helper para atualizar posição do indicador junto com o marcador
@@ -468,7 +468,7 @@ export default function useMapRenderer(mapInstanceRef) {
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
           existing.setDraggable(!!canDragLotes);
           existing.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 50, true);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 38, true);
           markerStateCache.set(key, nextState);
           const ind = lotesIndicatorsRef.current.get(key);
           if (ind) { ind._pos = offsetCenter; try { ind.draw(); } catch(e) {} }
@@ -483,7 +483,7 @@ export default function useMapRenderer(mapInstanceRef) {
           label: { text: String(totalCabecas), color: '#fff', fontSize: '11px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 50, true);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 38, true);
         setMarkerBlink(marker, false);
         marker._lotesNaArea = lotesNaArea;
         marker._center = offsetCenter;
@@ -628,7 +628,7 @@ export default function useMapRenderer(mapInstanceRef) {
           marker.setTitle(t.titulo);
           marker.setZIndex(t.prioridade === 'Urgente' ? 3000 : 2500);
           marker.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 28);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 22);
           markerStateCache.set(key, nextState);
         }
         marker._tarefa = t;
@@ -639,7 +639,7 @@ export default function useMapRenderer(mapInstanceRef) {
         position, map, icon,
         title: t.titulo, zIndex: t.prioridade === 'Urgente' ? 3000 : 2500
       });
-      if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(m, cfg.icone_url, 28);
+      if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(m, cfg.icone_url, 22);
       m._tarefa = t;
       m.addListener('click', () => onClickTarefa(m._tarefa));
       markerStateCache.set(key, JSON.stringify({ lat: position.lat, lng: position.lng, title: t.titulo, prioridade: t.prioridade, iconUrl: cfg?.icone_url || '' }));
