@@ -948,7 +948,7 @@ export default function MapaGeral() {
   const totalAlertas = lotesFiltrados.filter((l) => l.alertas.length > 0).length;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white" translate="no">
+    <div className="absolute inset-0 z-30 bg-white" translate="no">
       <div className="w-full h-full relative">
         <div ref={mapRef} style={{ height: '100%', width: '100%', backgroundColor: '#e5e7eb', touchAction: 'pan-x pan-y', WebkitOverflowScrolling: 'touch' }} />
 
