@@ -62,6 +62,18 @@ export default function PWAInstaller() {
     let messageHandler;
 
     if ("serviceWorker" in navigator) {
+      if (import.meta.env.DEV) {
+        navigator.serviceWorker.getRegistrations().then((regs) => {
+          regs.forEach((reg) => reg.unregister().then(() => {
+            console.info("[DEV] Service worker desregistrado para evitar cache stale.");
+          }));
+        });
+        if (window.caches) {
+          window.caches.keys().then((keys) => keys.forEach((key) => window.caches.delete(key)));
+        }
+        return;
+      }
+
       navigator.serviceWorker
         .register("/functions/pwaServiceWorker", { scope: "/" })
         .then((registration) => {
