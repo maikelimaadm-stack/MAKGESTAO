@@ -989,7 +989,7 @@ export default function Layout({ children, currentPageName }) {
       </Dialog>
 
 
-      <main className={(isFolha ? "max-w-none" : "max-w-[1600px] mx-auto") + " flex-1 min-h-0 w-full overflow-hidden pb-16 md:pb-0"}>
+      <main className={(isFolha ? "max-w-none" : "max-w-[1600px] mx-auto") + " flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden pb-16 md:pb-0"}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -997,7 +997,7 @@ export default function Layout({ children, currentPageName }) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative h-full min-h-0 overflow-hidden">
+            className="relative min-h-full">
             
             {children}
           </motion.div>

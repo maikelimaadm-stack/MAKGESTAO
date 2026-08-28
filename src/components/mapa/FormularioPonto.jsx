@@ -377,19 +377,22 @@ export default function FormularioPonto({ coordenadas, onSave, onCancel, usarGPS
       if (data.tipo_categoria === "DEPOSITO") {
         const descricaoLocal = `DEPÓSITO DE SUPLEMENTAÇÃO - ${data.nome}`;
 
-        if (!localEstoqueId && pontoSuplementacaoExistente) {
+        if (!localEstoqueId) {
           const locais = await base44.entities.LocalEstoque.list();
-          const nomesAntigos = [
+          const nomeNormalizado = normalizeText(data.nome);
+          const nomesAntigos = pontoSuplementacaoExistente ? [
             pontoSuplementacaoExistente.local_estoque_nome,
             pontoSuplementacaoExistente.nome_ponto,
             item?.nome
-          ].filter(Boolean).map(normalizeText);
+          ].filter(Boolean).map(normalizeText) : [];
           const localExistente = locais.find((local) =>
+            nomeNormalizado === normalizeText(local.nome) ||
             nomesAntigos.includes(normalizeText(local.nome)) ||
-            nomesAntigos.includes(normalizeText(String(local.descricao || "").replace("DEPÓSITO DE SUPLEMENTAÇÃO -", "")))
+            nomesAntigos.includes(normalizeText(String(local.descricao || "").replace("DEPÓSITO DE SUPLEMENTAÇÃO -", "").trim()))
           );
           if (localExistente) {
             localEstoqueId = localExistente.id;
+            localEstoqueNome = localExistente.nome;
           }
         }
 
