@@ -642,6 +642,7 @@ export default function FormularioLote({ onSubmit, onCancel, onSettingsClick, on
           showEditAction={isReadOnly}
           showDeleteDuplicateActions={isEditing && !editMode && !isDuplicating}
           onCancel={onCancel}
+          onSave={() => handleSubmit({ preventDefault: () => {} })}
           onEditRecord={() => setEditMode(true)}
           onSettingsClick={onSettingsClick}
           onLayoutConfigClick={() => { if (filterOpen) onToggleFilter?.(); setLayoutConfigOpen(true); }}
