@@ -4,6 +4,17 @@ import App from '@/App.jsx'
 import '@/index.css'
 import '@/lib/installDeleteDialogInterceptor'
 
+// Dev mode: unregister any stale service workers and clear caches to prevent
+// cached stale JS chunks from causing "Cannot read properties of null (reading 'useState')"
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    regs.forEach((reg) => reg.unregister());
+  });
+  if (window.caches) {
+    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key)));
+  }
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
   <App />
