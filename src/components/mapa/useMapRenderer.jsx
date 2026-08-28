@@ -561,9 +561,9 @@ export default function useMapRenderer(mapInstanceRef) {
             if (!currentPos) return;
             const pos = proj.fromLatLngToDivPixel(currentPos);
             if (!pos) return;
-            // Posição personalizada do identificador em relação ao ícone
-            div.style.left = `${pos.x + 20}px`;
-            div.style.top = `${pos.y - 25}px`;
+            // Posição personalizada do identificador em relação ao ícone (ajustado para ícone 38px)
+            div.style.left = `${pos.x + 15}px`;
+            div.style.top = `${pos.y - 19}px`;
             div.style.transform = 'translate(-50%, -50%)';
           };
           indicatorOverlay.onRemove = function() { div.parentNode?.removeChild(div); };
@@ -574,7 +574,7 @@ export default function useMapRenderer(mapInstanceRef) {
         indicatorOverlay._markerRef = markersRef.current.get(key);
         indicatorOverlay._pos = offsetCenter;
         if (indicatorOverlay._state !== stateStr) {
-          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:15px;height:15px;border-radius:9999px;background:${i.cor};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
+          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:12px;height:12px;border-radius:9999px;background:${i.cor};border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
           indicatorOverlay._state = stateStr;
         }
         setOverlayBlink(indicatorOverlay, blinkAlerts && totalAlertas > 0);

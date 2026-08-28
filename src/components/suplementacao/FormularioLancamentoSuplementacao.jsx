@@ -10,6 +10,7 @@ import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { updateMapaCachedData, refreshMapaCacheEntry } from "@/components/offline/mapaOfflineCache";
 import { Progress } from "@/components/ui/progress";
 import { normalizeText, obterSaldoProdutoLocal, parseNumber, registrarSaidaSuplementacao } from "./estoqueSuplementacaoUtils";
@@ -46,6 +47,7 @@ export default function FormularioLancamentoSuplementacao({ ponto, onSubmit, onC
   const queryClient = useQueryClient();
   const [progresso, setProgresso] = useState({ show: false, atual: 0, total: 0, mensagem: "" });
   const [mostrarConsumoLote, setMostrarConsumoLote] = useState(false);
+  const [mostrarDetalhes, setMostrarDetalhes] = useState(false);
   const [sobraHerdadaDecidida, setSobraHerdadaDecidida] = useState(false);
   const [sobraHerdadaKg, setSobraHerdadaKg] = useState(0);
   const [formData, setFormData] = useState({
@@ -651,6 +653,15 @@ export default function FormularioLancamentoSuplementacao({ ponto, onSubmit, onC
 
 
 
+            {/* Detalhes do consumo (colapsável) */}
+            {(ultimoEvento || (pctPV > 0 && pesoMedioGeral > 0 && totalCabecas > 0) || (quantidadeKg > 0 && totalCabecas > 0 && lotes.length > 0)) && (
+              <button type="button" onClick={() => setMostrarDetalhes((prev) => !prev)} className="flex items-center gap-1.5 w-full text-left text-xs font-semibold text-slate-700 hover:text-emerald-700 transition-colors py-1">
+                {mostrarDetalhes ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                {mostrarDetalhes ? "Ocultar análises de consumo" : "Ver análises de consumo"}
+              </button>
+            )}
+            {mostrarDetalhes && (
+            <>
             {/* Consumo do fechamento / estimativa */}
             {ultimoEvento && (() => {
               const sobraAnterior = ultimoEvento.sobra_kg || 0;
@@ -731,6 +742,8 @@ export default function FormularioLancamentoSuplementacao({ ponto, onSubmit, onC
                   </div>
                 )}
               </div>
+            )}
+            </>
             )}
 
             <div>
