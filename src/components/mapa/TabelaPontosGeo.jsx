@@ -9,7 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ConfiguracaoColunasMapaDialog from "@/components/mapa/ConfiguracaoColunasMapaDialog";
-import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical } from "lucide-react";
+import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical, Download } from "lucide-react";
+import { exportRowsToXlsx } from "@/components/common/xlsxExportUtils";
+import { toast } from "sonner";
 
 const COLUNAS_DISPONIVEIS = [
   { id: "selecao", label: "Seleção", default: true, fixo: true, width: 25 },
@@ -246,6 +248,20 @@ export default function TabelaPontosGeo({ pontos = [], onEdit, onEditDetalhes, o
     setSelectedItems([]);
   };
 
+  const handleExportarSelecionados = () => {
+    const cols = colunasOrdenadas.filter((c) => !c.fixo);
+    const selecionados = pontosComDetalhes.filter((p) => selectedItems.includes(p.id));
+    if (selecionados.length === 0) { toast.error("Selecione ao menos um ponto!"); return; }
+    const rows = selecionados.map((item) => cols.map((c) => getFieldValue(item, c.id)));
+    exportRowsToXlsx({
+      columns: cols.map((c) => ({ label: c.label })),
+      rows,
+      title: "Pontos Selecionados",
+      fileName: "pontos_selecionados"
+    });
+    toast.success(`${selecionados.length} ponto(s) exportado(s)`);
+  };
+
   const handleRowTouch = (item, event) => {
     const now = Date.now();
     if (lastTapRef.current.id === item.id && now - lastTapRef.current.time < 300) {
@@ -316,7 +332,7 @@ export default function TabelaPontosGeo({ pontos = [], onEdit, onEditDetalhes, o
       <div className="flex justify-between items-center px-1 gap-2 flex-wrap">
         <div className="text-xs text-slate-500">{pontosFiltrados.length} de {pontos.length} registros</div>
         <div className="flex gap-2 flex-wrap">
-          {selectedItems.length > 0 && <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="h-7 text-xs">Ações ({selectedItems.length})</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuLabel className="text-xs">Ações em Lote</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem onClick={handleExcluirSelecionados} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem></DropdownMenuContent></DropdownMenu>}
+          {selectedItems.length > 0 && <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="h-7 text-xs">Ações ({selectedItems.length})</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuLabel className="text-xs">Ações em Lote</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem onClick={handleExportarSelecionados} className="text-xs"><Download className="w-3 h-3 mr-1.5" />Exportar Selecionados</DropdownMenuItem><DropdownMenuItem onClick={handleExcluirSelecionados} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem></DropdownMenuContent></DropdownMenu>}
         </div>
       </div>
 

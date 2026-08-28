@@ -8,8 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ConfiguracaoColunasMapaDialog from "@/components/mapa/ConfiguracaoColunasMapaDialog";
-import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical } from "lucide-react";
+import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical, Download } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { exportRowsToXlsx } from "@/components/common/xlsxExportUtils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ordenarPorNomeNumerico } from "@/hooks/useSetorAreas";
 import { toast } from "sonner";
@@ -213,6 +214,20 @@ export default function TabelaAreasGeo({ areas = [], onEdit, onEditDetalhes, onD
     setSelectedItems([]);
   };
 
+  const handleExportarSelecionados = () => {
+    const cols = colunasOrdenadas.filter((c) => !c.fixo);
+    const selecionados = areas.filter((a) => selectedItems.includes(a.id));
+    if (selecionados.length === 0) { toast.error("Selecione ao menos uma área!"); return; }
+    const rows = selecionados.map((item) => cols.map((c) => getFieldValue(item, c.id)));
+    exportRowsToXlsx({
+      columns: cols.map((c) => ({ label: c.label })),
+      rows,
+      title: "Áreas Selecionadas",
+      fileName: "areas_selecionadas"
+    });
+    toast.success(`${selecionados.length} área(s) exportada(s)`);
+  };
+
   const handleRowTouch = (item, event) => {
     const now = Date.now();
     if (lastTapRef.current.id === item.id && now - lastTapRef.current.time < 300) {
@@ -344,6 +359,7 @@ export default function TabelaAreasGeo({ areas = [], onEdit, onEditDetalhes, onD
                 <DropdownMenuItem onClick={() => { setBatchType("cor"); setBatchValue("#61aad9"); }} className="text-xs">Definir Cor</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => { setBatchType("renumerar"); setStartNumber("1"); }} className="text-xs">Reatribuir Códigos</DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleExportarSelecionados} className="text-xs"><Download className="w-3 h-3 mr-1.5" />Exportar Selecionados</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleExcluirSelecionados} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
