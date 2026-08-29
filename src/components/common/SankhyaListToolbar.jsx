@@ -31,7 +31,7 @@ const TipBtn = ({ title, children }) => (
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom" className="rounded-md bg-slate-900 text-white border-0 shadow-md px-2.5 py-1 text-xs font-medium">
+      <TooltipContent side="bottom" className="rounded-md bg-[var(--mg-text-1)] text-white border-0 shadow-md px-2.5 py-1 text-xs font-medium">
         {title}
       </TooltipContent>
     </Tooltip>
@@ -115,7 +115,7 @@ export default function SankhyaListToolbar({
             {filterActive && (
               <span
                 onClick={(e) => { e.stopPropagation(); onClearFilter?.(); }}
-                className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-white text-red-600 border border-red-400 text-[10px] leading-[13px] font-bold cursor-pointer hover:bg-red-50 flex items-center justify-center"
+                className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-white text-[var(--mg-red)] border border-[var(--mg-red-light)] text-[10px] leading-[13px] font-bold cursor-pointer hover:bg-[var(--mg-red-light)] flex items-center justify-center"
               >
                 ×
               </span>
@@ -172,7 +172,7 @@ export default function SankhyaListToolbar({
         {/* Search */}
         {showSearch && (
           <div className="mg-action-bar__search-pill">
-            <Search className="w-3.5 h-3.5 text-slate-400 pointer-events-none shrink-0" />
+            <Search className="w-3.5 h-3.5 text-[var(--mg-text-3)] pointer-events-none shrink-0" />
             <input
               value={searchValue}
               onChange={(e) => onSearchChange?.(e.target.value)}
@@ -198,9 +198,9 @@ export default function SankhyaListToolbar({
                 <MoreHorizontal className="w-4 h-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 rounded-lg shadow-lg border border-slate-200 p-1">
+            <DropdownMenuContent align="end" className="w-52 rounded-lg shadow-lg border border-[var(--mg-border)] p-1">
               <DropdownMenuItem onClick={onConfigColumns} disabled={!onConfigColumns} className="h-8 cursor-pointer gap-2 text-xs rounded-md">
-                <Columns3 className="w-3.5 h-3.5 text-slate-500" />
+                <Columns3 className="w-3.5 h-3.5 text-[var(--mg-text-3)]" />
                 Configurar colunas
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -213,7 +213,7 @@ export default function SankhyaListToolbar({
                   type="button"
                   onClick={onConfigExportExcel}
                   disabled={!onConfigExportExcel}
-                  className="h-8 w-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-40 rounded-r-md transition-colors"
+                  className="h-8 w-8 flex items-center justify-center text-[var(--mg-text-3)] hover:text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)] disabled:opacity-40 rounded-r-md transition-colors"
                   title="Configurar Excel"
                 >
                   <Settings2 className="w-3.5 h-3.5" />
@@ -228,7 +228,7 @@ export default function SankhyaListToolbar({
                   type="button"
                   onClick={onConfigExportPdf}
                   disabled={!onConfigExportPdf}
-                  className="h-8 w-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-40 rounded-r-md transition-colors"
+                  className="h-8 w-8 flex items-center justify-center text-[var(--mg-text-3)] hover:text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)] disabled:opacity-40 rounded-r-md transition-colors"
                   title="Configurar PDF"
                 >
                   <Settings2 className="w-3.5 h-3.5" />
@@ -252,13 +252,13 @@ export default function SankhyaListToolbar({
 
       {/* Record title bar */}
       {viewMode === "record" && (
-        <div className="flex items-center gap-2 bg-slate-50 border-t border-slate-100 px-3 py-1.5 w-full">
+        <div className="flex items-center gap-2 bg-[var(--mg-gray-fill)] border-t border-[var(--mg-border)] px-3 py-1.5 w-full">
           {recordLabel && (
-            <span className="px-1.5 py-0.5 rounded bg-slate-600 text-white text-[10px] font-bold uppercase tracking-wide">
+            <span className="px-1.5 py-0.5 rounded bg-[var(--mg-accent)] text-white text-[10px] font-bold uppercase tracking-wide">
               {recordLabel}
             </span>
           )}
-          <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">{title}</span>
+          <span className="text-xs font-semibold text-[var(--mg-text-1)] truncate min-w-0 flex-1">{title}</span>
           <span className="ml-auto text-[10px] font-bold text-primary uppercase tracking-wide whitespace-nowrap">
             {operationLabel || "VISUALIZAÇÃO DE REGISTRO"}
           </span>

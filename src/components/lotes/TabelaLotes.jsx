@@ -592,15 +592,15 @@ export default function TabelaLotes({
         </PopoverTrigger>
         <PopoverContent align="end" side="bottom" sideOffset={4} className="w-[310px] p-0 z-[9999] rounded-none">
           <div className="space-y-0.5 border-b px-1 py-1">
-            <button type="button" className="flex items-center w-full h-8 text-xs hover:bg-slate-100 rounded pr-2 pl-2" onClick={() => {handleSort(colunaId);setMenuFiltroAberto(null);}}>
+            <button type="button" className="flex items-center w-full h-8 text-xs hover:bg-[var(--mg-gray-fill)] rounded pr-2 pl-2" onClick={() => {handleSort(colunaId);setMenuFiltroAberto(null);}}>
               <ArrowDownAZ className="w-4 h-4 mr-2" /> Classificar do Menor para o Maior
             </button>
-            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-slate-100 rounded" onClick={() => {setSortConfig({ key: colunaId, direction: "desc" });setMenuFiltroAberto(null);}}>
+            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-[var(--mg-gray-fill)] rounded" onClick={() => {setSortConfig({ key: colunaId, direction: "desc" });setMenuFiltroAberto(null);}}>
               <ArrowUpZA className="w-4 h-4 mr-2" /> Classificar do Maior para o Menor
             </button>
             <button
               type="button"
-              className={`flex items-center w-full px-2 h-8 text-xs rounded ${hasActiveFilter(colunaId) ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-300 cursor-not-allowed'}`}
+              className={`flex items-center w-full px-2 h-8 text-xs rounded ${hasActiveFilter(colunaId) ? 'hover:bg-[var(--mg-gray-fill)] text-[var(--mg-text-1)]' : 'text-[var(--mg-text-3)] cursor-not-allowed'}`}
               disabled={!hasActiveFilter(colunaId)}
               onClick={() => {clearColumnFilter(colunaId);setMenuFiltroAberto(null);}}>
               
@@ -610,7 +610,7 @@ export default function TabelaLotes({
           <div className="p-1 space-y-1">
             {isRangeFilter ?
             <div className="space-y-1">
-                <div className="text-[11px] leading-none font-semibold text-slate-500">Entre</div>
+                <div className="text-[11px] leading-none font-semibold text-[var(--mg-text-3)]">Entre</div>
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">
                   <Input
                   type={filterType === "date" ? "date" : "number"}
@@ -618,7 +618,7 @@ export default function TabelaLotes({
                   onChange={(e) => setFiltroTemp((prev) => ({ ...prev, valores: [e.target.value ? `${filterType === "date" ? "start" : "min"}:${e.target.value}` : "", ...prev.valores.filter((item) => !String(item).startsWith(filterType === "date" ? "start:" : "min:"))].filter(Boolean) }))}
                   placeholder="De"
                   className="h-[22px] text-xs rounded-none shadow-none focus-visible:ring-0 px-1" />
-                  <span className="text-xs text-slate-500">a</span>
+                  <span className="text-xs text-[var(--mg-text-3)]">a</span>
                   <Input
                   type={filterType === "date" ? "date" : "number"}
                   value={String(valoresSelecionados.find((item) => String(item).startsWith(filterType === "date" ? "end:" : "max:")) || "").replace(filterType === "date" ? "end:" : "max:", "")}
@@ -628,8 +628,8 @@ export default function TabelaLotes({
                 </div>
               </div> :
             <Input value={buscaFiltroMenu} onChange={(e) => setBuscaFiltroMenu(e.target.value)} placeholder="PESQUISAR" className="h-[22px] text-xs uppercase rounded-none shadow-none focus-visible:ring-0 px-1" />}
-            {(filterType === "list" || isRangeFilter) && <div className="border border-slate-300 rounded-none max-h-64 overflow-y-auto p-1 bg-white">
-              <label className="flex h-8 items-center gap-2 px-2 py-0 text-xs text-slate-700 border-b border-slate-200 whitespace-nowrap overflow-hidden">
+            {(filterType === "list" || isRangeFilter) && <div className="border border-[var(--mg-border)] rounded-none max-h-64 overflow-y-auto p-1 bg-white">
+              <label className="flex h-8 items-center gap-2 px-2 py-0 text-xs text-[var(--mg-text-1)] border-b border-[var(--mg-border)] whitespace-nowrap overflow-hidden">
                 <Checkbox
                   checked={allVisibleSelected}
                   onCheckedChange={(checked) => {
@@ -643,7 +643,7 @@ export default function TabelaLotes({
                 <span className="block flex-1 overflow-hidden text-ellipsis whitespace-nowrap">(Selecionar Tudo)</span>
               </label>
               {filteredOptions.map((option) =>
-              <label key={option} className="flex h-6 items-center gap-2 px-2 py-0 text-xs text-slate-700 hover:bg-slate-50 whitespace-nowrap overflow-hidden">
+              <label key={option} className="flex h-6 items-center gap-2 px-2 py-0 text-xs text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)] whitespace-nowrap overflow-hidden">
                   <Checkbox
                   checked={valoresSelecionados.includes(option)}
                   onCheckedChange={(checked) => {
@@ -656,10 +656,10 @@ export default function TabelaLotes({
               )}
             </div>}
             <div className="flex items-center justify-end gap-0 pt-2">
-              <Button variant="outline" size="icon" title="Aplicar filtro" className="h-8 w-10 rounded-none border-slate-200 text-slate-800 hover:bg-slate-50" onClick={() => {setValoresFiltro(colunaId, filtroTemp.valores);setMenuFiltroAberto(null);setBuscaFiltroMenu("");setFiltroTemp({ colunaId: null, valores: [] });}}>
+              <Button variant="outline" size="icon" title="Aplicar filtro" className="h-8 w-10 rounded-none border-[var(--mg-border)] text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)]" onClick={() => {setValoresFiltro(colunaId, filtroTemp.valores);setMenuFiltroAberto(null);setBuscaFiltroMenu("");setFiltroTemp({ colunaId: null, valores: [] });}}>
                 <Check className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="icon" title="Cancelar" className="h-8 w-10 rounded-none -ml-px border-slate-200 text-slate-800 hover:bg-slate-50" onClick={() => {setMenuFiltroAberto(null);setBuscaFiltroMenu("");setFiltroTemp({ colunaId: null, valores: [] });}}>
+              <Button variant="outline" size="icon" title="Cancelar" className="h-8 w-10 rounded-none -ml-px border-[var(--mg-border)] text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)]" onClick={() => {setMenuFiltroAberto(null);setBuscaFiltroMenu("");setFiltroTemp({ colunaId: null, valores: [] });}}>
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -726,7 +726,7 @@ export default function TabelaLotes({
                           }
 
                           {isResizing &&
-                          <div className="absolute top-0 right-0 h-full w-5 z-50 flex items-center justify-center cursor-col-resize bg-lime-800 "
+                          <div className="absolute top-0 right-0 h-full w-5 z-50 flex items-center justify-center cursor-col-resize bg-[var(--mg-accent-dark)] "
                           onMouseDown={(e) => startDragResize(e, coluna)}
                           onTouchStart={(e) => startDragResize(e, coluna)}
                           onClick={(e) => {e.stopPropagation();setResizeColumnId(null);}}

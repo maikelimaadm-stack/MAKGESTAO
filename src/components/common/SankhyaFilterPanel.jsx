@@ -219,10 +219,10 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
   const renderOperatedField = (field, renderInput) => {
     const operator = operators[field.id] || "between";
     if (operator === "between") {
-      return <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">{renderInput(field, "min")}<span className="text-slate-500">a</span>{renderInput(field, "max")}</div>;
+      return <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">{renderInput(field, "min")}<span className="text-[var(--mg-text-3)]">a</span>{renderInput(field, "max")}</div>;
     }
     if (operator === "empty" || operator === "notEmpty") {
-      return <div className="h-6 flex items-center px-1.5 border border-slate-200 bg-slate-50 text-[11px] text-slate-500">Não precisa preencher valor</div>;
+      return <div className="h-6 flex items-center px-1.5 border border-[var(--mg-border)] bg-[var(--mg-gray-fill)] text-[11px] text-[var(--mg-text-3)]">Não precisa preencher valor</div>;
     }
     const suffix = operator === "gte" || operator === "gt" ? "min" : operator === "lte" || operator === "lt" ? "max" : "exact";
     return renderInput(field, suffix);
@@ -300,7 +300,7 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
       <div className="filter-panel__header">
         <div className="filter-panel__header-row">
           <Checkbox checked={!!filters.esconderAoAtualizar} onCheckedChange={(checked) => update("esconderAoAtualizar", !!checked)} className="h-3.5 w-3.5" />
-          <span className="font-semibold text-slate-700">Esconder ao atualizar</span>
+          <span className="font-semibold text-[var(--mg-text-1)]">Esconder ao atualizar</span>
         </div>
         <div className="filter-panel__actions">
           <button type="button" onClick={() => setConfigOpen(true)} className="ios-btn tb-btn tb-btn-blue tb-btn-labeled"><Plus className="w-4 h-4" /> Filtro</button>
