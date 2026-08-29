@@ -21,10 +21,10 @@ export default function FormularioSetor({ initialData, isEditing, onSubmit, onCa
 
 const FL = ({ label, required, error, children, dataField }) => (
   <div data-field={dataField}>
-    <label className="text-[12px] text-slate-500 pl-1 leading-none">
+    <label className="text-[12px] text-[var(--mg-text-2)] pl-1 leading-none">
       {label}{required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
-    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-slate-300'} focus-within:border-emerald-500 transition-colors`}>
+    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-[var(--mg-border)]'} focus-within:border-[var(--mg-accent)] transition-colors`}>
       {children}
     </div>
   </div>
@@ -67,9 +67,9 @@ const FL = ({ label, required, error, children, dataField }) => (
 
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-    <Card className="shadow-sm border-slate-300">
-      <CardHeader className="flex flex-col space-y-1.5 p-6 bg-slate-50 border-b py-1 px-1">
-        <CardTitle className="text-sm font-semibold text-slate-900">
+    <Card className="shadow-sm border-[var(--mg-border)]">
+      <CardHeader className="flex flex-col space-y-1.5 p-6 bg-[var(--mg-gray-fill)] border-b py-1 px-1">
+        <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">
           {isEditing ? "Editar Setor / Fazenda" : "Novo Setor / Fazenda"}
         </CardTitle>
       </CardHeader>
@@ -117,7 +117,7 @@ const FL = ({ label, required, error, children, dataField }) => (
     </FL>
     <div className="flex items-center gap-2 pt-4">
       <Switch checked={formData.ativo} onCheckedChange={(value) => handleChange("ativo", value)} />
-      <label className="text-[12px] text-slate-500">Setor Ativo</label>
+      <label className="text-[12px] text-[var(--mg-text-2)]">Setor Ativo</label>
     </div>
   </div>
 
@@ -127,7 +127,7 @@ const FL = ({ label, required, error, children, dataField }) => (
 
   <div className="flex flex-col-reverse lg:flex-row justify-end gap-1 pt-1 border-t">
     <Button type="button" variant="outline" onClick={onCancel} className="h-7 px-2 text-xs">Cancelar</Button>
-    <Button type="submit" className="h-7 bg-emerald-600 hover:bg-emerald-700 text-white px-3 text-xs">{ isEditing ? "Atualizar" : "Salvar"}</Button>
+    <Button type="submit" className="h-7 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white px-3 text-xs">{ isEditing ? "Atualizar" : "Salvar"}</Button>
   </div>
 </form>
       </CardContent>

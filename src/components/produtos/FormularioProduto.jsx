@@ -19,10 +19,10 @@ const AC_INPUT_CLS = "border-0 shadow-none focus-visible:ring-0 bg-transparent h
 
 const FL = ({ label, required, error, children }) => (
   <div>
-    <label className="text-[12px] text-slate-500 pl-1 leading-none">
+    <label className="text-[12px] text-[var(--mg-text-2)] pl-1 leading-none">
       {label}{required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
-    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-slate-300'} focus-within:border-emerald-500 transition-colors`}>
+    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-[var(--mg-border)]'} focus-within:border-[var(--mg-accent)] transition-colors`}>
       {children}
     </div>
   </div>
@@ -195,9 +195,9 @@ export default function FormularioProduto({ onSubmit, onCancel, initialData, isE
 
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-      <Card className="shadow-sm border-slate-300">
-        <CardHeader className="flex flex-col space-y-1.5 p-6 bg-slate-50 border-b py-1 px-1">
-          <CardTitle className="text-sm font-semibold text-slate-700">
+      <Card className="shadow-sm border-[var(--mg-border)]">
+        <CardHeader className="flex flex-col space-y-1.5 p-6 bg-[var(--mg-gray-fill)] border-b py-1 px-1">
+          <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">
             {isEditing ? 'Editar Produto' : 'Novo Produto'}
           </CardTitle>
         </CardHeader>
@@ -255,7 +255,7 @@ export default function FormularioProduto({ onSubmit, onCancel, initialData, isE
                   placeholder="BUSCAR UNIDADE..."
                   displayField="nome"
                   searchFields={["sigla", "descricao", "nome"]}
-                  renderItem={(u) => <div className="text-xs text-slate-900">{u.sigla} - {u.descricao}</div>}
+                  renderItem={(u) => <div className="text-xs text-[var(--mg-text-1)]">{u.sigla} - {u.descricao}</div>}
                   className="w-full"
                   inputClassName={AC_INPUT_CLS}
                 />
@@ -308,7 +308,7 @@ export default function FormularioProduto({ onSubmit, onCancel, initialData, isE
             {formData.tipo_uso === "Nutrição Animal" && (
               <div className="border border-indigo-200 bg-indigo-50/50 rounded-lg p-1 space-y-0.5">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1">
-                  <span className="font-semibold text-xs text-slate-700">Configuração de Suplementação</span>
+                  <span className="font-semibold text-xs text-[var(--mg-text-1)]">Configuração de Suplementação</span>
                   {!formData.percentual_consumo_pv && formData.nome_produto && (
                     <Button type="button" variant="outline" size="sm" className="h-7 text-xs border-indigo-300 text-indigo-700"
                       onClick={() => {
@@ -349,8 +349,8 @@ export default function FormularioProduto({ onSubmit, onCancel, initialData, isE
             )}
 
             {/* Seção de Unidade de Estoque */}
-            <div className="border border-slate-200 bg-slate-50/50 rounded-lg p-1 space-y-0.5">
-              <span className="font-semibold text-xs text-slate-700">Unidade de Estoque</span>
+            <div className="border border-[var(--mg-border)] bg-[var(--mg-gray-fill)] rounded-lg p-1 space-y-0.5">
+              <span className="font-semibold text-xs text-[var(--mg-text-1)]">Unidade de Estoque</span>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
                 <FL label="Unidade principal de estoque">
                   <Select value={formData.unidade_principal_estoque || "KG"} onValueChange={(value) => handleChange('unidade_principal_estoque', value)}>
@@ -378,14 +378,14 @@ export default function FormularioProduto({ onSubmit, onCancel, initialData, isE
             <div className="flex flex-wrap gap-6 py-1 px-1">
               <div className="flex items-center gap-2">
                 <Checkbox id="prod_ativo" checked={formData.ativo} onCheckedChange={(v) => handleChange("ativo", v)} />
-                <label htmlFor="prod_ativo" className="text-xs text-slate-700 cursor-pointer">Ativo</label>
+                <label htmlFor="prod_ativo" className="text-xs text-[var(--mg-text-1)] cursor-pointer">Ativo</label>
               </div>
             </div>
 
             {/* Botões */}
             <div className="flex flex-col-reverse lg:flex-row justify-end gap-1 pt-1 border-t">
               <Button type="button" variant="outline" onClick={onCancel} size="sm" className="h-7 text-xs px-3">Cancelar</Button>
-              <Button type="submit" size="sm" className="h-7 text-xs px-3 bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button type="submit" size="sm" className="h-7 text-xs px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white">
                 {isEditing ? 'Atualizar' : 'Salvar'}
               </Button>
             </div>

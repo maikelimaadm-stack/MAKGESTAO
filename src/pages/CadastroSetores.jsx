@@ -142,14 +142,14 @@ export default function CadastroSetores() {
 
   return (
     <div className="p-1 md:p-1 space-y-1">
-      {!showForm && <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-slate-200">
+      {!showForm && <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-[var(--mg-border)]">
         <div>
-          <h1 className="font-bold text-slate-800">Cadastro de Setores</h1>
+          <h1 className="font-bold text-[var(--mg-text-1)]">Cadastro de Setores</h1>
           
         </div>
         <div className="flex gap-1 flex-wrap">
           {!showForm &&
-          <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-7 w-7">
+          <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-[var(--mg-border)] bg-white shadow-sm hover:bg-[var(--mg-gray-fill)] hover:text-[var(--mg-text-1)] h-7 w-7">
               <Settings className="w-4 h-4" />
             </Button>
           }
@@ -157,7 +157,7 @@ export default function CadastroSetores() {
 
           
           {!showForm &&
-          <Button onClick={() => {setEditando(null);setShowForm(true);}} size="sm" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs">
+          <Button onClick={() => {setEditando(null);setShowForm(true);}} size="sm" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white h-7 text-xs">
               Adicionar
             </Button>
           }

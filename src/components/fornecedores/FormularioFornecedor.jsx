@@ -13,10 +13,10 @@ import AutocompleteGenerico from "../financeiro/AutocompleteGenerico.jsx";
 
 const FL = ({ label, required, error, children, dataField }) => (
   <div data-field={dataField}>
-    <label className="text-[12px] text-slate-500 pl-1 leading-none">
+    <label className="text-[12px] text-[var(--mg-text-2)] pl-1 leading-none">
       {label}{required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
-    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-slate-300'} focus-within:border-emerald-500 transition-colors`}>
+    <div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-[var(--mg-border)]'} focus-within:border-[var(--mg-accent)] transition-colors`}>
       {children}
     </div>
   </div>
@@ -127,9 +127,9 @@ export default function FormularioFornecedor({ onSubmit, onCancel, initialData =
 
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-      <Card className="shadow-sm border-slate-300">
-        <CardHeader className="flex flex-col space-y-1.5 p-6 bg-slate-50 border-b py-1 px-1">
-          <CardTitle className="text-sm font-semibold text-slate-700">
+      <Card className="shadow-sm border-[var(--mg-border)]">
+        <CardHeader className="flex flex-col space-y-1.5 p-6 bg-[var(--mg-gray-fill)] border-b py-1 px-1">
+          <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">
             {isEditing ? 'Editar Fornecedor/Cliente' : 'Novo Fornecedor/Cliente'}
           </CardTitle>
         </CardHeader>
@@ -240,7 +240,7 @@ export default function FormularioFornecedor({ onSubmit, onCancel, initialData =
             </FL>
 
             <div className="flex flex-wrap gap-6 py-1 px-1 border-t pt-1">
-              <span className="text-[12px] text-slate-500 w-full">Classificação</span>
+              <span className="text-[12px] text-[var(--mg-text-2)] w-full">Classificação</span>
               {["Fornecedor", "Cliente", "Funcionario"].map(tipo => (
                 <div key={tipo} className="flex items-center gap-2">
                   <Checkbox
@@ -253,12 +253,12 @@ export default function FormularioFornecedor({ onSubmit, onCancel, initialData =
                       }));
                     }}
                   />
-                  <label htmlFor={`tipo_${tipo}`} className="text-xs text-slate-700 cursor-pointer">{tipo === 'Funcionario' ? 'Funcionário' : tipo}</label>
+                  <label htmlFor={`tipo_${tipo}`} className="text-xs text-[var(--mg-text-1)] cursor-pointer">{tipo === 'Funcionario' ? 'Funcionário' : tipo}</label>
                 </div>
               ))}
-              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-300">
+              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-[var(--mg-border)]">
                 <Checkbox id="forn_ativo" checked={formData.ativo} onCheckedChange={(v) => setFormData(prev => ({ ...prev, ativo: v }))} />
-                <label htmlFor="forn_ativo" className="text-xs text-slate-700 cursor-pointer">Ativo</label>
+                <label htmlFor="forn_ativo" className="text-xs text-[var(--mg-text-1)] cursor-pointer">Ativo</label>
               </div>
             </div>
 
@@ -266,7 +266,7 @@ export default function FormularioFornecedor({ onSubmit, onCancel, initialData =
               <Button type="button" variant="outline" onClick={onCancel} size="sm" className="h-7 text-xs px-3">
                 Cancelar
               </Button>
-              <Button type="submit" size="sm" className="h-7 text-xs px-3 bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button type="submit" size="sm" className="h-7 text-xs px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white">
                 {isEditing ? 'Atualizar' : 'Salvar'}
               </Button>
             </div>
