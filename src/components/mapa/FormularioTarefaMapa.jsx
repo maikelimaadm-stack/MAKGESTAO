@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Crosshair, MapPin, ImagePlus, X, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import TaskLocationPickerDialog from "./TaskLocationPickerDialog";
+import MultiAreaSelect from "@/components/tarefas/MultiAreaSelect";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { getPermissionDisplayName, getUserDisplayName, isExcludedSystemUser } from "@/lib/userDisplayName";
 import { canAccessPage, normalizePermissionRecord } from "@/lib/permissions";
@@ -165,6 +166,8 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
       observacoes: source.observacoes || "",
       area_id: source.area_id || areaId || "",
       area_nome: source.area_nome || areaNome || "",
+      area_ids: source.area_ids || (source.area_id ? [source.area_id] : areaId ? [areaId] : []),
+      area_nomes: source.area_nomes || (source.area_nome ? [source.area_nome] : areaNome ? [areaNome] : []),
       lote_id: source.lote_id || loteId || "",
       lote_nome: source.lote_nome || loteNome || "",
       ponto_suplementacao_id: source.ponto_suplementacao_id || pontoSuplId || "",
@@ -175,6 +178,16 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    // Se já tem area_ids (múltiplas áreas), resolve o setor pelo primeiro ID
+    if (formData.area_ids?.length > 0) {
+      const primeiraArea = areas.find((item) => item.id === formData.area_ids[0]);
+      if (primeiraArea && setorSelecionadoId !== (primeiraArea.setor_id || "")) {
+        setSetorSelecionadoId(primeiraArea.setor_id || "");
+      }
+      return;
+    }
+
+    // Compatibilidade: resolve a partir de area_id único
     const areaSelecionada = formData.area_id ? areas.find((item) => item.id === formData.area_id) : null;
     const areaPorNome = !areaSelecionada && formData.area_nome ? areas.find((item) => item.nome === formData.area_nome) : null;
     const areaResolvida = areaSelecionada || areaPorNome;
@@ -193,6 +206,8 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
           ...prev,
           area_id: areaResolvida.id || prev.area_id,
           area_nome: areaResolvida.nome || prev.area_nome,
+          area_ids: prev.area_ids?.length ? prev.area_ids : [areaResolvida.id],
+          area_nomes: prev.area_nomes?.length ? prev.area_nomes : [areaResolvida.nome],
           setor_nome: areaResolvida.setor_nome || prev.setor_nome
         }));
       }
@@ -205,7 +220,7 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
         setSetorSelecionadoId(setor.id);
       }
     }
-  }, [formData.area_id, formData.area_nome, formData.setor_nome, areas, setores, setorSelecionadoId]);
+  }, [formData.area_id, formData.area_ids, formData.area_nome, formData.setor_nome, areas, setores, setorSelecionadoId]);
 
   const areasDoSetor = setorSelecionadoId ? getAreasBySetor(setorSelecionadoId) : [];
   const tiposTarefaFiltrados = formData.grupo_atividade_id ?
@@ -278,10 +293,18 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
     return false;
   };
 
-  const handleAreaChange = (selectedAreaId) => {
-    const selectedArea = areas.find((area) => area.id === selectedAreaId);
-    const center = getAreaCenter(selectedArea);
-    setFormData((prev) => ({ ...prev, area_id: selectedAreaId, area_nome: selectedArea?.nome || "", setor_nome: selectedArea?.setor_nome || prev.setor_nome, coordenadas: center || null }));
+  const handleAreasChange = (selectedIds, selectedNomes) => {
+    const firstArea = selectedIds.length > 0 ? areas.find((a) => a.id === selectedIds[0]) : null;
+    const center = selectedIds.length === 1 ? getAreaCenter(firstArea) : null;
+    setFormData((prev) => ({
+      ...prev,
+      area_ids: selectedIds,
+      area_nomes: selectedNomes,
+      area_id: selectedIds[0] || "",
+      area_nome: selectedNomes.join(", ") || "",
+      setor_nome: firstArea?.setor_nome || prev.setor_nome,
+      coordenadas: selectedIds.length === 1 ? (center || prev.coordenadas) : prev.coordenadas
+    }));
   };
 
   const handleGrupoAtividadeChange = (selectedGrupoId) => {
@@ -359,7 +382,7 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-1">
         <FL label="Fazenda">
-          <Select value={setorSelecionadoId || "__sem_setor__"} onValueChange={(value) => { const setor = setores.find((item) => item.id === value); setSetorSelecionadoId(value === "__sem_setor__" ? "" : value); setFormData((prev) => ({ ...prev, setor_nome: value === "__sem_setor__" ? "" : setor?.nome || "", area_id: areaId || loteId ? prev.area_id : "", area_nome: areaId || loteId ? prev.area_nome : "" })); }} disabled={Boolean(areaId || loteId)}>
+          <Select value={setorSelecionadoId || "__sem_setor__"} onValueChange={(value) => { const setor = setores.find((item) => item.id === value); setSetorSelecionadoId(value === "__sem_setor__" ? "" : value); setFormData((prev) => ({ ...prev, setor_nome: value === "__sem_setor__" ? "" : setor?.nome || "", area_id: areaId || loteId ? prev.area_id : "", area_nome: areaId || loteId ? prev.area_nome : "", area_ids: areaId || loteId ? prev.area_ids : [], area_nomes: areaId || loteId ? prev.area_nomes : [] })); }} disabled={Boolean(areaId || loteId)}>
             <SelectTrigger className="h-7 text-xs border-0 shadow-none focus:ring-0 bg-transparent"><SelectValue placeholder="SELECIONE" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="__sem_setor__" className="text-xs">SELECIONE</SelectItem>
@@ -369,11 +392,15 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
         </FL>
 
         {!areaId && !loteId ?
-          <FL label="Local / pasto">
-            <Select value={formData.area_id} onValueChange={handleAreaChange} disabled={!setorSelecionadoId}>
-              <SelectTrigger className="h-7 text-xs border-0 shadow-none focus:ring-0 bg-transparent"><SelectValue placeholder={setorSelecionadoId ? "SELECIONE" : "SELECIONE A FAZENDA"} /></SelectTrigger>
-              <SelectContent>{areasDoSetor.map((area) => <SelectItem key={area.id} value={area.id} className="text-xs">{(area.nome || "").toUpperCase()}</SelectItem>)}</SelectContent>
-            </Select>
+          <FL label="Local / pasto (múltiplas)">
+            <div className="flex items-center h-7">
+              <MultiAreaSelect
+                areas={areasDoSetor}
+                selectedIds={formData.area_ids || []}
+                onChange={handleAreasChange}
+                disabled={!setorSelecionadoId}
+                placeholder={setorSelecionadoId ? "SELECIONE" : "SELECIONE A FAZENDA"} />
+            </div>
           </FL> :
           <FL label="Local / pasto">
             <Input value={(formData.area_nome || formData.lote_nome || "").toUpperCase()} readOnly className="h-7 text-xs bg-slate-50 uppercase border-0 shadow-none focus-visible:ring-0" />
@@ -456,7 +483,7 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
         <div className="space-y-1 lg:col-span-2">
           <label className="text-[12px] text-slate-500 pl-1 leading-none">Local da tarefa no mapa</label>
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
-            {(formData.area_nome || formData.lote_nome) && <div className="text-xs text-slate-600"><span className="font-medium">VINCULADO A:</span> {formData.area_nome || formData.lote_nome}</div>}
+            {(formData.area_nomes?.length > 0 || formData.area_nome || formData.lote_nome) && <div className="text-xs text-slate-600"><span className="font-medium">VINCULADO A:</span> {formData.area_nomes?.length > 0 ? formData.area_nomes.join(", ").toUpperCase() : (formData.area_nome || formData.lote_nome)}</div>}
             {formData.coordenadas ? <div className="text-xs text-slate-600 flex items-center gap-2"><MapPin className="w-3.5 h-3.5" />{formData.coordenadas.lat.toFixed(6)}, {formData.coordenadas.lng.toFixed(6)}</div> : <div className="text-xs text-slate-500">MARQUE O PONTO EXATO NO MAPA PARA FACILITAR A EXECUÇÃO.</div>}
             <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => { if (onRequestSelectLocation) { onRequestSelectLocation(formData); return; } setShowLocationPicker(true); }}>
               <Crosshair className="w-3.5 h-3.5" />
@@ -528,6 +555,8 @@ export default function FormularioTarefaMapa({ tarefa, areaId, areaNome, loteId,
             coordenadas: coords,
             area_id: area?.id || prev.area_id,
             area_nome: area?.nome || prev.area_nome,
+            area_ids: area?.id ? [area.id] : prev.area_ids,
+            area_nomes: area?.nome ? [area.nome] : prev.area_nomes,
             setor_nome: area?.setor_nome || prev.setor_nome
           }));
         }} />

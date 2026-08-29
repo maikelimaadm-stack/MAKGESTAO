@@ -207,7 +207,7 @@ export default function TabelaLancamentosTarefas({
 
   const setores = useMemo(() => [...new Set(tarefas.map((item) => item.setor_nome).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
   const tiposTarefa = useMemo(() => [...new Set(tarefas.map((item) => item.tipo_tarefa_nome || item.tipo).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
-  const areas = useMemo(() => [...new Set(tarefas.map((item) => item.area_nome).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
+  const areas = useMemo(() => [...new Set(tarefas.flatMap((item) => item.area_nomes?.length ? item.area_nomes : (item.area_nome ? [item.area_nome] : [])).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
   const titulos = useMemo(() => [...new Set(tarefas.map((item) => item.titulo).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
   const descricoes = useMemo(() => [...new Set(tarefas.map((item) => item.descricao).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
   const responsaveis = useMemo(() => [...new Set(tarefas.map((item) => item.responsavel).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" })), [tarefas]);
@@ -248,7 +248,7 @@ export default function TabelaLancamentosTarefas({
       const matchPrioridade = incluiValor(filtroPrioridade, prioridade);
       const matchGrupo = incluiValor(filtroGrupo, tarefa.grupo_atividade_nome);
       const matchTipoTarefa = incluiValor(filtroTipoTarefa, tarefa.tipo_tarefa_nome || tarefa.tipo);
-      const matchArea = incluiValor(filtroArea, tarefa.area_nome);
+      const matchArea = filtroArea.length === 0 || (tarefa.area_nomes?.length > 0 ? tarefa.area_nomes.some((nome) => filtroArea.includes(String(nome || ""))) : filtroArea.includes(String(tarefa.area_nome || "")));
       const matchSetor = incluiValor(filtroSetor, tarefa.setor_nome);
       const matchTitulo = incluiValor(filtroTitulo, tarefa.titulo);
       const matchDescricao = incluiValor(filtroDescricao, tarefa.descricao);
@@ -339,7 +339,7 @@ export default function TabelaLancamentosTarefas({
     if (colunaId === "tipo") return tarefa.tipo || "-";
     if (colunaId === "tipo_tarefa_nome") return tarefa.tipo_tarefa_nome || tarefa.tipo || "-";
     if (colunaId === "setor_nome") return tarefa.setor_nome || "-";
-    if (colunaId === "area_nome") return tarefa.area_nome || "-";
+    if (colunaId === "area_nome") return (tarefa.area_nomes?.length > 0 ? tarefa.area_nomes.join(", ") : tarefa.area_nome) || "-";
     if (colunaId === "responsavel") return tarefa.responsavel || "-";
     if (colunaId === "data_pedido") return formatarData(tarefa.data_pedido);
     if (colunaId === "data_prevista") return formatarData(tarefa.data_prevista);
