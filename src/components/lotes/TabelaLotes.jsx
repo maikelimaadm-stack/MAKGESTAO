@@ -566,7 +566,7 @@ export default function TabelaLotes({
   }, [colunasOrdenadas, colunasTodasOrdenadas, lotesOrdenados, relatedOptions, selectedItems, onVisibleDataChange, agregacoes, agregacoesTodas, columnWidths]);
 
   const renderFilterControl = (colunaId) => {
-    const buttonClass = `h-4 w-4 min-w-4 p-0 ${hasActiveFilter(colunaId) ? "text-emerald-700" : "text-slate-500 hover:text-slate-700"}`;
+    const buttonClass = `h-4 w-4 min-w-4 p-0 ${hasActiveFilter(colunaId) ? "text-[var(--mg-accent)]" : "text-[var(--mg-text-3)] hover:text-[var(--mg-text-1)]"}`;
     const coluna = colunasDisponiveis.find((c) => c.id === colunaId);
     const columnLabel = coluna?.label || colunaId;
     const options = columnOptions[colunaId] || [];
@@ -691,8 +691,8 @@ export default function TabelaLotes({
           <div className="relative h-full overflow-hidden flex flex-col">
             <div ref={headerScrollRef} className="flex-none w-full overflow-hidden bg-white" style={{ paddingRight: scrollbarWidth }}>
               <Table style={{ width: totalTableWidth, minWidth: totalTableWidth }} className="border-separate border-spacing-0 table-fixed select-none">
-                <TableHeader className="bg-white shadow-[0_1px_0_0_#d1d5db]">
-                  <TableRow className="bg-white">
+                <TableHeader className="bg-[var(--mg-gray-fill)] shadow-[0_1px_0_0_var(--mg-border)]">
+                  <TableRow className="bg-[var(--mg-gray-fill)]">
                     {colunasOrdenadas.map((coluna, columnIndex) => {
                       const width = columnPixelWidths[coluna.id] || 160;
                       const isFrozen = columnIndex < frozenColumnCount;
@@ -703,7 +703,7 @@ export default function TabelaLotes({
                         <TableHead
                           key={coluna.id}
                           style={{ width, minWidth: width, maxWidth: width, left: isFrozen ? frozenOffsets[coluna.id] : undefined }}
-                          className={`group ${isFrozen ? "sticky z-40" : "relative"} align-middle text-gray-900 px-2 text-xs font-medium border-r border-b border-gray-300 bg-white whitespace-nowrap h-7 py-0 select-none cursor-pointer ${getColumnAlignClass(coluna)}`}
+                          className={`group ${isFrozen ? "sticky z-40" : "relative"} align-middle text-[var(--mg-text-2)] px-2 text-xs font-bold uppercase tracking-wide border-r border-b border-[var(--mg-border)] bg-[var(--mg-gray-fill)] whitespace-nowrap h-8 py-0 select-none cursor-pointer ${getColumnAlignClass(coluna)}`}
                           onDoubleClick={() => handleSort(coluna.id)}>
 
                           <div className="block w-full h-full leading-7 whitespace-nowrap overflow-hidden text-ellipsis">
@@ -715,7 +715,7 @@ export default function TabelaLotes({
                               {filterControl}
                               <button
                               type="button"
-                              className={`h-5 w-4 flex items-center justify-center rounded cursor-col-resize ${isResizing ? 'text-emerald-700 bg-emerald-100' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'}`}
+                              className={`h-5 w-4 flex items-center justify-center rounded cursor-col-resize ${isResizing ? 'text-[var(--mg-accent)] bg-[var(--mg-accent-light-bg)]' : 'text-[var(--mg-text-2)] hover:text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)]'}`}
                               onMouseDown={(e) => startDragResize(e, coluna)}
                               onTouchStart={(e) => startDragResize(e, coluna)}
                               onClick={(e) => e.stopPropagation()}
@@ -747,7 +747,7 @@ export default function TabelaLotes({
                 <TableBody>
                   {lotesOrdenados.length === 0 ?
                   <TableRow>
-                      <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-slate-400 border border-gray-300">
+                      <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-[var(--mg-text-3)] border border-[var(--mg-border)]">
                         Nenhum lote encontrado
                       </TableCell>
                     </TableRow> :
@@ -755,7 +755,7 @@ export default function TabelaLotes({
                   lotesOrdenados.map((lote, index) =>
                   <TableRow
                     key={lote.id}
-                    className={`${selectedItems.includes(lote.id) ? "bg-green-500 hover:bg-green-600 text-white" : index % 2 === 0 ? "bg-gray-100 hover:bg-gray-200" : "bg-white hover:bg-gray-100"} transition-colors border-b cursor-pointer select-none`}
+                    className={`${selectedItems.includes(lote.id) ? "bg-[var(--mg-accent-light-bg)] hover:bg-[var(--mg-accent-glow)]" : index % 2 === 0 ? "bg-[var(--mg-bg-page)] hover:bg-[var(--mg-accent-light-bg)]" : "bg-white hover:bg-[var(--mg-accent-light-bg)]"} transition-colors border-b cursor-pointer select-none`}
                     onClick={(event) => handleRowSelect(lote, event)}
                     onDoubleClick={() => selectedItems.length <= 1 && onEdit(lote)}
                     onTouchEnd={(event) => handleRowTouch(lote, event)}>
@@ -768,7 +768,7 @@ export default function TabelaLotes({
                         <TableCell
                           key={`${lote.id}-${coluna.id}`}
                           style={{ width, minWidth: width, maxWidth: width, left: isFrozen ? frozenOffsets[coluna.id] : undefined }}
-                          className={`py-1 text-xs align-middle border-r border-b whitespace-nowrap overflow-hidden select-none px-2 ${isFrozen ? "sticky z-20" : ""} ${getColumnAlignClass(coluna)} ${selectedItems.includes(lote.id) ? "bg-green-500 text-white border-green-600" : index % 2 === 0 ? "bg-gray-100 text-gray-700 border-gray-300" : "bg-white text-gray-700 border-gray-300"}`}
+                          className={`py-1 text-xs align-middle border-r border-b border-[var(--mg-border)] whitespace-nowrap overflow-hidden select-none px-2 ${isFrozen ? "sticky z-20" : ""} ${getColumnAlignClass(coluna)} ${selectedItems.includes(lote.id) ? "bg-[var(--mg-accent-light-bg)] text-[var(--mg-text-1)] border-[var(--mg-border)]" : index % 2 === 0 ? "bg-[var(--mg-bg-page)] text-[var(--mg-text-1)] border-[var(--mg-border)]" : "bg-white text-[var(--mg-text-1)] border-[var(--mg-border)]"}`}
                           title={String(renderCell(lote, coluna.id) ?? "")}>
                           
                               {renderCell(lote, coluna.id)}
@@ -779,7 +779,7 @@ export default function TabelaLotes({
                   )
                   }
                   {Object.keys(agregacoes).length > 0 &&
-                  <TableRow className="sticky bottom-0 z-30 bg-slate-200 font-medium shadow-[0_-1px_0_0_#d1d5db]">
+                  <TableRow className="sticky bottom-0 z-30 bg-[var(--mg-gray-fill)] font-medium shadow-[0_-1px_0_0_var(--mg-border)]">
                       {colunasOrdenadas.map((coluna, columnIndex) => {
                       const width = Math.max(columnWidths[coluna.id] || coluna.width || 160, getColumnMinWidth(coluna));
                       const isFrozen = columnIndex < frozenColumnCount;
@@ -788,7 +788,7 @@ export default function TabelaLotes({
                         <TableCell
                           key={`total-${coluna.id}`}
                           style={{ width, minWidth: width, maxWidth: width, left: isFrozen ? frozenOffsets[coluna.id] : undefined }}
-                          className={`h-5 px-2 py-0 text-[11px] leading-5 align-middle border-r border-b border-gray-300 whitespace-nowrap overflow-hidden text-ellipsis select-none bg-slate-200 text-slate-900 ${isFrozen ? "sticky z-40" : ""} ${getColumnAlignClass(coluna)}`}>
+                          className={`h-5 px-2 py-0 text-[11px] leading-5 align-middle border-r border-b border-[var(--mg-border)] whitespace-nowrap overflow-hidden text-ellipsis select-none bg-[var(--mg-gray-fill)] text-[var(--mg-text-1)] font-bold ${isFrozen ? "sticky z-40" : ""} ${getColumnAlignClass(coluna)}`}>
                             {agregacoes[coluna.id] !== undefined ? formatTotalValue(agregacoes[coluna.id], coluna) : ""}
                           </TableCell>);
                     })}

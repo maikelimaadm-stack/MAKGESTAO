@@ -60,8 +60,8 @@ const DEFAULT_FILTER_CONFIG = {
   filterFolders: DEFAULT_FOLDERS,
   fieldGroups: DEFAULT_FIELD_GROUPS
 };
-const inputClass = "h-6 rounded-none border-slate-300 px-1.5 text-xs shadow-none";
-const selectClass = "h-6 rounded-none border-slate-300 px-1.5 text-xs shadow-none";
+const inputClass = "filter-panel__field-input";
+const selectClass = "filter-panel__field-input";
 
 export default function SankhyaFilterPanel({ open, filters, onChange, onApply, onClear, lotes = [], areas = [] }) {
   const [filterConfigs, setFilterConfigs] = useState(() => {
@@ -243,9 +243,9 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
     if (!field) return null;
 
     return (
-      <div key={field.id} className="rounded-sm border border-slate-200 bg-white p-1.5 shadow-sm hover:border-primary/40">
+      <div key={field.id} className="filter-panel__field">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="min-w-0 truncate font-semibold text-slate-700">{field.label}</label>
+          <label className="filter-panel__field-label">{field.label}</label>
         </div>
         {field.type === "codeName" && renderCodeName("lote", "lotes", "Lote")}
         {field.type === "codeNameDynamic" && renderCodeName(field.id.replace("_codigo_nome", ""), field.source, field.label)}
@@ -265,7 +265,7 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
 
   if (configOpen) {
     return (
-      <section className="w-full h-full min-h-0 shrink-0 border-r border-slate-300 bg-white overflow-hidden">
+      <section className="filter-panel cadastro-emp-scope">
         <SankhyaFilterConfigDialog
           inline
           open={configOpen}
@@ -296,19 +296,19 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
   }
 
   return (
-    <aside className="w-[310px] shrink-0 border-r border-slate-300 bg-white text-xs h-full min-h-0 overflow-hidden flex flex-col">
-      <div className="border-slate-300 p-1 space-y-1 bg-white shrink-0 border">
-        <div className="flex items-center gap-2 h-6">
-          <Checkbox checked={!!filters.esconderAoAtualizar} onCheckedChange={(checked) => update("esconderAoAtualizar", !!checked)} className="h-3.5 w-3.5 rounded-none" />
+    <aside className="filter-panel cadastro-emp-scope">
+      <div className="filter-panel__header">
+        <div className="filter-panel__header-row">
+          <Checkbox checked={!!filters.esconderAoAtualizar} onCheckedChange={(checked) => update("esconderAoAtualizar", !!checked)} className="h-3.5 w-3.5" />
           <span className="font-semibold text-slate-700">Esconder ao atualizar</span>
         </div>
-        <div className="grid grid-cols-[88px_1fr] gap-1">
-          <Button type="button" onClick={() => setConfigOpen(true)} className="h-7 rounded-none bg-primary hover:bg-primary/90 text-white text-xs px-1"><Plus className="w-4 h-4" /> Filtro</Button>
-          <Button type="button" onClick={applyFilters} className="h-7 rounded-none bg-slate-700 hover:bg-slate-800 text-white text-xs">Aplicar</Button>
+        <div className="filter-panel__actions">
+          <button type="button" onClick={() => setConfigOpen(true)} className="ios-btn tb-btn tb-btn-blue tb-btn-labeled"><Plus className="w-4 h-4" /> Filtro</button>
+          <button type="button" onClick={applyFilters} className="ios-btn tb-btn tb-btn-gray tb-btn-labeled">Aplicar</button>
         </div>
-        <div className="border-t border-slate-200 pt-1">
+        <div className="filter-panel__select-row">
           <Select value={activeConfigId || "padrao"} onValueChange={setActiveConfigId}>
-            <SelectTrigger className="h-7 rounded-none border-slate-300 px-2 text-xs shadow-none">
+            <SelectTrigger className="filter-panel__field-input">
               <SelectValue placeholder="FILTROS PERSONALIZADOS" />
             </SelectTrigger>
             <SelectContent>
@@ -322,22 +322,22 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
         </div>
       </div>
 
-      <div className="h-8 px-1.5 flex items-center justify-between border-b border-slate-300 bg-slate-50 font-semibold text-slate-700 shrink-0">
+      <div className="filter-panel__section-header">
         <span>Filtros rápidos</span>
-        <button type="button" onClick={clearAll} className="relative text-slate-500 hover:text-primary"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-white text-[9px] leading-3">×</span></button>
+        <button type="button" onClick={clearAll} className="filter-panel__clear-btn"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-white text-[9px] leading-3">×</span></button>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div className="filter-panel__body">
         {groupedFolders.map((folder) =>
-        <div key={folder.id} className="border-b border-slate-300">
-            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="w-full h-8 px-2 flex items-center justify-between gap-1 bg-slate-50 font-semibold text-slate-700 text-left hover:bg-primary/5">
+        <div key={folder.id} className="filter-panel__folder">
+            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="filter-panel__folder-trigger">
               <span className="flex min-w-0 items-center gap-1">
                 {openGroups[folder.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                 <span className="truncate">{folder.name}</span>
               </span>
-              <span className="rounded-sm bg-white px-1.5 py-0.5 text-[10px] text-slate-500 border border-slate-200">{folder.fields.length}</span>
+              <span className="filter-panel__field-count">{folder.fields.length}</span>
             </button>
-            {openGroups[folder.id] && <div className="p-1.5 space-y-1.5">{folder.fields.map(renderField)}</div>}
+            {openGroups[folder.id] && <div className="filter-panel__folder-content">{folder.fields.map(renderField)}</div>}
           </div>
         )}
 

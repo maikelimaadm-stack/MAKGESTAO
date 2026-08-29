@@ -371,7 +371,7 @@ export default function CadastroLotes() {
 
 
   return (
-    <div className="cadastro-lotes-rounded-scope -mt-px p-0 md:p-0 bg-[var(--background-page)] h-[calc(100dvh-var(--app-content-offset,91px))] overflow-hidden">
+    <div className="cadastro-emp-scope -mt-px p-0 md:p-0 bg-[var(--background-page)] h-[calc(100dvh-var(--app-content-offset,44px))] overflow-hidden">
       {showConfigCampos && (
         <section className="w-full h-full bg-white overflow-hidden">
           <ConfiguracaoCamposLoteDialog
