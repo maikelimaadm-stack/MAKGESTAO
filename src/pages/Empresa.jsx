@@ -102,10 +102,10 @@ export default function Empresa() {
         <>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Empresas</h1>
-              <p className="text-xs text-slate-600">Gerenciar empresas</p>
+              <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Empresas</h1>
+              <p className="text-xs text-[var(--mg-text-2)]">Gerenciar empresas</p>
             </div>
-            <Button onClick={() => { setEditingEmpresa(null); setShowForm(true); }} size="sm" className="h-8 gap-1 text-xs bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={() => { setEditingEmpresa(null); setShowForm(true); }} size="sm" className="h-8 gap-1 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
               <Plus className="w-3.5 h-3.5" />
               Nova Empresa
             </Button>
