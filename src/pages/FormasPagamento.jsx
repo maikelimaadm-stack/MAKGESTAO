@@ -102,15 +102,15 @@ export default function FormasPagamento() {
   return (
     <div className="p-1 md:p-1 space-y-1">
       {!showForm && (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-slate-200">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-[var(--mg-bg-card)] rounded px-1 py-1 shadow-sm border-b border-[var(--mg-border)]">
           <div>
-            <h1 className="font-bold text-slate-800">Formas de Pagamento</h1>
+            <h1 className="font-bold text-[var(--mg-text-1)]">Formas de Pagamento</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-7 w-7">
               <Settings className="w-4 h-4" />
             </Button>
-            <Button onClick={() => { setShowForm(true); setEditingItem(null); }} size="sm" className="bg-lime-900 text-primary-foreground px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-emerald-600">
+            <Button onClick={() => { setShowForm(true); setEditingItem(null); }} size="sm" className="bg-[var(--mg-accent)] text-primary-foreground px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-[var(--mg-accent-dark)]">
               Adicionar
             </Button>
           </div>
