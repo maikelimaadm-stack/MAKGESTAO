@@ -76,25 +76,31 @@ button:focus-visible {
 
 @layer base {
   :root {
+    /* ModeloBase1 ERP Design Tokens */
+    --mg-accent: #2899f5;
+    --mg-accent-light: #60a5fa;
+    --mg-accent-dark: #1e7fc7;
+    --background-page: #f8fafc;
+    --border-color: #e2e8f0;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 207 91% 56%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 207 91% 56%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --ring: 207 91% 56%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -111,25 +117,29 @@ button:focus-visible {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
+    --mg-accent: #2899f5;
+    --mg-accent-light: #60a5fa;
+    --background-page: #0f172a;
+    --border-color: #1e293b;
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 207 91% 56%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 207 91% 56%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --ring: 207 91% 56%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -228,4 +238,294 @@ input[type="number"] {
   [data-radix-select-trigger] {
     font-size: 16px !important;
   }
+}
+
+/* ========================================
+   ModeloBase1 ERP Design System
+   ======================================== */
+
+/* ERP Shell Layout */
+.erp-shell {
+  --erp-sidebar-width: 240px;
+  --erp-sidebar-collapsed-width: 0px;
+  --erp-header-height: 40px;
+}
+
+.erp-shell-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.erp-shell-trigger {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.erp-shell-logout {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* ERP Sidebar */
+.erp-sidebar {
+  width: var(--erp-sidebar-width);
+  transition: width 0.2s ease, margin 0.2s ease;
+}
+
+.erp-sidebar-brand {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.erp-sidebar-logo {
+  background: linear-gradient(135deg, var(--mg-accent, #2899f5), var(--mg-accent-light, #60a5fa));
+  box-shadow: 0 1px 3px rgba(40, 153, 245, 0.3);
+}
+
+.erp-sidebar-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.erp-sidebar-group-trigger {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.erp-sidebar-group-trigger:hover {
+  background-color: rgba(40, 153, 245, 0.06);
+}
+
+.erp-sidebar-submenu {
+  overflow: hidden;
+}
+
+.erp-sidebar-sub-link {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.erp-sidebar-sub-link:hover {
+  background-color: rgba(40, 153, 245, 0.06);
+}
+
+.erp-sidebar-sub-link[data-active="true"],
+.erp-sidebar-sub-link.active {
+  background-color: rgba(40, 153, 245, 0.1);
+  color: var(--mg-accent, #2899f5);
+  font-weight: 600;
+}
+
+/* ERP Breadcrumbs */
+.erp-shell-breadcrumbs {
+  padding: 8px 16px;
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.erp-shell-breadcrumb-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.erp-shell-breadcrumb-pill--page-title {
+  background-color: rgba(40, 153, 245, 0.1);
+  color: var(--mg-accent, #2899f5);
+}
+
+.erp-shell-breadcrumb-separator {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* ERP Cards (mg-emp-card) */
+.erp-card,
+.mg-emp-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.erp-card:hover,
+.mg-emp-card:hover {
+  border-color: var(--mg-accent, #2899f5);
+  box-shadow: 0 2px 8px rgba(40, 153, 245, 0.12);
+}
+
+.mg-emp-card--selected {
+  border-color: var(--mg-accent, #2899f5);
+  box-shadow: 0 0 0 2px rgba(40, 153, 245, 0.2);
+}
+
+.mg-emp-card__select-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: var(--mg-accent, #2899f5);
+  color: white;
+}
+
+.mg-emp-card__header {
+  margin-bottom: 8px;
+}
+
+.mg-emp-card__avatar {
+  background: linear-gradient(135deg, var(--mg-accent, #2899f5), var(--mg-accent-light, #60a5fa));
+}
+
+.mg-emp-card__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mg-emp-card__code {
+  font-weight: 600;
+  color: #475569;
+}
+
+.mg-emp-card__sep {
+  color: #cbd5e1;
+}
+
+.mg-emp-card__name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.mg-emp-card__fields {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mg-emp-card__fields--per-row-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mg-emp-card__fields--per-row-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.mg-emp-card__field-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.mg-emp-card__field-value {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ERP Cards Virtual Grid */
+.mg-cards-virtual-shell {
+  position: relative;
+  width: 100%;
+}
+
+.mg-cards-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.mg-cards-grid--cards-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mg-cards-grid--cards-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.mg-cards-grid--cards-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* ERP Info Pill */
+.erp-info-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* ERP Operation Badge */
+.erp-operation-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.erp-operation-badge--create {
+  background-color: rgba(40, 153, 245, 0.1);
+  color: var(--mg-accent, #2899f5);
+}
+
+.erp-operation-badge--edit {
+  background-color: rgba(234, 179, 8, 0.1);
+  color: #a16207;
+}
+
+.erp-operation-badge--view {
+  background-color: rgba(100, 116, 139, 0.1);
+  color: #475569;
+}
+
+/* ERP Empty State */
+.erp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* ERP Loading State */
+.erp-loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: #94a3b8;
+}
+
+/* Scrollbar refinada para sidebar */
+.erp-sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.erp-sidebar-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.erp-sidebar-content::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
 }
