@@ -143,12 +143,12 @@ export default function ControlePecuaria() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Controle de Pecuária</h1>
-          <p className="text-xs text-slate-600">Visão completa do rebanho e operações</p>
+          <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Controle de Pecuária</h1>
+          <p className="text-xs text-[var(--mg-text-2)]">Visão completa do rebanho e operações</p>
         </div>
         <div className="flex gap-2">
           <Link to={createPageUrl("MapaGeral")}>
-            <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
+            <Button size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
               Ver no Mapa
             </Button>
           </Link>
@@ -162,79 +162,79 @@ export default function ControlePecuaria() {
 
       {/* Cards de Resumo */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Total Cabeças</div>
-                <div className="text-xl font-bold text-slate-900">{stats.totalCabecas.toLocaleString()}</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Total Cabeças</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{stats.totalCabecas.toLocaleString()}</div>
               </div>
-              <Users className="w-6 h-6 text-slate-400" />
+              <Users className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Lotes Ativos</div>
-                <div className="text-xl font-bold text-slate-900">{stats.totalLotes}</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Lotes Ativos</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{stats.totalLotes}</div>
               </div>
-              <Package className="w-6 h-6 text-slate-400" />
+              <Package className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Áreas Ocupadas</div>
-                <div className="text-xl font-bold text-slate-900">{stats.areasOcupadas}/{stats.totalAreas}</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Áreas Ocupadas</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{stats.areasOcupadas}/{stats.totalAreas}</div>
               </div>
-              <MapPin className="w-6 h-6 text-slate-400" />
+              <MapPin className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Movimentações</div>
-                <div className="text-xl font-bold text-slate-900">{stats.movRecentes}</div>
-                <div className="text-[9px] text-slate-400">últimos {periodoMov} dias</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Movimentações</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{stats.movRecentes}</div>
+                <div className="text-[9px] text-[var(--mg-text-3)]">últimos {periodoMov} dias</div>
               </div>
-              <ArrowRightLeft className="w-6 h-6 text-slate-400" />
+              <ArrowRightLeft className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Tarefas Pendentes</div>
-                <div className="text-xl font-bold text-slate-900">{stats.tarefasPendentes}</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Tarefas Pendentes</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{stats.tarefasPendentes}</div>
                 {stats.tarefasUrgentes > 0 && (
-                  <div className="text-[9px] text-slate-600">{stats.tarefasUrgentes} urgente(s)</div>
+                  <div className="text-[9px] text-[var(--mg-text-2)]">{stats.tarefasUrgentes} urgente(s)</div>
                 )}
               </div>
-              <Clock className="w-6 h-6 text-slate-400" />
+              <Clock className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-200">
+        <Card className="shadow-sm border-[var(--mg-border)]">
           <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] text-slate-500 uppercase">Suplementação</div>
-                <div className="text-xl font-bold text-slate-900">{(stats.totalSuplKg / 1000).toFixed(1)}t</div>
-                <div className="text-[9px] text-slate-400">últimos 30 dias</div>
+                <div className="text-[10px] text-[var(--mg-text-3)] uppercase">Suplementação</div>
+                <div className="text-xl font-bold text-[var(--mg-text-1)]">{(stats.totalSuplKg / 1000).toFixed(1)}t</div>
+                <div className="text-[9px] text-[var(--mg-text-3)]">últimos 30 dias</div>
               </div>
-              <Scale className="w-6 h-6 text-slate-400" />
+              <Scale className="w-6 h-6 text-[var(--mg-text-3)]" />
             </div>
           </CardContent>
         </Card>
@@ -253,7 +253,7 @@ export default function ControlePecuaria() {
           {/* Filtros */}
           <div className="flex flex-wrap gap-2">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--mg-text-3)]" />
               <Input
                 placeholder="Buscar lote..."
                 value={searchTerm}
@@ -288,7 +288,7 @@ export default function ControlePecuaria() {
           {/* Lista de Lotes */}
           <div className="grid gap-2">
             {lotesFiltrados.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-[var(--mg-text-3)]">
                 <Users className="w-10 h-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">Nenhum lote encontrado</p>
               </div>
@@ -299,10 +299,10 @@ export default function ControlePecuaria() {
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-sm text-slate-900">{lote.nome}</span>
+                          <span className="font-semibold text-sm text-[var(--mg-text-1)]">{lote.nome}</span>
                           <Badge variant="outline" className="text-[10px]">{lote.categoria}</Badge>
                         </div>
-                        <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                        <div className="flex flex-wrap gap-3 text-xs text-[var(--mg-text-3)]">
                           <span className="flex items-center gap-1">
                             <Users className="w-3 h-3" />
                             {lote.quantidade_cabecas} cab
@@ -359,16 +359,16 @@ export default function ControlePecuaria() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <Badge variant="outline" className="text-[10px]">{mov.tipo}</Badge>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-[var(--mg-text-3)]">
                           {format(new Date(mov.data_movimentacao), 'dd/MM/yyyy HH:mm')}
                         </span>
                       </div>
-                      <div className="text-sm text-slate-700">
+                      <div className="text-sm text-[var(--mg-text-1)]">
                         {mov.lote && <span className="font-medium">{mov.lote}</span>}
                         {mov.quantidade_animais && <span> • {mov.quantidade_animais} animais</span>}
                       </div>
                       {mov.area_origem_nome && mov.area_destino_nome && (
-                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                        <div className="text-xs text-[var(--mg-text-3)] flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
                           {mov.area_origem_nome} → {mov.area_destino_nome}
                         </div>
@@ -383,11 +383,11 @@ export default function ControlePecuaria() {
 
         <TabsContent value="operacoes" className="space-y-3 mt-3">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-[var(--mg-text-2)]">
               {operacoes.filter(o => o.status === 'Em Andamento').length} em andamento • {operacoes.filter(o => o.status === 'Planejada').length} planejada(s)
             </div>
             <Link to={createPageUrl("OperacoesAgricolas")}>
-              <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
+              <Button size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
                 Ver Todas
               </Button>
             </Link>
@@ -395,23 +395,23 @@ export default function ControlePecuaria() {
 
           <div className="space-y-2">
             {operacoes.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-[var(--mg-text-3)]">
                 <Tractor className="w-10 h-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">Nenhuma operação registrada</p>
               </div>
             ) : (
               operacoes.slice(0, 20).map(op => (
-                <Card key={op.id} className="shadow-sm border-slate-200">
+                <Card key={op.id} className="shadow-sm border-[var(--mg-border)]">
                   <CardContent className="p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm text-slate-900">{op.tipo_operacao}</span>
-                          <Badge className="text-[10px] bg-slate-100 text-slate-700">
+                          <span className="font-medium text-sm text-[var(--mg-text-1)]">{op.tipo_operacao}</span>
+                          <Badge className="text-[10px] bg-[var(--mg-gray-fill)] text-[var(--mg-text-1)]">
                             {op.status}
                           </Badge>
                         </div>
-                        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                        <div className="flex flex-wrap gap-2 text-xs text-[var(--mg-text-3)]">
                           {op.area_nome && (
                             <span className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />
@@ -434,9 +434,9 @@ export default function ControlePecuaria() {
                             <span>{op.hectares_trabalhados} ha</span>
                           )}
                           {op.custo_total && (
-                            <span className="font-medium text-slate-700">
-                              R$ {op.custo_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </span>
+                            <span className="font-medium text-[var(--mg-text-1)]">
+                               R$ {op.custo_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                             </span>
                           )}
                         </div>
                       </div>
@@ -450,11 +450,11 @@ export default function ControlePecuaria() {
 
         <TabsContent value="tarefas" className="space-y-3 mt-3">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-[var(--mg-text-2)]">
               {stats.tarefasPendentes} pendente(s) • {stats.tarefasUrgentes} urgente(s)
             </div>
             <Link to={createPageUrl("MapaGeral")}>
-              <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
+              <Button size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
                 Gerenciar no Mapa
               </Button>
             </Link>
@@ -467,12 +467,12 @@ export default function ControlePecuaria() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm text-slate-900">{tarefa.titulo}</span>
-                        <Badge className="text-[10px] bg-slate-100 text-slate-700">
+                        <span className="font-medium text-sm text-[var(--mg-text-1)]">{tarefa.titulo}</span>
+                        <Badge className="text-[10px] bg-[var(--mg-gray-fill)] text-[var(--mg-text-1)]">
                           {tarefa.prioridade}
                         </Badge>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                      <div className="flex flex-wrap gap-2 text-xs text-[var(--mg-text-3)]">
                         <Badge variant="outline" className="text-[10px]">{tarefa.tipo}</Badge>
                         {tarefa.data_prevista && (
                           <span className="flex items-center gap-1">

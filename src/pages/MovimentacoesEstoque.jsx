@@ -785,31 +785,31 @@ export default function MovimentacoesEstoque() {
     <div className="p-1 md:p-1 space-y-1">
       {!showForm && !showTransferenciaLote &&
       <>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-slate-200">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-[var(--mg-border)]">
             <div>
-              <h1 className="font-bold text-slate-800">Movimentações de Estoque</h1>
+              <h1 className="font-bold text-[var(--mg-text-1)]">Movimentações de Estoque</h1>
             </div>
             <div className="flex gap-1 flex-wrap">
-              <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="h-7 w-7 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
+              <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="h-7 w-7 border border-[var(--mg-border)] bg-white shadow-sm hover:bg-[var(--mg-gray-fill)] hover:text-[var(--mg-text-1)]">
                 <Settings className="w-4 h-4" />
               </Button>
-              
 
-            
+
+
               <Button onClick={handleExport} variant="outline" size="sm" className="h-7 text-xs">
                 Exportar
               </Button>
-              <Button onClick={() => {setShowTransferenciaLote(true);setShowForm(false);setEditingMovimentacao(null);}} size="sm" variant="outline" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs">
+              <Button onClick={() => {setShowTransferenciaLote(true);setShowForm(false);setEditingMovimentacao(null);}} size="sm" variant="outline" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white h-7 text-xs">
                 Transferência Lote
               </Button>
-              <Button onClick={() => {setEditingMovimentacao(null);setShowForm(true);setShowTransferenciaLote(false);}} size="sm" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs">
+              <Button onClick={() => {setEditingMovimentacao(null);setShowForm(true);setShowTransferenciaLote(false);}} size="sm" className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow rounded-md px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white h-7 text-xs">
                 Adicionar
               </Button>
             </div>
           </div>
 
           <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-            <TabsList className="h-7 bg-slate-50 border">
+            <TabsList className="h-7 bg-[var(--mg-gray-fill)] border border-[var(--mg-border)]">
               <TabsTrigger value="principais" className="text-[11px] h-5 px-2">Principais ({movPrincipais.length})</TabsTrigger>
               <TabsTrigger value="movimentacoes" className="text-[11px] h-5 px-2">Movimentações ({movTodas.length})</TabsTrigger>
             </TabsList>
@@ -886,7 +886,7 @@ export default function MovimentacoesEstoque() {
             <DialogTitle className="text-sm">Salvando...</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <p className="text-xs text-slate-600">{progressoSalvamento.etapa}</p>
+            <p className="text-xs text-[var(--mg-text-2)]">{progressoSalvamento.etapa}</p>
             <Progress value={progressoSalvamento.current} className="w-full h-1.5" />
           </div>
         </DialogContent>

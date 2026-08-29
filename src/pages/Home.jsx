@@ -147,8 +147,8 @@ export default function Home() {
     <div className="p-4 md:p-6 space-y-3">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-xs text-slate-600">Visão geral do sistema</p>
+          <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Dashboard</h1>
+          <p className="text-xs text-[var(--mg-text-2)]">Visão geral do sistema</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowConfigGraficos(true)} className="h-8 text-xs">
@@ -161,7 +161,7 @@ export default function Home() {
         <Card className="shadow-sm border-l-4 border-l-primary">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-slate-900">Suplementação (30 dias)</CardTitle>
+              <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">Suplementação (30 dias)</CardTitle>
               <Link to={createPageUrl("DashboardSuplementacao")}>
                 <Button variant="ghost" size="sm" className="h-7 text-xs">Ver detalhes</Button>
               </Link>
@@ -173,29 +173,29 @@ export default function Home() {
                 <div className="flex items-center justify-center mb-1">
                   <MapPin className="w-4 h-4 text-primary" />
                 </div>
-                <div className="text-lg font-bold text-slate-900">{dadosSuplementacao.pontosAtivos}</div>
-                <div className="text-xs text-slate-600">Pontos</div>
+                <div className="text-lg font-bold text-[var(--mg-text-1)]">{dadosSuplementacao.pontosAtivos}</div>
+                <div className="text-xs text-[var(--mg-text-2)]">Pontos</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
                   <Package className="w-4 h-4 text-blue-600" />
                 </div>
-                <div className="text-lg font-bold text-slate-900">{dadosSuplementacao.totalFornecido.toFixed(0)} kg</div>
-                <div className="text-xs text-slate-600">Fornecido</div>
+                <div className="text-lg font-bold text-[var(--mg-text-1)]">{dadosSuplementacao.totalFornecido.toFixed(0)} kg</div>
+                <div className="text-xs text-[var(--mg-text-2)]">Fornecido</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
                   <Package className="w-4 h-4 text-purple-600" />
                 </div>
-                <div className="text-lg font-bold text-slate-900">{dadosSuplementacao.eventosCount}</div>
-                <div className="text-xs text-slate-600">Lançamentos</div>
+                <div className="text-lg font-bold text-[var(--mg-text-1)]">{dadosSuplementacao.eventosCount}</div>
+                <div className="text-xs text-[var(--mg-text-2)]">Lançamentos</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
                   <AlertTriangle className="w-4 h-4 text-amber-600" />
                 </div>
                 <div className="text-lg font-bold text-amber-600">{dadosSuplementacao.alertas}</div>
-                <div className="text-xs text-slate-600">Alertas</div>
+                <div className="text-xs text-[var(--mg-text-2)]">Alertas</div>
               </div>
             </div>
           </CardContent>
@@ -206,7 +206,7 @@ export default function Home() {
         {graficosVisiveis.includes('movimentacoes_mes') && (
           <Card className="shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-900">Movimentações (6 Meses)</CardTitle>
+              <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">Movimentações (6 Meses)</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -227,7 +227,7 @@ export default function Home() {
         {graficosVisiveis.includes('estoque_categoria') && (
           <Card className="shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-900">Estoque por Categoria</CardTitle>
+              <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">Estoque por Categoria</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -260,13 +260,13 @@ export default function Home() {
             <DialogTitle className="text-sm">Configurar Gráficos</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5">
-            <div className="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded">
+            <div className="flex items-center space-x-2 p-1.5 hover:bg-[var(--mg-gray-fill)] rounded">
               <Checkbox checked={graficosVisiveis.includes('movimentacoes_mes')} onCheckedChange={() => toggleGrafico('movimentacoes_mes')} />
               <label className="cursor-pointer flex-1 text-xs" onClick={() => toggleGrafico('movimentacoes_mes')}>
                 Movimentações de Estoque
               </label>
             </div>
-            <div className="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded">
+            <div className="flex items-center space-x-2 p-1.5 hover:bg-[var(--mg-gray-fill)] rounded">
               <Checkbox checked={graficosVisiveis.includes('estoque_categoria')} onCheckedChange={() => toggleGrafico('estoque_categoria')} />
               <label className="cursor-pointer flex-1 text-xs" onClick={() => toggleGrafico('estoque_categoria')}>
                 Estoque por Categoria
