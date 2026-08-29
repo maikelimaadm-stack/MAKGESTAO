@@ -29,7 +29,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const iconButtonClass =
-  "h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 shadow-none transition-colors";
+  "h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-primary shadow-none transition-colors";
 
 const TipBtn = ({ title, children }) => (
   <TooltipProvider delayDuration={300}>
@@ -110,7 +110,7 @@ export default function SankhyaListToolbar({
             variant="ghost"
             size="icon"
             onClick={onNew}
-            className="h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-emerald-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-none transition-colors"
+            className="h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-primary/30 bg-primary hover:bg-primary/90 text-white shadow-none transition-colors"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -226,7 +226,7 @@ export default function SankhyaListToolbar({
                 <DropdownMenuSeparator />
                 <div className="flex items-center rounded-md overflow-hidden">
                   <DropdownMenuItem onClick={onExportExcel} disabled={!onExportExcel} className="h-8 flex-1 cursor-pointer gap-2 text-xs rounded-none rounded-l-md">
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-primary" />
                     Exportar Excel
                   </DropdownMenuItem>
                   <button
@@ -259,9 +259,9 @@ export default function SankhyaListToolbar({
           )}
 
           {/* Counter badge */}
-          <div className="h-full px-3 border-r border-slate-200 bg-slate-50 flex items-center justify-center gap-1 min-w-[3rem]">
+          <div className="h-full px-3 border-r border-slate-200 bg-slate-50/50 flex items-center justify-center gap-1 min-w-[3rem]">
             {selectedCount > 0 ? (
-              <span className="text-xs font-semibold text-emerald-700">{selectedCount}<span className="text-slate-400 font-normal">/{total}</span></span>
+              <span className="text-xs font-semibold text-primary">{selectedCount}<span className="text-slate-400 font-normal">/{total}</span></span>
             ) : viewMode === "record" && total > 0 ? (
               <span className="text-xs font-semibold text-slate-700">{currentIndex + 1}<span className="text-slate-400 font-normal">/{total}</span></span>
             ) : (
@@ -280,7 +280,7 @@ export default function SankhyaListToolbar({
             </span>
           )}
           <span className="text-xs font-semibold text-slate-700 truncate min-w-0 flex-1">{title}</span>
-          <span className="ml-auto text-[10px] font-bold text-emerald-700 uppercase tracking-wide whitespace-nowrap">
+          <span className="ml-auto text-[10px] font-bold text-primary uppercase tracking-wide whitespace-nowrap">
             {operationLabel || "VISUALIZAÇÃO DE REGISTRO"}
           </span>
         </div>

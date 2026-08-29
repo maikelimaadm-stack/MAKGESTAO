@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const CORES = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
+const CORES = ['#2899f5', '#60a5fa', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
 
 export default function Home() {
   const [showConfigGraficos, setShowConfigGraficos] = useState(false);
@@ -158,7 +158,7 @@ export default function Home() {
       </div>
 
       {dadosSuplementacao.pontosAtivos > 0 && (
-        <Card className="shadow-sm border-l-4 border-l-emerald-500">
+        <Card className="shadow-sm border-l-4 border-l-primary">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-slate-900">Suplementação (30 dias)</CardTitle>
@@ -171,7 +171,7 @@ export default function Home() {
             <div className="grid grid-cols-4 gap-3">
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
-                  <MapPin className="w-4 h-4 text-emerald-600" />
+                  <MapPin className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-lg font-bold text-slate-900">{dadosSuplementacao.pontosAtivos}</div>
                 <div className="text-xs text-slate-600">Pontos</div>
@@ -216,7 +216,7 @@ export default function Home() {
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip contentStyle={{ fontSize: 11 }} />
                   <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="entradas" fill="#10b981" name="Entradas" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="entradas" fill="#2899f5" name="Entradas" radius={[3, 3, 0, 0]} />
                   <Bar dataKey="saidas" fill="#ef4444" name="Saídas" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

@@ -243,7 +243,7 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
     if (!field) return null;
 
     return (
-      <div key={field.id} className="rounded-sm border border-slate-200 bg-white p-1.5 shadow-sm hover:border-emerald-200">
+      <div key={field.id} className="rounded-sm border border-slate-200 bg-white p-1.5 shadow-sm hover:border-primary/40">
         <div className="mb-1 flex items-center justify-between gap-2">
           <label className="min-w-0 truncate font-semibold text-slate-700">{field.label}</label>
         </div>
@@ -303,8 +303,8 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
           <span className="font-semibold text-slate-700">Esconder ao atualizar</span>
         </div>
         <div className="grid grid-cols-[88px_1fr] gap-1">
-          <Button type="button" onClick={() => setConfigOpen(true)} className="h-7 rounded-none bg-green-500 hover:bg-green-600 text-white text-xs px-1"><Plus className="w-4 h-4" /> Filtro</Button>
-          <Button type="button" onClick={applyFilters} className="h-7 rounded-none bg-slate-600 hover:bg-slate-700 text-white text-xs">Aplicar</Button>
+          <Button type="button" onClick={() => setConfigOpen(true)} className="h-7 rounded-none bg-primary hover:bg-primary/90 text-white text-xs px-1"><Plus className="w-4 h-4" /> Filtro</Button>
+          <Button type="button" onClick={applyFilters} className="h-7 rounded-none bg-slate-700 hover:bg-slate-800 text-white text-xs">Aplicar</Button>
         </div>
         <div className="border-t border-slate-200 pt-1">
           <Select value={activeConfigId || "padrao"} onValueChange={setActiveConfigId}>
@@ -324,13 +324,13 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
 
       <div className="h-8 px-1.5 flex items-center justify-between border-b border-slate-300 bg-slate-50 font-semibold text-slate-700 shrink-0">
         <span>Filtros rápidos</span>
-        <button type="button" onClick={clearAll} className="relative"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-slate-700 text-white text-[9px] leading-3">×</span></button>
+        <button type="button" onClick={clearAll} className="relative text-slate-500 hover:text-primary"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-white text-[9px] leading-3">×</span></button>
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto">
         {groupedFolders.map((folder) =>
         <div key={folder.id} className="border-b border-slate-300">
-            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="w-full h-8 px-2 flex items-center justify-between gap-1 bg-slate-100 font-semibold text-slate-700 text-left hover:bg-slate-200">
+            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="w-full h-8 px-2 flex items-center justify-between gap-1 bg-slate-50 font-semibold text-slate-700 text-left hover:bg-primary/5">
               <span className="flex min-w-0 items-center gap-1">
                 {openGroups[folder.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                 <span className="truncate">{folder.name}</span>
