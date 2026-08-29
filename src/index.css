@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -80,8 +81,39 @@ button:focus-visible {
     --mg-accent: #2899f5;
     --mg-accent-light: #60a5fa;
     --mg-accent-dark: #1e7fc7;
-    --background-page: #f8fafc;
-    --border-color: #e2e8f0;
+    --background-page: #f5f7fa;
+    --border-color: #e5e7eb;
+    /* mg-ui-system tokens */
+    --mg-bg-page: #f5f7fa;
+    --mg-bg-card: #ffffff;
+    --mg-bg-surface: #ffffff;
+    --mg-border: #e5e7eb;
+    --mg-border-focus: #2899f5;
+    --mg-text-1: #111827;
+    --mg-text-2: #6b7280;
+    --mg-text-3: #9ca3af;
+    --mg-accent-light-bg: rgba(40, 153, 245, 0.08);
+    --mg-accent-glow: rgba(40, 153, 245, 0.15);
+    --mg-green: #059669;
+    --mg-green-light: rgba(5, 150, 105, 0.08);
+    --mg-yellow: #d97706;
+    --mg-red: #dc2626;
+    --mg-red-light: rgba(220, 38, 38, 0.08);
+    --mg-gray-fill: #f3f4f6;
+    --mg-gray-fill2: #e5e7eb;
+    --mg-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --mg-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --mg-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --mg-radius-card: 14px;
+    --mg-radius-control: 8px;
+    --mg-control-height: 36px;
+    --mg-toolbar-height: 34px;
+    --mg-font-size: 13px;
+    --mg-font-size-sm: 12px;
+    --mg-font-size-xs: 11px;
+    --background-card: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -171,6 +203,10 @@ button:focus-visible {
 
   body {
     @apply bg-background text-foreground;
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: var(--mg-font-size);
+    color: var(--mg-text-1);
+    -webkit-font-smoothing: antialiased;
   }
 
   input[aria-invalid="true"],
@@ -698,4 +734,453 @@ input[type="number"] {
 .btn-primary-gradient:hover {
   opacity: 0.92;
   box-shadow: 0 2px 6px rgba(40, 153, 245, 0.4);
+}
+
+/* ========================================
+   ModeloBase1 — UI System Components
+   ======================================== */
+
+/* iOS-style button base */
+.ios-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  transition: transform 100ms ease, opacity 100ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.ios-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.ios-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Toolbar buttons (tb-btn) */
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--mg-toolbar-height, 34px);
+  min-height: var(--mg-toolbar-height, 34px);
+  padding-inline: 10px;
+  border-radius: var(--mg-radius-control, 8px);
+  font-size: var(--mg-font-size-sm, 12px);
+  font-weight: 600;
+  border: 1px solid var(--mg-border, #e5e7eb);
+  background: var(--mg-bg-card, #fff);
+  color: var(--mg-text-2, #6b7280);
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.tb-btn:hover:not(:disabled) {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-1, #111827);
+}
+
+.tb-btn-icon {
+  width: var(--mg-toolbar-height, 34px);
+  padding-inline: 0;
+}
+
+.tb-btn-labeled {
+  padding-inline: 14px;
+}
+
+.tb-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.tb-btn-ghost:hover:not(:disabled) {
+  background: var(--mg-gray-fill, #f3f4f6);
+}
+
+.tb-btn-green {
+  background: var(--mg-green, #059669);
+  color: #fff;
+  border-color: transparent;
+}
+
+.tb-btn-green:hover:not(:disabled) {
+  background: #047857;
+  color: #fff;
+}
+
+.tb-btn-blue {
+  background: var(--mg-accent, #2899f5);
+  color: #fff;
+  border-color: transparent;
+}
+
+.tb-btn-blue:hover:not(:disabled) {
+  background: #2180d0;
+  color: #fff;
+}
+
+.tb-btn-red {
+  background: var(--mg-red, #dc2626);
+  color: #fff;
+  border-color: transparent;
+}
+
+.tb-btn-red:hover:not(:disabled) {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.tb-btn-gray {
+  background: var(--mg-gray-fill2, #e5e7eb);
+  color: var(--mg-text-1, #111827);
+  border-color: transparent;
+}
+
+.tb-btn-gray:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+.tb-btn-filter {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-2, #6b7280);
+  border-color: transparent;
+}
+
+.tb-btn-filter.is-active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+}
+
+.tb-btn-more {
+  background: transparent;
+  border-color: transparent;
+  color: var(--mg-text-2, #6b7280);
+}
+
+.tb-btn-more:hover:not(:disabled) {
+  background: var(--mg-gray-fill, #f3f4f6);
+}
+
+/* Action Bar */
+.mg-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: calc(var(--mg-toolbar-height, 34px) + 12px);
+  padding: 6px 20px;
+  background: var(--mg-bg-card, #fff);
+  border-bottom: 1px solid var(--mg-border, #e5e7eb);
+}
+
+.mg-action-bar__zone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mg-action-bar__zone--locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.mg-action-slot {
+  overflow: hidden;
+  transition: width 220ms ease, opacity 220ms ease;
+  width: 0;
+  opacity: 0;
+}
+
+.mg-action-slot.is-visible {
+  width: var(--slot-width, 88px);
+  opacity: 1;
+}
+
+.mg-action-bar__attach-btn {
+  position: relative;
+}
+
+.mg-action-bar__search-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--mg-toolbar-height, 34px);
+  min-width: 180px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  background: var(--mg-gray-fill, #f3f4f6);
+  border: 1px solid transparent;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.mg-action-bar__search-pill:focus-within {
+  border-color: var(--mg-accent, #2899f5);
+  background: var(--mg-bg-card, #fff);
+  box-shadow: 0 0 0 2px var(--mg-accent-glow, rgba(40, 153, 245, 0.15));
+}
+
+.mg-action-bar__search-pill input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--mg-font-size-sm, 12px);
+  color: var(--mg-text-1, #111827);
+}
+
+.mg-action-bar__search-pill input::placeholder {
+  color: var(--mg-text-3, #9ca3af);
+}
+
+/* Desktop Header */
+.mg-desktop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  min-height: 44px;
+  padding-inline: 20px;
+  background: var(--mg-bg-card, #fff);
+  border-bottom: 1px solid var(--mg-border, #e5e7eb);
+}
+
+.mg-desktop-header__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mg-desktop-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mg-desktop-header__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--mg-font-size-sm, 12px);
+  color: var(--mg-text-2, #6b7280);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mg-desktop-header__crumb {
+  color: var(--mg-text-2, #6b7280);
+  font-weight: 500;
+}
+
+.mg-desktop-header__crumb--current {
+  color: var(--mg-text-1, #111827);
+  font-weight: 600;
+}
+
+.mg-desktop-header__sep {
+  width: 14px;
+  height: 14px;
+  color: var(--mg-text-3, #9ca3af);
+  flex-shrink: 0;
+}
+
+.mg-desktop-header__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--mg-accent, #2899f5), var(--mg-accent-light, #60a5fa));
+  margin-left: 4px;
+}
+
+.mg-desktop-menu-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mg-desktop-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--mg-border, #e5e7eb);
+  background: var(--mg-bg-card, #fff);
+  color: var(--mg-text-2, #6b7280);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.mg-desktop-menu-trigger:hover {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-1, #111827);
+}
+
+.mg-desktop-menu-trigger.is-active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+  border-color: var(--mg-accent, #2899f5);
+}
+
+/* Topbar icon buttons */
+.mg-topbar-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--mg-text-2, #6b7280);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.mg-topbar-icon-btn:hover {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-1, #111827);
+}
+
+.mg-topbar-icon-btn.is-active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+}
+
+.mg-topbar-user-initials {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mg-accent, #2899f5);
+  letter-spacing: -0.02em;
+}
+
+/* View mode toggle */
+.view-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--mg-toolbar-height, 34px);
+  width: var(--mg-toolbar-height, 34px);
+  border-radius: var(--mg-radius-control, 8px);
+  border: none;
+  background: transparent;
+  color: var(--mg-text-2, #6b7280);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.view-mode-btn:hover:not(:disabled) {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-1, #111827);
+}
+
+.view-mode-btn.is-active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+}
+
+/* Navigation buttons */
+.mg-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--mg-toolbar-height, 34px);
+  width: var(--mg-toolbar-height, 34px);
+  border-radius: var(--mg-radius-control, 8px);
+  border: none;
+  background: transparent;
+  color: var(--mg-text-2, #6b7280);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.mg-nav-btn:hover:not(:disabled) {
+  background: var(--mg-gray-fill, #f3f4f6);
+  color: var(--mg-text-1, #111827);
+}
+
+.mg-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Filter pills rail */
+.mg-filter-pills-rail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 20px;
+  background: var(--mg-bg-card, #fff);
+  border-bottom: 1px solid var(--mg-border, #e5e7eb);
+  overflow-x: auto;
+}
+
+.mg-filter-pills-rail__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--mg-font-size-xs, 11px);
+  font-weight: 600;
+  border: 1px solid var(--mg-border, #e5e7eb);
+  background: var(--mg-bg-card, #fff);
+  color: var(--mg-text-2, #6b7280);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.mg-filter-pills-rail__nav:hover {
+  background: var(--mg-gray-fill, #f3f4f6);
+}
+
+.mg-filter-pills-rail__nav.is-active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+  border-color: var(--mg-accent, #2899f5);
+}
+
+/* Accent icon button */
+.mg-accent-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.mg-accent-icon-btn:hover {
+  background: var(--mg-accent-glow, rgba(40, 153, 245, 0.15));
+}
+
+/* Counter badge in toolbar */
+.mg-toolbar-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mg-gray-fill, #f3f4f6);
+  font-size: var(--mg-font-size-xs, 11px);
+  font-weight: 700;
+  color: var(--mg-text-1, #111827);
+}
+
+.mg-toolbar-counter--active {
+  background: var(--mg-accent-light-bg, rgba(40, 153, 245, 0.08));
+  color: var(--mg-accent, #2899f5);
 }

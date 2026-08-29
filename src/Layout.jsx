@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import {
   Scale, FileText, Users, LogOut, Package, Shield, FolderOpen, Cloud,
   Thermometer, Building2, TrendingUp, ArrowRightLeft, DollarSign, Home, Map, ClipboardList,
-  BookOpen, Settings, ChevronDown, Bell, User, Menu, CloudRain, CloudOff, Wifi, Search, X, ChevronRight, EyeOff, Eye, Loader2, Sparkles, Mail } from
+  BookOpen, Settings, ChevronDown, Bell, User, Menu, CloudRain, CloudOff, Wifi, Search, X, ChevronRight, EyeOff, Eye, Loader2, Sparkles, Mail, Hexagon } from
 "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -431,7 +431,7 @@ export default function Layout({ children, currentPageName }) {
 
   const isFolha = (currentPageName || '').toLowerCase().startsWith('folha');
   const isRoot = location.pathname === createPageUrl("Home");
-  const appContentOffset = isFolha ? "0px" : menuOculto ? "51px" : "91px";
+  const appContentOffset = isFolha ? "0px" : "44px";
 
   const renderSidebarMenu = () => (
     <div className="space-y-0.5">
@@ -481,7 +481,7 @@ export default function Layout({ children, currentPageName }) {
   );
 
   return (
-    <div className="h-[100dvh] overflow-hidden bg-[var(--background-page)] safe-area-top flex" translate="no" style={{ "--app-content-offset": appContentOffset }}>
+    <div className="erp-shell h-[100dvh] overflow-hidden bg-[var(--background-page)] safe-area-top flex" translate="no" style={{ "--app-content-offset": appContentOffset }}>
       <style>{`
         html, body { overscroll-behavior: none; }
         button, [role="button"], a { -webkit-user-select: none; user-select: none; }
@@ -493,7 +493,9 @@ export default function Layout({ children, currentPageName }) {
       {!isFolha && !menuOculto && (
         <aside className="erp-sidebar hidden md:flex flex-col w-[240px] shrink-0 bg-white border-r border-[var(--border-color)]">
           <div className="erp-sidebar-brand flex items-center gap-3 px-3 py-4">
-            <div className="erp-sidebar-logo flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white" style={{ background: "linear-gradient(135deg, var(--mg-accent), var(--mg-accent-light))" }}>M</div>
+            <div className="mg-desktop-header__logo shrink-0">
+              <Hexagon className="h-4 w-4 text-white" strokeWidth={2.2} />
+            </div>
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-slate-800">{empresaAtual?.apelido || empresaAtual?.nome || 'MAK Gestão'}</div>
               <div className="truncate text-xs text-slate-500">Sistema de gestão</div>
@@ -507,12 +509,17 @@ export default function Layout({ children, currentPageName }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         {!isFolha && (
-          <header className="erp-shell-header flex h-10 shrink-0 items-center justify-between gap-2 bg-white px-4">
-            <div className="flex min-w-0 items-center gap-2">
+          <header className="mg-desktop-header">
+            <div className="mg-desktop-header__left">
               {!isRoot && <BackButton className="mr-1" />}
-              <button type="button" onClick={() => setMobileMenuOpen(true)} className="erp-shell-trigger inline-flex h-8 w-8 items-center justify-center rounded-[5px] border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 md:hidden" aria-label="Menu">
-                <Menu className="h-4 w-4" />
+              <button type="button" onClick={() => setMobileMenuOpen(true)} className="mg-desktop-menu-trigger md:hidden" aria-label="Menu">
+                <Menu className="h-3.5 w-3.5" />
               </button>
+              {currentMenuPage && (
+                <nav className="mg-desktop-header__crumbs" aria-label="Navegação">
+                  <span className="mg-desktop-header__crumb mg-desktop-header__crumb--current">{currentMenuPage.title}</span>
+                </nav>
+              )}
             </div>
             <div className="hidden lg:flex items-center gap-4">
               {weather && (
@@ -528,7 +535,7 @@ export default function Layout({ children, currentPageName }) {
                 </>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="mg-desktop-header__actions">
               {empresas.length > 0 && (
                 <Select value={empresaSelecionada || ''} onValueChange={handleEmpresaChange}>
                   <SelectTrigger className="h-8 w-[160px] text-xs hidden lg:flex border-slate-300">
@@ -541,20 +548,17 @@ export default function Layout({ children, currentPageName }) {
                   </SelectContent>
                 </Select>
               )}
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSearchOpen(true)}>
-                <Search className="w-4 h-4 text-slate-600" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:inline-flex">
-                <Bell className="w-4 h-4 text-slate-600" />
-              </Button>
+              <button type="button" className="mg-topbar-icon-btn" onClick={() => setSearchOpen(true)} aria-label="Buscar">
+                <Search className="h-3.5 w-3.5" />
+              </button>
+              <button type="button" className="mg-topbar-icon-btn hidden md:flex" aria-label="Notificações">
+                <Bell className="h-3.5 w-3.5" />
+              </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 gap-2 px-2">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--mg-accent), var(--mg-accent-light))" }}>
-                      <span className="text-white font-semibold text-xs">{user?.full_name?.charAt(0).toUpperCase() || 'U'}</span>
-                    </div>
-                    <span className="text-xs font-medium text-slate-700 hidden lg:block">{user?.full_name?.split(' ')[0] || 'Usuario'}</span>
-                  </Button>
+                  <button type="button" className="mg-topbar-icon-btn" aria-label="Usuário">
+                    <span className="mg-topbar-user-initials">{user?.full_name?.charAt(0).toUpperCase() || 'U'}</span>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel className="text-xs">
@@ -574,6 +578,9 @@ export default function Layout({ children, currentPageName }) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <div className="mg-desktop-header__logo">
+                <Hexagon className="h-4 w-4 text-white" strokeWidth={2.2} />
+              </div>
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetContent side="right" className="w-72 flex flex-col">
                   <SheetHeader><SheetTitle className="text-left text-sm">Menu</SheetTitle></SheetHeader>
@@ -632,12 +639,6 @@ export default function Layout({ children, currentPageName }) {
               </Sheet>
             </div>
           </header>
-        )}
-
-        {!isFolha && currentMenuPage && (
-          <div className="erp-shell-breadcrumbs flex shrink-0 items-center gap-2 px-4 py-2 bg-white border-b border-[var(--border-color)]">
-            <span className="erp-shell-breadcrumb-pill">{currentMenuPage.title}</span>
-          </div>
         )}
 
         <SendEmailDialog open={showEmailDialog} onOpenChange={setShowEmailDialog} senderEmail="suporte@makestaopecuaria.com" senderName={empresaAtual?.apelido || empresaAtual?.nome || "MakGestão Pecuária"} />
