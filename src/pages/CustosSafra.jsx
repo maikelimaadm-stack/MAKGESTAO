@@ -410,9 +410,9 @@ export default function CustosSafra() {
       <div className="p-4 md:p-6">
         <Card className="shadow-sm">
           <CardContent className="p-12 text-center">
-            <Layers className="w-16 h-16 text-[var(--mg-text-3)] mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-[var(--mg-text-1)] mb-2">Nenhuma Safra</h2>
-            <p className="text-xs text-[var(--mg-text-3)] mb-6">Cadastre uma safra primeiro</p>
+            <Layers className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-700 mb-2">Nenhuma Safra</h2>
+            <p className="text-xs text-slate-500 mb-6">Cadastre uma safra primeiro</p>
             <Button onClick={() => setShowSafraDialog(true)} size="sm" className="h-8 gap-1 text-xs">
               <Plus className="w-3.5 h-3.5" />
               Cadastrar Safra
@@ -429,8 +429,8 @@ export default function CustosSafra() {
         <>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
-              <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Custos de Safra</h1>
-              <p className="text-xs text-[var(--mg-text-2)]">Safra: {safraAtiva.ano_inicio}/{safraAtiva.ano_fim}</p>
+              <h1 className="text-xl font-bold text-slate-900">Custos de Safra</h1>
+              <p className="text-xs text-slate-600">Safra: {safraAtiva.ano_inicio}/{safraAtiva.ano_fim}</p>
             </div>
             <div className="flex gap-2">
               <Select value={safraAtiva?.id || ''} onValueChange={(value) => {
@@ -454,16 +454,16 @@ export default function CustosSafra() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mb-2">
-            <Card className="shadow-sm border-l-4 border-l-[var(--mg-accent)]">
+            <Card className="shadow-sm border-l-4 border-l-emerald-500">
               <CardContent className="p-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-[var(--mg-text-2)] mb-0.5 truncate leading-tight">Total da Safra</p>
-                    <p className="text-lg font-bold text-[var(--mg-accent-dark)] truncate leading-tight">{formatarMoeda(totalGeralSafra)}</p>
-                    <p className="text-[10px] text-[var(--mg-text-3)] mt-0.5 truncate leading-tight">Valor investido</p>
+                    <p className="text-[10px] font-medium text-slate-600 mb-0.5 truncate leading-tight">Total da Safra</p>
+                    <p className="text-lg font-bold text-emerald-700 truncate leading-tight">{formatarMoeda(totalGeralSafra)}</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5 truncate leading-tight">Valor investido</p>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-[var(--mg-accent-light-bg)] flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-3.5 h-3.5 text-[var(--mg-accent)]" />
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
                   </div>
                 </div>
               </CardContent>
@@ -473,9 +473,9 @@ export default function CustosSafra() {
               <CardContent className="p-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-[var(--mg-text-2)] mb-0.5 truncate leading-tight">Fornecedores</p>
+                    <p className="text-[10px] font-medium text-slate-600 mb-0.5 truncate leading-tight">Fornecedores</p>
                     <p className="text-lg font-bold text-blue-700 truncate leading-tight">{Object.keys(custosPorFornecedor).length}</p>
-                    <p className="text-[10px] text-[var(--mg-text-3)] mt-0.5 truncate leading-tight">Ativos</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5 truncate leading-tight">Ativos</p>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
                     <Users className="w-3.5 h-3.5 text-blue-600" />
@@ -488,9 +488,9 @@ export default function CustosSafra() {
               <CardContent className="p-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-[var(--mg-text-2)] mb-0.5 truncate leading-tight">Lançamentos</p>
+                    <p className="text-[10px] font-medium text-slate-600 mb-0.5 truncate leading-tight">Lançamentos</p>
                     <p className="text-lg font-bold text-violet-700 truncate leading-tight">{custos.length}</p>
-                    <p className="text-[10px] text-[var(--mg-text-3)] mt-0.5 truncate leading-tight">Custos</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5 truncate leading-tight">Custos</p>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
                     <Package className="w-3.5 h-3.5 text-violet-600" />
@@ -513,7 +513,7 @@ export default function CustosSafra() {
             <Button onClick={downloadTemplate} variant="outline" size="sm" className="h-8 text-xs">
               Modelo
             </Button>
-            <Button onClick={() => { setEditingCusto(null); setShowCustoForm(true); }} size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] ml-auto">
+            <Button onClick={() => { setEditingCusto(null); setShowCustoForm(true); }} size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 ml-auto">
               Novo Lançamento
             </Button>
           </div>
@@ -551,7 +551,7 @@ export default function CustosSafra() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-sm">
-              <Layers className="w-4 h-4 text-[var(--mg-accent)]" />
+              <Layers className="w-4 h-4 text-emerald-600" />
               Gerenciar Safras
             </DialogTitle>
           </DialogHeader>
@@ -561,8 +561,8 @@ export default function CustosSafra() {
                 <CardContent className="p-3">
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="font-bold text-sm text-[var(--mg-text-1)]">{safra.ano_inicio}/{safra.ano_fim}</p>
-                      <p className="text-xs text-[var(--mg-text-2)]">{safra.descricao}</p>
+                      <p className="font-bold text-sm text-slate-900">{safra.ano_inicio}/{safra.ano_fim}</p>
+                      <p className="text-xs text-slate-600">{safra.descricao}</p>
                     </div>
                     <Button size="sm" variant={safraAtiva?.id === safra.id ? "default" : "outline"} onClick={() => { setSafraAtiva(safra); setShowSafraDialog(false); }} className="h-7 text-xs">
                       {safraAtiva?.id === safra.id ? 'Ativa' : 'Selecionar'}
@@ -600,8 +600,8 @@ export default function CustosSafra() {
                 {importErrors.map((erro, idx) => (
                   <TableRow key={idx} className="text-xs">
                     <TableCell className="font-bold text-orange-700">{erro.linha}</TableCell>
-                    <TableCell className="text-[var(--mg-red)]">{erro.erro}</TableCell>
-                    <TableCell className="font-mono text-[var(--mg-text-2)]">{erro.dados}</TableCell>
+                    <TableCell className="text-red-600">{erro.erro}</TableCell>
+                    <TableCell className="font-mono text-slate-600">{erro.dados}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -633,7 +633,7 @@ export default function CustosSafra() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-sm">
-              <Loader2 className="w-4 h-4 animate-spin text-[var(--mg-accent)]" />
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
               Importando
             </DialogTitle>
           </DialogHeader>
@@ -644,7 +644,7 @@ export default function CustosSafra() {
                 <span className="font-semibold">{importProgress.current}/{importProgress.total}</span>
               </div>
               <Progress value={progressPercentage} className="h-1.5" />
-              <p className="text-center text-xs font-semibold text-[var(--mg-accent)]">{progressPercentage}%</p>
+              <p className="text-center text-xs font-semibold text-emerald-600">{progressPercentage}%</p>
             </div>
             {importProgress.errors > 0 && (
               <div className="bg-orange-50 border border-orange-200 rounded p-2">

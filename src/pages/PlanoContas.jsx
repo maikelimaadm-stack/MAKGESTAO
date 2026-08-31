@@ -202,31 +202,31 @@ export default function PlanoContas() {
     return nodes.map(node => (
       <div key={node.id} className="select-none">
         <div 
-          className="flex items-center gap-2 py-1.5 px-2 hover:bg-[var(--mg-gray-fill)] rounded group"
+          className="flex items-center gap-2 py-1.5 px-2 hover:bg-slate-50 rounded group"
           style={{ paddingLeft: `${level * 24 + 8}px` }}
         >
           {node.children.length > 0 ? (
             <button onClick={() => toggleNode(node.id)} className="w-4 h-4 flex items-center justify-center">
               {expandedNodes[node.id] ? (
-                <ChevronDown className="w-3.5 h-3.5 text-[var(--mg-text-2)]" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-600" />
               ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-[var(--mg-text-2)]" />
+                <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
               )}
             </button>
           ) : (
             <div className="w-4" />
           )}
           
-          <span className={`font-mono text-xs ${node.aceita_lancamento === false ? 'font-bold text-[var(--mg-accent-dark)]' : 'text-[var(--mg-text-2)]'}`}>
+          <span className={`font-mono text-xs ${node.aceita_lancamento === false ? 'font-bold text-blue-700' : 'text-slate-600'}`}>
             {node.codigo}
           </span>
           
-          <span className={`flex-1 text-sm ${node.aceita_lancamento === false ? 'font-semibold text-[var(--mg-text-1)]' : 'text-[var(--mg-text-1)]'}`}>
+          <span className={`flex-1 text-sm ${node.aceita_lancamento === false ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>
             {node.descricao}
           </span>
           
           {node.aceita_lancamento === false && (
-            <span className="text-xs px-2 py-0.5 bg-[var(--mg-accent-light-bg)] text-[var(--mg-accent)] rounded">Agrupador</span>
+            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">Agrupador</span>
           )}
           
           <div className="opacity-0 group-hover:opacity-100 flex gap-1">
@@ -246,7 +246,7 @@ export default function PlanoContas() {
               }}
               className="h-7 w-7"
             >
-              <Edit2 className="w-3 h-3 text-[var(--mg-accent)]" />
+              <Edit2 className="w-3 h-3 text-blue-600" />
             </Button>
             <Button
               variant="ghost"
@@ -254,7 +254,7 @@ export default function PlanoContas() {
               onClick={() => setDeleteConfirmId(node.id)}
               className="h-7 w-7"
             >
-              <Trash2 className="w-3 h-3 text-[var(--mg-red)]" />
+              <Trash2 className="w-3 h-3 text-red-600" />
             </Button>
           </div>
         </div>
@@ -297,8 +297,8 @@ export default function PlanoContas() {
     <div className="p-4 md:p-6 space-y-2">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
         <div>
-          <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Plano de Contas</h1>
-          <p className="text-xs text-[var(--mg-text-2)]">Estrutura hierárquica de contas</p>
+          <h1 className="text-xl font-bold text-slate-900">Plano de Contas</h1>
+          <p className="text-xs text-slate-600">Estrutura hierárquica de contas</p>
         </div>
         <div className="flex gap-2">
           {planos.length === 0 && (
@@ -307,7 +307,7 @@ export default function PlanoContas() {
               Inserir Padrão
             </Button>
           )}
-          <Button onClick={() => { setShowForm(!showForm); setEditingItem(null); setFormData({ codigo: "", descricao: "", tipo: "Despesa", plano_pai_id: "", aceita_lancamento: true }); }} size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
+          <Button onClick={() => { setShowForm(!showForm); setEditingItem(null); setFormData({ codigo: "", descricao: "", tipo: "Despesa", plano_pai_id: "", aceita_lancamento: true }); }} size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
           Novo
           </Button>
         </div>
@@ -315,9 +315,9 @@ export default function PlanoContas() {
 
       {showForm && (
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="shadow-sm border-[var(--mg-border)] bg-white">
-            <CardHeader className="bg-[var(--mg-gray-fill)] border-b border-[var(--mg-border)] py-3">
-              <CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">
+          <Card className="shadow-sm border-slate-300 bg-white">
+            <CardHeader className="bg-slate-50 border-b border-slate-200 py-3">
+              <CardTitle className="text-sm font-semibold text-slate-900">
                 {editingItem ? 'Editar' : 'Novo'} Plano de Contas
               </CardTitle>
             </CardHeader>
@@ -369,7 +369,7 @@ export default function PlanoContas() {
                   <Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditingItem(null); }} size="sm" className="h-8 text-xs">
                     Cancelar
                   </Button>
-                  <Button type="submit" size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
+                  <Button type="submit" size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
                     Salvar
                   </Button>
                 </div>
@@ -396,9 +396,9 @@ export default function PlanoContas() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="text-center py-12 text-[var(--mg-text-3)]">Carregando...</div>
+            <div className="text-center py-12 text-slate-400">Carregando...</div>
           ) : tree.length === 0 ? (
-            <div className="text-center py-12 text-[var(--mg-text-3)]">
+            <div className="text-center py-12 text-slate-400">
               <FolderTree className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p className="text-sm">Nenhum plano de contas cadastrado</p>
               <Button onClick={inserirPadrao} variant="outline" size="sm" className="mt-3 gap-1 text-xs">

@@ -14,13 +14,13 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const iconButtonClass =
-  "h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-[var(--mg-border)] bg-white hover:bg-[var(--mg-gray-fill)] text-[var(--mg-text-2)] hover:text-[var(--mg-text-1)] shadow-none transition-colors";
+  "h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 shadow-none transition-colors";
 
 const TipBtn = ({ title, children }) => (
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom" className="rounded-md bg-[var(--mg-text-1)] text-white border-0 shadow-md px-2.5 py-1 text-xs font-medium">
+      <TooltipContent side="bottom" className="rounded-md bg-slate-900 text-white border-0 shadow-md px-2.5 py-1 text-xs font-medium">
         {title}
       </TooltipContent>
     </Tooltip>
@@ -64,12 +64,12 @@ export default function LegacyRecordToolbar({
   const isLast = currentIndex >= total - 1;
 
   return (
-    <div className="bg-white border-b border-[var(--mg-border)] shadow-sm">
+    <div className="bg-white border-b border-slate-200 shadow-sm">
       {/* Main toolbar row */}
-      <div className="flex items-center h-9 overflow-x-auto whitespace-nowrap border-b border-[var(--mg-border)]">
+      <div className="flex items-center h-9 overflow-x-auto whitespace-nowrap border-b border-slate-200">
 
         {/* Left nav group */}
-        <div className="flex items-center h-full border-r border-[var(--mg-border)]">
+        <div className="flex items-center h-full border-r border-slate-200">
           {onBack && (
             <TipBtn title="Voltar">
               <Button type="button" variant="ghost" size="icon" onClick={onBack} className={iconButtonClass}>
@@ -91,7 +91,7 @@ export default function LegacyRecordToolbar({
             variant="ghost"
             size="icon"
             onClick={onNew}
-            className="h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-[var(--mg-accent-light)] bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white shadow-none transition-colors"
+            className="h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-emerald-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-none transition-colors"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -107,7 +107,7 @@ export default function LegacyRecordToolbar({
               onClick={onToggleFilter}
               className={
                 filterOpen || filterActive
-                  ? "relative h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-[var(--mg-red-light)] bg-[var(--mg-red)] hover:brightness-110 text-white shadow-none transition-colors"
+                  ? "relative h-8 w-9 rounded-none border-y-0 border-l-0 border-r border-red-300 bg-red-500 hover:bg-red-600 text-white shadow-none transition-colors"
                   : iconButtonClass
               }
             >
@@ -115,7 +115,7 @@ export default function LegacyRecordToolbar({
               {filterActive && (
                 <span
                   onClick={(e) => { e.stopPropagation(); onClearFilter?.(); }}
-                  className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-white text-[var(--mg-red)] border border-[var(--mg-red-light)] text-[10px] leading-[13px] font-bold cursor-pointer"
+                  className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-white text-red-600 border border-red-400 text-[10px] leading-[13px] font-bold cursor-pointer"
                 >
                   ×
                 </span>
@@ -125,7 +125,7 @@ export default function LegacyRecordToolbar({
         )}
 
         {/* Record navigation */}
-        <div className="flex items-center h-full border-l border-[var(--mg-border)]">
+        <div className="flex items-center h-full border-l border-slate-200">
           <TipBtn title="Primeiro registro">
             <Button type="button" variant="ghost" size="icon" onClick={onFirst} disabled={!canNavigate || isFirst} className={iconButtonClass}>
               <ChevronsLeft className="w-4 h-4" />
@@ -151,7 +151,7 @@ export default function LegacyRecordToolbar({
         {/* Edit */}
         {showEditAction && (
           <TipBtn title="Editar registro">
-            <Button type="button" variant="ghost" size="icon" onClick={onEditRecord} className={`${iconButtonClass} border-l border-[var(--mg-border)]`}>
+            <Button type="button" variant="ghost" size="icon" onClick={onEditRecord} className={`${iconButtonClass} border-l border-slate-200`}>
               <Pencil className="w-4 h-4" />
             </Button>
           </TipBtn>
@@ -160,7 +160,7 @@ export default function LegacyRecordToolbar({
         {/* Delete / Duplicate */}
         {showDeleteDuplicateActions && (
           <TipBtn title="Excluir registro">
-            <Button type="button" variant="ghost" size="icon" onClick={onDelete} disabled={!canNavigate} className={`${iconButtonClass} border-l border-[var(--mg-border)] hover:text-[var(--mg-red)] hover:bg-[var(--mg-red-light)]`}>
+            <Button type="button" variant="ghost" size="icon" onClick={onDelete} disabled={!canNavigate} className={`${iconButtonClass} border-l border-slate-200 hover:text-red-600 hover:bg-red-50`}>
               <Trash2 className="w-4 h-4" />
             </Button>
           </TipBtn>
@@ -175,14 +175,14 @@ export default function LegacyRecordToolbar({
 
         {/* Save / Cancel */}
         {showSaveActions && (
-          <div className="flex items-center h-full border-l border-[var(--mg-border)]">
+          <div className="flex items-center h-full border-l border-slate-200">
             <TipBtn title="Salvar alterações">
-              <Button type="button" variant="ghost" size="icon" onClick={onSave} className={`${iconButtonClass} text-[var(--mg-green)] hover:brightness-110 hover:bg-[var(--mg-green-light)]`}>
+              <Button type="button" variant="ghost" size="icon" onClick={onSave} className={`${iconButtonClass} text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50`}>
                 <Check className="w-4 h-4" />
               </Button>
             </TipBtn>
             <TipBtn title="Descartar alterações">
-              <Button type="button" variant="ghost" size="icon" onClick={onCancel} className={`${iconButtonClass} hover:text-[var(--mg-red)] hover:bg-[var(--mg-red-light)]`}>
+              <Button type="button" variant="ghost" size="icon" onClick={onCancel} className={`${iconButtonClass} hover:text-red-600 hover:bg-red-50`}>
                 <X className="w-4 h-4" />
               </Button>
             </TipBtn>
@@ -190,7 +190,7 @@ export default function LegacyRecordToolbar({
         )}
 
         {/* Right group */}
-        <div className="ml-auto flex items-center h-full border-l border-[var(--mg-border)]">
+        <div className="ml-auto flex items-center h-full border-l border-slate-200">
           {showUtilityActions && (
             <TipBtn title={attachDisabled ? "Salve o registro antes de anexar" : "Anexos"}>
               <Button type="button" variant="ghost" size="icon" onClick={onAttachClick} disabled={attachDisabled} className={iconButtonClass}>
@@ -206,13 +206,13 @@ export default function LegacyRecordToolbar({
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 rounded-lg shadow-lg border border-[var(--mg-border)] p-1">
+              <DropdownMenuContent align="end" className="w-52 rounded-lg shadow-lg border border-slate-200 p-1">
                 <DropdownMenuItem onClick={onLayoutConfigClick} disabled={!onLayoutConfigClick} className="h-8 cursor-pointer gap-2 text-xs rounded-md">
-                  <Settings2 className="w-3.5 h-3.5 text-[var(--mg-text-3)]" />
+                  <Settings2 className="w-3.5 h-3.5 text-slate-500" />
                   Layout do formulário
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onSettingsClick} disabled={!onSettingsClick} className="h-8 cursor-pointer gap-2 text-xs rounded-md">
-                  <Settings2 className="w-3.5 h-3.5 text-[var(--mg-text-3)]" />
+                  <Settings2 className="w-3.5 h-3.5 text-slate-500" />
                   Campos personalizados
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -220,22 +220,22 @@ export default function LegacyRecordToolbar({
           )}
 
           {/* Counter */}
-          <div className="h-full px-3 border-r border-[var(--mg-border)] bg-[var(--mg-gray-fill)] flex items-center justify-center min-w-[3rem]">
-            <span className="text-xs font-semibold text-[var(--mg-text-1)]">
-              {total > 0 ? <>{currentIndex + 1}<span className="text-[var(--mg-text-3)] font-normal">/{total}</span></> : total}
+          <div className="h-full px-3 border-r border-slate-200 bg-slate-50 flex items-center justify-center min-w-[3rem]">
+            <span className="text-xs font-semibold text-slate-700">
+              {total > 0 ? <>{currentIndex + 1}<span className="text-slate-400 font-normal">/{total}</span></> : total}
             </span>
           </div>
         </div>
       </div>
 
       {/* Record title bar */}
-      <div className="h-7 flex items-center gap-2 bg-gradient-to-r from-[var(--mg-gray-fill)] to-white border-b border-[var(--mg-border)] px-3">
-        <span className="px-1.5 py-0.5 rounded bg-[var(--mg-accent)] text-white text-[10px] font-bold uppercase tracking-wide">
+      <div className="h-7 flex items-center gap-2 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100 px-3">
+        <span className="px-1.5 py-0.5 rounded bg-slate-600 text-white text-[10px] font-bold uppercase tracking-wide">
           {badgeLabel}
         </span>
-        <span className="text-xs font-semibold text-[var(--mg-text-1)] uppercase truncate min-w-0 flex-1">{title}</span>
+        <span className="text-xs font-semibold text-slate-700 uppercase truncate min-w-0 flex-1">{title}</span>
         {operationLabel && (
-          <span className="ml-auto text-[10px] font-bold text-[var(--mg-accent)] uppercase tracking-wide whitespace-nowrap">
+          <span className="ml-auto text-[10px] font-bold text-emerald-700 uppercase tracking-wide whitespace-nowrap">
             {operationLabel}
           </span>
         )}

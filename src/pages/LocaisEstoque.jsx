@@ -32,7 +32,7 @@ const STORAGE_PREFIX = "colunas_locais_estoque";
 const WIDTHS_KEY = `${STORAGE_PREFIX}_largura`;
 const MIN_COL_W = 60;
 
-const FL = ({ label, required, error, children, dataField }) => (<div data-field={dataField}><label className="text-[12px] text-[var(--mg-text-2)] pl-1 leading-none">{label}{required && <span className="text-[var(--mg-red)] ml-0.5">*</span>}</label><div className={`rounded-md border ${error ? 'border-[var(--mg-red)] bg-red-50' : 'border-[var(--mg-border)]'} focus-within:border-[var(--mg-accent)] transition-colors`}>{children}</div></div>);
+const FL = ({ label, required, error, children, dataField }) => (<div data-field={dataField}><label className="text-[12px] text-slate-500 pl-1 leading-none">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label><div className={`rounded-md border ${error ? 'border-red-500 bg-red-50' : 'border-slate-300'} focus-within:border-emerald-500 transition-colors`}>{children}</div></div>);
 
 function getFieldValue(item, colId) {
   if (colId === "numero") return item.numero_local || "";
@@ -182,23 +182,23 @@ export default function LocaisEstoque() {
     );
   };
 
-  const renderCell = (item, colId) => { if (colId === "numero") return item.numero_local || "-"; if (colId === "nome") return <span className={`uppercase font-medium ${item.ativo === false ? 'text-[var(--mg-text-3)] line-through' : ''}`}>{item.nome || "-"}</span>; if (colId === "capacidade") return item.capacidade || "-"; if (colId === "descricao") return item.descricao || "-"; if (colId === "ativo") return item.ativo !== false ? <Badge className="text-[10px] bg-[var(--mg-green-light)] text-[var(--mg-green)]">Ativo</Badge> : <Badge className="text-[10px] bg-[var(--mg-gray-fill)] text-[var(--mg-text-3)]">Inativo</Badge>; return "-"; };
+  const renderCell = (item, colId) => { if (colId === "numero") return item.numero_local || "-"; if (colId === "nome") return <span className={`uppercase font-medium ${item.ativo === false ? 'text-slate-400 line-through' : ''}`}>{item.nome || "-"}</span>; if (colId === "capacidade") return item.capacidade || "-"; if (colId === "descricao") return item.descricao || "-"; if (colId === "ativo") return item.ativo !== false ? <Badge className="text-[10px] bg-emerald-100 text-emerald-700">Ativo</Badge> : <Badge className="text-[10px] bg-slate-100 text-slate-500">Inativo</Badge>; return "-"; };
 
   return (
     <div className="p-1 md:p-1 space-y-1">
       {!showForm && (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-[var(--mg-bg-card)] rounded px-1 py-1 shadow-sm border-b border-[var(--mg-border)]">
-          <div><h1 className="font-bold text-[var(--mg-text-1)]">Locais de Estoque</h1></div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-slate-200">
+          <div><h1 className="font-bold text-slate-800">Locais de Estoque</h1></div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-7 w-7"><Settings className="w-4 h-4" /></Button>
-            <Button onClick={() => { setShowForm(true); setEditing(null); setFormData({ nome: "", descricao: "", capacidade: "", ativo: true }); setErrors({}); }} size="sm" className="bg-[var(--mg-accent)] text-primary-foreground px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-[var(--mg-accent-dark)]">Adicionar</Button>
+            <Button onClick={() => { setShowForm(true); setEditing(null); setFormData({ nome: "", descricao: "", capacidade: "", ativo: true }); setErrors({}); }} size="sm" className="bg-lime-900 text-primary-foreground px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-emerald-600">Adicionar</Button>
           </div>
         </div>
       )}
       <AnimatePresence mode="wait">
         {showForm ? (
           <motion.div key="form" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-            <Card className="shadow-sm border-[var(--mg-border)]"><CardHeader className="flex flex-col space-y-1.5 p-6 bg-[var(--mg-gray-fill)] border-b py-1 px-1"><CardTitle className="text-sm font-semibold text-[var(--mg-text-1)]">{editing ? 'Editar Local' : 'Novo Local'}</CardTitle></CardHeader>
+            <Card className="shadow-sm border-slate-300"><CardHeader className="flex flex-col space-y-1.5 p-6 bg-slate-50 border-b py-1 px-1"><CardTitle className="text-sm font-semibold text-slate-700">{editing ? 'Editar Local' : 'Novo Local'}</CardTitle></CardHeader>
               <CardContent className="p-1">
                 <form onSubmit={handleSubmit} className="space-y-0.5">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-1">
@@ -209,17 +209,17 @@ export default function LocaisEstoque() {
                   <div className="flex flex-wrap gap-6 py-1 px-1">
                     <div className="flex items-center gap-2">
                       <Checkbox id="le_ativo" checked={formData.ativo} onCheckedChange={(v) => setFormData(p => ({ ...p, ativo: v }))} />
-                      <label htmlFor="le_ativo" className="text-xs text-[var(--mg-text-1)] cursor-pointer">Ativo</label>
+                      <label htmlFor="le_ativo" className="text-xs text-slate-700 cursor-pointer">Ativo</label>
                     </div>
                   </div>
-                  <div className="flex flex-col-reverse lg:flex-row justify-end gap-1 pt-1 border-t"><Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditing(null); }} size="sm" className="h-7 text-xs px-3">Cancelar</Button><Button type="submit" size="sm" className="h-7 text-xs px-3 bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white">{editing ? 'Atualizar' : 'Salvar'}</Button></div>
+                  <div className="flex flex-col-reverse lg:flex-row justify-end gap-1 pt-1 border-t"><Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditing(null); }} size="sm" className="h-7 text-xs px-3">Cancelar</Button><Button type="submit" size="sm" className="h-7 text-xs px-3 bg-emerald-600 hover:bg-emerald-700 text-white">{editing ? 'Atualizar' : 'Salvar'}</Button></div>
                 </form>
               </CardContent>
             </Card>
           </motion.div>
         ) : (
           <div key="table" className="space-y-1 overflow-hidden">
-            <div className="flex justify-between items-center px-1 gap-2 flex-wrap"><div className="text-xs text-[var(--mg-text-3)]">{sortedData.length} de {locais.length} registros</div><div className="flex gap-2 flex-wrap">{selectedItems.length > 0 && (<DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="h-7 text-xs">Ações ({selectedItems.length})</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuLabel className="text-xs">Ações em Lote</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem onClick={() => handleRequestDelete(selectedItems)} className="text-xs text-[var(--mg-red)]">Excluir Selecionados</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onClick={() => setSelectedItems([])} className="text-xs">Limpar Seleção</DropdownMenuItem></DropdownMenuContent></DropdownMenu>)}</div></div>
+            <div className="flex justify-between items-center px-1 gap-2 flex-wrap"><div className="text-xs text-slate-500">{sortedData.length} de {locais.length} registros</div><div className="flex gap-2 flex-wrap">{selectedItems.length > 0 && (<DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="h-7 text-xs">Ações ({selectedItems.length})</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuLabel className="text-xs">Ações em Lote</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem onClick={() => handleRequestDelete(selectedItems)} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onClick={() => setSelectedItems([])} className="text-xs">Limpar Seleção</DropdownMenuItem></DropdownMenuContent></DropdownMenu>)}</div></div>
             <Card className="overflow-hidden"><CardContent className="p-0 overflow-hidden"><div className="relative overflow-hidden"><div ref={scrollContainerRef} className="relative w-full overflow-auto max-h-[calc(100dvh-240px)] md:max-h-[calc(100dvh-150px)]" style={{ overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}>
               <Table ref={tableRef} className={`w-full ${isMobile ? "min-w-[500px]" : "min-w-[700px]"} border-separate border-spacing-0 table-fixed`}>
                 <TableHeader className="bg-white"><TableRow className="sticky top-0 z-40 bg-white">
@@ -232,11 +232,11 @@ export default function LocaisEstoque() {
                   })}
                 </TableRow></TableHeader>
                 <TableBody>
-                  {sortedData.length === 0 ? (<TableRow><TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-[var(--mg-text-3)] border border-gray-300">Nenhum local encontrado</TableCell></TableRow>) : sortedData.map(item => (
+                  {sortedData.length === 0 ? (<TableRow><TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-slate-400 border border-gray-300">Nenhum local encontrado</TableCell></TableRow>) : sortedData.map(item => (
                     <TableRow key={item.id} className="data-[state=selected]:bg-muted transition-colors border-b hover:bg-gray-100" onDoubleClick={() => handleEdit(item)} onTouchEnd={(ev) => handleRowTouch(item, ev)}>
                       {colunasOrdenadas.map(coluna => { const w = columnWidths[coluna.id] || coluna.width || 160;
                         if (coluna.id === "selecao") return (<TableCell key={`${item.id}-sel`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-center align-middle h-7 border-r border-b border-gray-300" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}><div className="flex items-center justify-center w-full h-full"><Checkbox checked={selectedItems.includes(item.id)} onCheckedChange={(ch) => setSelectedItems(prev => ch ? [...prev, item.id] : prev.filter(id => id !== item.id))} className="rounded-full h-4 w-4 border-2 border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" /></div></TableCell>);
-                        if (coluna.id === "acoes") return (<TableCell key={`${item.id}-act`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-center align-middle h-7 border-r border-b border-gray-300" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}><div className="flex items-center justify-center w-full h-full"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="w-3.5 h-3.5 text-slate-600" /></Button></DropdownMenuTrigger><DropdownMenuContent align="start"><DropdownMenuItem onClick={() => handleEdit(item)} className="text-xs">Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onClick={() => handleRequestDelete(item.id)} className="text-xs text-[var(--mg-red)]">Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div></TableCell>);
+                        if (coluna.id === "acoes") return (<TableCell key={`${item.id}-act`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-center align-middle h-7 border-r border-b border-gray-300" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}><div className="flex items-center justify-center w-full h-full"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="w-3.5 h-3.5 text-slate-600" /></Button></DropdownMenuTrigger><DropdownMenuContent align="start"><DropdownMenuItem onClick={() => handleEdit(item)} className="text-xs">Editar</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onClick={() => handleRequestDelete(item.id)} className="text-xs text-red-600">Excluir</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div></TableCell>);
                         const al = coluna.align === "right" ? "text-right" : coluna.align === "center" ? "text-center" : "text-left";
                         return (<TableCell key={`${item.id}-${coluna.id}`} style={{ width: w, minWidth: w, maxWidth: w }} className={`px-2 py-1 text-gray-700 text-xs align-middle border-r border-b border-gray-300 whitespace-normal break-words ${al}`}>{renderCell(item, coluna.id)}</TableCell>);
                       })}

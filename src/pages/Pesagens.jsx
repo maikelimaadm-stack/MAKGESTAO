@@ -507,8 +507,8 @@ export default function Pesagens() {
         <>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
-              <h1 className="text-xl font-bold text-[var(--mg-text-1)]">Pesagens</h1>
-              <p className="text-xs text-[var(--mg-text-2)]">Controle de balança</p>
+              <h1 className="text-xl font-bold text-slate-900">Pesagens</h1>
+              <p className="text-xs text-slate-600">Controle de balança</p>
             </div>
             <div className="flex gap-2 flex-wrap">
               <Button onClick={() => navigate('/ConfiguracaoPesagens')} variant="outline" size="sm" className="h-8 text-xs">
@@ -527,7 +527,7 @@ export default function Pesagens() {
               <Button onClick={downloadTemplate} variant="outline" size="sm" className="h-8 text-xs">
                 Modelo
               </Button>
-              <Button onClick={() => { setEditingPesagem(null); setShowForm(true); }} size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)]">
+              <Button onClick={() => { setEditingPesagem(null); setShowForm(true); }} size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
                 Nova Pesagem
               </Button>
             </div>
@@ -592,10 +592,10 @@ export default function Pesagens() {
                     <TableCell className="font-bold text-orange-700">
                       {erro.linha}
                     </TableCell>
-                    <TableCell className="text-[var(--mg-red)]">
+                    <TableCell className="text-red-600">
                       {erro.erro}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[var(--mg-text-2)]">
+                    <TableCell className="font-mono text-xs text-slate-600">
                       {erro.dados}
                     </TableCell>
                   </TableRow>
@@ -652,7 +652,7 @@ export default function Pesagens() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Loader2 className="w-5 h-5 animate-spin text-[var(--mg-accent)]" />
+              <Loader2 className="w-5 h-5 animate-spin text-green-600" />
               Importando Dados
             </DialogTitle>
             <DialogDescription>
@@ -662,16 +662,16 @@ export default function Pesagens() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-[var(--mg-text-2)]">{importProgressText || 'Importando...'}</span>
-                <span className="font-semibold text-[var(--mg-text-1)]">
+                <span className="text-slate-600">{importProgressText || 'Importando...'}</span>
+                <span className="font-semibold text-slate-900">
                   {importProgress.current} de {importProgress.total}
                 </span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
-              <p className="text-center text-sm font-medium text-[var(--mg-accent)]">
+              <p className="text-center text-sm font-medium text-green-600">
                 {progressPercentage}%
               </p>
-              <p className="text-center text-xs text-[var(--mg-text-3)]">
+              <p className="text-center text-xs text-slate-500">
                 Aguarde, não feche esta janela...
               </p>
             </div>

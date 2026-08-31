@@ -459,9 +459,9 @@ export default function Produtos() {
   return (
     <div className="p-1 md:p-1 space-y-1">
       {!showForm && (
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-[var(--mg-border)]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 bg-white rounded px-1 py-1 shadow-sm border-b border-slate-200">
           <div>
-            <h1 className="font-bold text-[var(--mg-text-1)]">Produtos</h1>
+            <h1 className="font-bold text-slate-800">Produtos</h1>
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={() => refetch()} className="h-7 text-xs">Atualizar</Button>
@@ -471,8 +471,8 @@ export default function Produtos() {
               <Button variant="outline" size="sm" className="h-7 text-xs cursor-pointer" asChild><span><Upload className="w-3.5 h-3.5" /> Importar</span></Button>
               <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={showImportProgress} />
             </label>
-            <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-[var(--mg-border)] bg-white shadow-sm hover:bg-[var(--mg-gray-fill)] hover:text-[var(--mg-text-1)] h-7 w-7"><Settings className="w-4 h-4" /></Button>
-            <Button onClick={() => { setEditingProduto(null); setShowForm(true); }} size="sm" className="bg-[var(--mg-accent)] text-white px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-[var(--mg-accent-dark)]">Adicionar</Button>
+            <Button variant="outline" size="icon" onClick={() => setShowConfigColunas(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-7 w-7"><Settings className="w-4 h-4" /></Button>
+            <Button onClick={() => { setEditingProduto(null); setShowForm(true); }} size="sm" className="bg-lime-900 text-primary-foreground px-3 text-xs font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-7 hover:bg-emerald-600">Adicionar</Button>
           </div>
         </div>
       )}

@@ -60,8 +60,8 @@ const DEFAULT_FILTER_CONFIG = {
   filterFolders: DEFAULT_FOLDERS,
   fieldGroups: DEFAULT_FIELD_GROUPS
 };
-const inputClass = "filter-panel__field-input";
-const selectClass = "filter-panel__field-input";
+const inputClass = "h-6 rounded-none border-slate-300 px-1.5 text-xs shadow-none";
+const selectClass = "h-6 rounded-none border-slate-300 px-1.5 text-xs shadow-none";
 
 export default function SankhyaFilterPanel({ open, filters, onChange, onApply, onClear, lotes = [], areas = [] }) {
   const [filterConfigs, setFilterConfigs] = useState(() => {
@@ -219,10 +219,10 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
   const renderOperatedField = (field, renderInput) => {
     const operator = operators[field.id] || "between";
     if (operator === "between") {
-      return <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">{renderInput(field, "min")}<span className="text-[var(--mg-text-3)]">a</span>{renderInput(field, "max")}</div>;
+      return <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">{renderInput(field, "min")}<span className="text-slate-500">a</span>{renderInput(field, "max")}</div>;
     }
     if (operator === "empty" || operator === "notEmpty") {
-      return <div className="h-6 flex items-center px-1.5 border border-[var(--mg-border)] bg-[var(--mg-gray-fill)] text-[11px] text-[var(--mg-text-3)]">Não precisa preencher valor</div>;
+      return <div className="h-6 flex items-center px-1.5 border border-slate-200 bg-slate-50 text-[11px] text-slate-500">Não precisa preencher valor</div>;
     }
     const suffix = operator === "gte" || operator === "gt" ? "min" : operator === "lte" || operator === "lt" ? "max" : "exact";
     return renderInput(field, suffix);
@@ -243,9 +243,9 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
     if (!field) return null;
 
     return (
-      <div key={field.id} className="filter-panel__field">
+      <div key={field.id} className="rounded-sm border border-slate-200 bg-white p-1.5 shadow-sm hover:border-emerald-200">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="filter-panel__field-label">{field.label}</label>
+          <label className="min-w-0 truncate font-semibold text-slate-700">{field.label}</label>
         </div>
         {field.type === "codeName" && renderCodeName("lote", "lotes", "Lote")}
         {field.type === "codeNameDynamic" && renderCodeName(field.id.replace("_codigo_nome", ""), field.source, field.label)}
@@ -265,7 +265,7 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
 
   if (configOpen) {
     return (
-      <section className="filter-panel cadastro-emp-scope">
+      <section className="w-full h-full min-h-0 shrink-0 border-r border-slate-300 bg-white overflow-hidden">
         <SankhyaFilterConfigDialog
           inline
           open={configOpen}
@@ -296,19 +296,19 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
   }
 
   return (
-    <aside className="filter-panel cadastro-emp-scope">
-      <div className="filter-panel__header">
-        <div className="filter-panel__header-row">
-          <Checkbox checked={!!filters.esconderAoAtualizar} onCheckedChange={(checked) => update("esconderAoAtualizar", !!checked)} className="h-3.5 w-3.5" />
-          <span className="font-semibold text-[var(--mg-text-1)]">Esconder ao atualizar</span>
+    <aside className="w-[310px] shrink-0 border-r border-slate-300 bg-white text-xs h-full min-h-0 overflow-hidden flex flex-col">
+      <div className="border-slate-300 p-1 space-y-1 bg-white shrink-0 border">
+        <div className="flex items-center gap-2 h-6">
+          <Checkbox checked={!!filters.esconderAoAtualizar} onCheckedChange={(checked) => update("esconderAoAtualizar", !!checked)} className="h-3.5 w-3.5 rounded-none" />
+          <span className="font-semibold text-slate-700">Esconder ao atualizar</span>
         </div>
-        <div className="filter-panel__actions">
-          <button type="button" onClick={() => setConfigOpen(true)} className="ios-btn tb-btn tb-btn-blue tb-btn-labeled"><Plus className="w-4 h-4" /> Filtro</button>
-          <button type="button" onClick={applyFilters} className="ios-btn tb-btn tb-btn-gray tb-btn-labeled">Aplicar</button>
+        <div className="grid grid-cols-[88px_1fr] gap-1">
+          <Button type="button" onClick={() => setConfigOpen(true)} className="h-7 rounded-none bg-green-500 hover:bg-green-600 text-white text-xs px-1"><Plus className="w-4 h-4" /> Filtro</Button>
+          <Button type="button" onClick={applyFilters} className="h-7 rounded-none bg-slate-600 hover:bg-slate-700 text-white text-xs">Aplicar</Button>
         </div>
-        <div className="filter-panel__select-row">
+        <div className="border-t border-slate-200 pt-1">
           <Select value={activeConfigId || "padrao"} onValueChange={setActiveConfigId}>
-            <SelectTrigger className="filter-panel__field-input">
+            <SelectTrigger className="h-7 rounded-none border-slate-300 px-2 text-xs shadow-none">
               <SelectValue placeholder="FILTROS PERSONALIZADOS" />
             </SelectTrigger>
             <SelectContent>
@@ -322,22 +322,22 @@ export default function SankhyaFilterPanel({ open, filters, onChange, onApply, o
         </div>
       </div>
 
-      <div className="filter-panel__section-header">
+      <div className="h-8 px-1.5 flex items-center justify-between border-b border-slate-300 bg-slate-50 font-semibold text-slate-700 shrink-0">
         <span>Filtros rápidos</span>
-        <button type="button" onClick={clearAll} className="filter-panel__clear-btn"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-white text-[9px] leading-3">×</span></button>
+        <button type="button" onClick={clearAll} className="relative"><Filter className="w-4 h-4" /><span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-slate-700 text-white text-[9px] leading-3">×</span></button>
       </div>
 
-      <div className="filter-panel__body">
+      <div className="flex-1 min-h-0 overflow-auto">
         {groupedFolders.map((folder) =>
-        <div key={folder.id} className="filter-panel__folder">
-            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="filter-panel__folder-trigger">
+        <div key={folder.id} className="border-b border-slate-300">
+            <button type="button" onClick={() => setOpenGroups({ ...openGroups, [folder.id]: !openGroups[folder.id] })} className="w-full h-8 px-2 flex items-center justify-between gap-1 bg-slate-100 font-semibold text-slate-700 text-left hover:bg-slate-200">
               <span className="flex min-w-0 items-center gap-1">
                 {openGroups[folder.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                 <span className="truncate">{folder.name}</span>
               </span>
-              <span className="filter-panel__field-count">{folder.fields.length}</span>
+              <span className="rounded-sm bg-white px-1.5 py-0.5 text-[10px] text-slate-500 border border-slate-200">{folder.fields.length}</span>
             </button>
-            {openGroups[folder.id] && <div className="filter-panel__folder-content">{folder.fields.map(renderField)}</div>}
+            {openGroups[folder.id] && <div className="p-1.5 space-y-1.5">{folder.fields.map(renderField)}</div>}
           </div>
         )}
 

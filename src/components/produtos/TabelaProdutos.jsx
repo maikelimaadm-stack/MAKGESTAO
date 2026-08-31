@@ -228,7 +228,7 @@ export default function TabelaProdutos({
   const renderCell = (produto, colunaId) => {
     const estoqueAbaixoMinimo = Number(produto.estoque_atual || 0) <= Number(produto.estoque_minimo || 0);
     if (colunaId === "numero") return <span className="font-mono">{produto.numero_produto || "-"}</span>;
-    if (colunaId === "nome") return <span className={`uppercase ${produto.ativo === false ? 'text-[var(--mg-text-3)] line-through' : ''}`}>{produto.nome_produto || "-"}</span>;
+    if (colunaId === "nome") return <span className={`uppercase ${produto.ativo === false ? 'text-slate-400 line-through' : ''}`}>{produto.nome_produto || "-"}</span>;
     if (colunaId === "tipo_uso") return produto.tipo_uso || "-";
     if (colunaId === "codigo") return produto.codigo_interno || "-";
     if (colunaId === "categoria") return produto.categoria || "-";
@@ -236,17 +236,17 @@ export default function TabelaProdutos({
     if (colunaId === "unidade") return produto.unidade_medida || "-";
     if (colunaId === "preco_custo") return `R$ ${formatarNumero(produto.preco_custo || 0)}`;
     if (colunaId === "preco_venda") return `R$ ${formatarNumero(produto.preco_venda || 0)}`;
-    if (colunaId === "estoque") return <span className={estoqueAbaixoMinimo ? "text-[var(--mg-red)] font-semibold" : "font-semibold"}>{formatarNumero(produto.estoque_atual || 0)}</span>;
+    if (colunaId === "estoque") return <span className={estoqueAbaixoMinimo ? "text-red-600 font-semibold" : "font-semibold"}>{formatarNumero(produto.estoque_atual || 0)}</span>;
     if (colunaId === "estoque_min") return formatarNumero(produto.estoque_minimo || 0);
     if (colunaId === "barras") return produto.codigo_barras || "-";
     if (colunaId === "local") return produto.local_estoque || "-";
     if (colunaId === "tipo_consumo") return produto.tipo_consumo || "-";
-    if (colunaId === "ativo") return produto.ativo !== false ? <Badge className="text-[10px] bg-[var(--mg-green-light)] text-[var(--mg-green)]">Ativo</Badge> : <Badge className="text-[10px] bg-[var(--mg-gray-fill)] text-[var(--mg-text-3)]">Inativo</Badge>;
+    if (colunaId === "ativo") return produto.ativo !== false ? <Badge className="text-[10px] bg-emerald-100 text-emerald-700">Ativo</Badge> : <Badge className="text-[10px] bg-slate-100 text-slate-500">Inativo</Badge>;
     return "-";
   };
 
   const renderFilterControl = (colunaId) => {
-    const buttonClass = `h-3 w-3 min-w-3 p-0 ${hasActiveFilter(colunaId) ? "text-[var(--mg-accent)]" : "text-[var(--mg-text-3)] hover:text-[var(--mg-text-1)]"}`;
+    const buttonClass = `h-3 w-3 min-w-3 p-0 ${hasActiveFilter(colunaId) ? "text-emerald-600" : "text-slate-300 hover:text-slate-400"}`;
     const columnLabel = COLUNAS_DISPONIVEIS.find(c => c.id === colunaId)?.label || colunaId;
     const options = columnOptions[colunaId] || [];
     const valoresSelecionados = filtroTemp.colunaId === colunaId ? filtroTemp.valores : getValoresFiltro(colunaId);
@@ -264,20 +264,20 @@ export default function TabelaProdutos({
         </PopoverTrigger>
         <PopoverContent align="end" side="bottom" sideOffset={4} className="w-[310px] p-0 z-[9999]">
           <div className="p-1 space-y-0.5 border-b">
-            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-[var(--mg-gray-fill)] rounded" onClick={() => { handleSort(colunaId); setMenuFiltroAberto(null); }}>
+            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-slate-100 rounded" onClick={() => { handleSort(colunaId); setMenuFiltroAberto(null); }}>
               <ArrowDownAZ className="w-4 h-4 mr-2" /> Classificar do Menor para o Maior
             </button>
-            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-[var(--mg-gray-fill)] rounded" onClick={() => { setSortConfig({ key: colunaId, direction: "desc" }); setMenuFiltroAberto(null); }}>
+            <button type="button" className="flex items-center w-full px-2 h-8 text-xs hover:bg-slate-100 rounded" onClick={() => { setSortConfig({ key: colunaId, direction: "desc" }); setMenuFiltroAberto(null); }}>
               <ArrowUpZA className="w-4 h-4 mr-2" /> Classificar do Maior para o Menor
             </button>
-            <button type="button" className={`flex items-center w-full px-2 h-8 text-xs rounded ${hasActiveFilter(colunaId) ? 'hover:bg-[var(--mg-gray-fill)] text-[var(--mg-text-1)]' : 'text-[var(--mg-text-3)] cursor-not-allowed'}`} disabled={!hasActiveFilter(colunaId)} onClick={() => { clearColumnFilter(colunaId); setMenuFiltroAberto(null); }}>
+            <button type="button" className={`flex items-center w-full px-2 h-8 text-xs rounded ${hasActiveFilter(colunaId) ? 'hover:bg-slate-100 text-slate-700' : 'text-slate-300 cursor-not-allowed'}`} disabled={!hasActiveFilter(colunaId)} onClick={() => { clearColumnFilter(colunaId); setMenuFiltroAberto(null); }}>
               <X className="w-4 h-4 mr-2" /> Limpar Filtro de "{columnLabel}"
             </button>
           </div>
           <div className="p-2 space-y-2">
             <Input value={buscaFiltroMenu} onChange={(e) => setBuscaFiltroMenu(e.target.value)} placeholder="PESQUISAR" className="h-8 text-xs uppercase" />
-            <div className="border border-[var(--mg-border)] rounded-sm max-h-64 overflow-y-auto p-1 bg-white">
-              <label className="flex h-8 items-center gap-2 px-2 py-0 text-xs text-[var(--mg-text-1)] border-b border-[var(--mg-border)] whitespace-nowrap overflow-hidden">
+            <div className="border border-slate-300 rounded-sm max-h-64 overflow-y-auto p-1 bg-white">
+              <label className="flex h-8 items-center gap-2 px-2 py-0 text-xs text-slate-700 border-b border-slate-200 whitespace-nowrap overflow-hidden">
                 <Checkbox checked={allVisibleSelected} onCheckedChange={(checked) => {
                   setFiltroTemp(prev => {
                     const restantes = prev.valores.filter(v => !filteredOptions.includes(v));
@@ -287,7 +287,7 @@ export default function TabelaProdutos({
                 <span className="block flex-1 overflow-hidden text-ellipsis whitespace-nowrap">(Selecionar Tudo)</span>
               </label>
               {filteredOptions.map(option => (
-                <label key={option} className="flex h-6 items-center gap-2 px-2 py-0 text-xs text-[var(--mg-text-1)] hover:bg-[var(--mg-gray-fill)] whitespace-nowrap overflow-hidden">
+                <label key={option} className="flex h-6 items-center gap-2 px-2 py-0 text-xs text-slate-700 hover:bg-slate-50 whitespace-nowrap overflow-hidden">
                   <Checkbox checked={valoresSelecionados.includes(option)} onCheckedChange={(checked) => {
                     setFiltroTemp(prev => ({ ...prev, valores: checked ? [...prev.valores, option] : prev.valores.filter(i => i !== option) }));
                   }} className="h-3.5 w-3.5 shrink-0" />
@@ -297,7 +297,7 @@ export default function TabelaProdutos({
             </div>
             <div className="flex items-center justify-end gap-2 pt-2">
               <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => { setMenuFiltroAberto(null); setBuscaFiltroMenu(""); setFiltroTemp({ colunaId: null, valores: [] }); }}>Cancelar</Button>
-              <Button size="sm" className="h-8 text-xs bg-[var(--mg-accent)] hover:bg-[var(--mg-accent-dark)] text-white" onClick={() => { setValoresFiltro(colunaId, filtroTemp.valores); setMenuFiltroAberto(null); setBuscaFiltroMenu(""); setFiltroTemp({ colunaId: null, valores: [] }); }}>OK</Button>
+              <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => { setValoresFiltro(colunaId, filtroTemp.valores); setMenuFiltroAberto(null); setBuscaFiltroMenu(""); setFiltroTemp({ colunaId: null, valores: [] }); }}>OK</Button>
             </div>
           </div>
         </PopoverContent>
@@ -309,7 +309,7 @@ export default function TabelaProdutos({
     <>
       <div className="space-y-1 overflow-hidden">
         <div className="flex justify-between items-center px-1 gap-2 flex-wrap">
-          <div className="text-xs text-[var(--mg-text-3)]">{produtosFiltrados.length} de {produtos.length} registros</div>
+          <div className="text-xs text-slate-500">{produtosFiltrados.length} de {produtos.length} registros</div>
           <div className="flex gap-2 flex-wrap">
             {selectedItems.length > 0 && (
               <DropdownMenu>
@@ -321,7 +321,7 @@ export default function TabelaProdutos({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => { selectedItems.forEach(id => { const p = produtos.find(x => x.id === id); if (p) onPrint(p); }); }} className="text-xs">Imprimir Todos</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setBulkDeleteConfirm(true)} className="text-xs text-[var(--mg-red)]">Excluir Selecionados</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setBulkDeleteConfirm(true)} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setSelectedItems([])} className="text-xs">Limpar Seleção</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -343,35 +343,35 @@ export default function TabelaProdutos({
 
                         if (coluna.id === "selecao") {
                           return (
-                            <TableHead key="selecao" style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="sticky top-0 z-40 h-7 p-0 bg-[var(--mg-gray-fill)] text-[var(--mg-text-2)] font-medium text-center align-middle px-0 border-r border-b border-[var(--mg-border)]">
+                            <TableHead key="selecao" style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="sticky top-0 z-40 h-7 p-0 bg-white text-muted-foreground font-medium text-center align-middle px-0 border-r border-b border-gray-200">
                               <div className="flex items-center justify-center w-full h-full">
-                                <Checkbox checked={selectedItems.length === produtosOrdenados.length && produtosOrdenados.length > 0} onCheckedChange={toggleSelectAll} className="peer shrink-0 shadow disabled:opacity-50 h-4 w-4 rounded-full border-2 border-[var(--mg-text-3)] data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
+                                <Checkbox checked={selectedItems.length === produtosOrdenados.length && produtosOrdenados.length > 0} onCheckedChange={toggleSelectAll} className="peer shrink-0 shadow disabled:opacity-50 h-4 w-4 rounded-full border-2 border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
                               </div>
                             </TableHead>
                           );
                         }
                         if (coluna.id === "acoes") {
                           return (
-                            <TableHead key="acoes" style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] sticky top-0 z-40 h-7 p-0 bg-[var(--mg-gray-fill)] text-[var(--mg-text-2)] font-medium text-center align-middle px-0 border-r border-b border-[var(--mg-border)]" />
+                            <TableHead key="acoes" style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] sticky top-0 z-40 h-7 p-0 bg-white text-muted-foreground font-medium text-center align-middle px-0 border-r border-b border-gray-200" />
                           );
                         }
 
                         const filterControl = renderFilterControl(coluna.id);
                         return (
-                          <TableHead key={coluna.id} style={{ width, minWidth: width, maxWidth: width }} className={`sticky top-0 z-40 relative align-middle text-[var(--mg-text-1)] px-2 pr-7 text-xs font-medium text-center border-r border-b border-[var(--mg-border)] bg-[var(--mg-gray-fill)] whitespace-normal break-words overflow-hidden h-7 ${coluna.align === "right" ? "text-right" : "text-left"}`}>
+                          <TableHead key={coluna.id} style={{ width, minWidth: width, maxWidth: width }} className={`sticky top-0 z-40 relative align-middle text-gray-900 px-2 pr-7 text-xs font-medium text-center border-r border-b border-gray-200 bg-white whitespace-normal break-words overflow-hidden h-7 ${coluna.align === "right" ? "text-right" : "text-left"}`}>
                             <div className={`inline-flex items-center h-full w-full overflow-hidden ${coluna.align === "right" ? "justify-end" : coluna.align === "center" ? "justify-center" : "justify-start"}`}>
                               <span className="truncate">{coluna.label}</span>
                             </div>
                             {filterControl && (
                               <div className="absolute right-1 top-1/2 -translate-y-1/2 z-50 flex items-center gap-1" onClick={e => e.stopPropagation()}>
                                 {filterControl}
-                                <button type="button" className={`h-4 w-4 flex items-center justify-center rounded ${isResizing ? 'text-[var(--mg-accent)] bg-[var(--mg-accent-light-bg)]' : 'text-[var(--mg-text-3)] hover:text-[var(--mg-text-1)]'}`} onClick={e => { e.stopPropagation(); toggleResizeMode(coluna.id); }} onTouchEnd={e => { e.stopPropagation(); e.preventDefault(); toggleResizeMode(coluna.id); }} title="Redimensionar coluna">
+                                <button type="button" className={`h-4 w-4 flex items-center justify-center rounded ${isResizing ? 'text-emerald-600 bg-emerald-100' : 'text-slate-300 hover:text-slate-500'}`} onClick={e => { e.stopPropagation(); toggleResizeMode(coluna.id); }} onTouchEnd={e => { e.stopPropagation(); e.preventDefault(); toggleResizeMode(coluna.id); }} title="Redimensionar coluna">
                                   <GripVertical className="w-2.5 h-2.5" />
                                 </button>
                               </div>
                             )}
                             {isResizing && (
-                              <div className="absolute top-0 -right-0 h-full w-5 z-50 flex items-center justify-center cursor-col-resize bg-[var(--mg-accent-dark)]" onMouseDown={e => startDragResize(e, coluna.id)} onTouchStart={e => startDragResize(e, coluna.id)} onClick={e => { e.stopPropagation(); setResizeColumnId(null); }} onDoubleClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
+                              <div className="absolute top-0 -right-0 h-full w-5 z-50 flex items-center justify-center cursor-col-resize bg-lime-800" onMouseDown={e => startDragResize(e, coluna.id)} onTouchStart={e => startDragResize(e, coluna.id)} onClick={e => { e.stopPropagation(); setResizeColumnId(null); }} onDoubleClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
                                 <GripVertical className="w-3.5 h-3.5 text-white" />
                               </div>
                             )}
@@ -383,39 +383,39 @@ export default function TabelaProdutos({
                   <TableBody>
                     {isLoading ? (
                       <TableRow>
-                        <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-[var(--mg-text-3)] border border-[var(--mg-border)]">Carregando...</TableCell>
+                        <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-slate-400 border border-gray-300">Carregando...</TableCell>
                       </TableRow>
                     ) : produtosOrdenados.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-[var(--mg-text-3)] border border-[var(--mg-border)]">Nenhum produto encontrado</TableCell>
+                        <TableCell colSpan={colunasOrdenadas.length} className="text-center py-8 text-xs text-slate-400 border border-gray-300">Nenhum produto encontrado</TableCell>
                       </TableRow>
                     ) : (
                       produtosOrdenados.map(produto => {
                         const estoqueAbaixoMinimo = Number(produto.estoque_atual || 0) <= Number(produto.estoque_minimo || 0);
                         return (
-                          <TableRow key={produto.id} className={`data-[state=selected]:bg-muted transition-colors border-b hover:bg-[var(--mg-accent-light-bg)] ${estoqueAbaixoMinimo ? "bg-[var(--mg-red-light)]" : ""}`} onDoubleClick={() => onEdit(produto)} onTouchEnd={(event) => handleRowTouch(produto, event)}>
+                          <TableRow key={produto.id} className={`data-[state=selected]:bg-muted transition-colors border-b hover:bg-gray-100 ${estoqueAbaixoMinimo ? "bg-red-50/40" : ""}`} onDoubleClick={() => onEdit(produto)} onTouchEnd={(event) => handleRowTouch(produto, event)}>
                             {colunasOrdenadas.map(coluna => {
                               const width = columnWidths[coluna.id] || coluna.width || 160;
                               if (coluna.id === "selecao") {
                                 return (
-                                  <TableCell key={`${produto.id}-selecao`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-[var(--mg-text-2)] font-medium text-center align-middle px-0 h-7 border-r border-b border-[var(--mg-border)]" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
+                                  <TableCell key={`${produto.id}-selecao`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-muted-foreground font-medium text-center align-middle px-0 h-7 border-r border-b border-gray-300" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
                                     <div className="flex items-center justify-center w-full h-full">
-                                      <Checkbox checked={selectedItems.includes(produto.id)} onCheckedChange={(checked) => setSelectedItems(prev => checked ? [...prev, produto.id] : prev.filter(id => id !== produto.id))} className="rounded-full peer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed shrink-0 shadow disabled:opacity-50 h-4 w-4 border-2 border-[var(--mg-text-3)] data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
+                                      <Checkbox checked={selectedItems.includes(produto.id)} onCheckedChange={(checked) => setSelectedItems(prev => checked ? [...prev, produto.id] : prev.filter(id => id !== produto.id))} className="rounded-full peer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed shrink-0 shadow disabled:opacity-50 h-4 w-4 border-2 border-gray-400 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
                                     </div>
                                   </TableCell>
                                 );
                               }
                               if (coluna.id === "acoes") {
                                 return (
-                                  <TableCell key={`${produto.id}-acoes`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-[var(--mg-text-2)] font-medium text-center align-middle px-0 h-7 border-r border-b border-[var(--mg-border)]" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
+                                  <TableCell key={`${produto.id}-acoes`} style={{ width: 25, minWidth: 25, maxWidth: 25 }} className="p-0 text-muted-foreground font-medium text-center align-middle px-0 h-7 border-r border-b border-gray-300" onClick={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
                                     <div className="flex items-center justify-center w-full h-full">
                                       <DropdownMenu>
-                                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="w-3.5 h-3.5 text-[var(--mg-text-2)]" /></Button></DropdownMenuTrigger>
+                                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-6 w-6"><MoreVertical className="w-3.5 h-3.5 text-slate-600" /></Button></DropdownMenuTrigger>
                                         <DropdownMenuContent align="start">
                                           <DropdownMenuItem onClick={() => onEdit(produto)} className="text-xs">Editar</DropdownMenuItem>
                                           <DropdownMenuItem onClick={() => onPrint(produto)} className="text-xs">Imprimir Ficha</DropdownMenuItem>
                                           <DropdownMenuSeparator />
-                                          <DropdownMenuItem onClick={() => setDeleteConfirm(produto)} className="text-xs text-[var(--mg-red)]">Excluir</DropdownMenuItem>
+                                          <DropdownMenuItem onClick={() => setDeleteConfirm(produto)} className="text-xs text-red-600">Excluir</DropdownMenuItem>
                                         </DropdownMenuContent>
                                       </DropdownMenu>
                                     </div>
@@ -423,7 +423,7 @@ export default function TabelaProdutos({
                                 );
                               }
                               return (
-                                <TableCell key={`${produto.id}-${coluna.id}`} style={{ width, minWidth: width, maxWidth: width }} className={`px-2 py-1 text-[var(--mg-text-1)] text-xs align-middle border-r border-b border-[var(--mg-border)] whitespace-normal break-words overflow-hidden ${coluna.align === "right" ? "text-right font-mono" : "uppercase"} ${coluna.align === "center" ? "text-center" : ""}`}>
+                                <TableCell key={`${produto.id}-${coluna.id}`} style={{ width, minWidth: width, maxWidth: width }} className={`px-2 py-1 text-gray-700 text-xs align-middle border-r border-b border-gray-300 whitespace-normal break-words overflow-hidden ${coluna.align === "right" ? "text-right font-mono" : "uppercase"} ${coluna.align === "center" ? "text-center" : ""}`}>
                                   {renderCell(produto, coluna.id)}
                                 </TableCell>
                               );
