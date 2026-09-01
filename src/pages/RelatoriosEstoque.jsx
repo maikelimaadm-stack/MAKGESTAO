@@ -19,25 +19,16 @@ import { getLocalEstoque, getLabelOperacao, toValue } from "../components/movime
 // ========== CONSTANTES ==========
 const MODELOS_RELATORIO = [
   { value: 'saldo_atual', label: 'Saldo Atual de Estoque', grupo: 'Estoque' },
-  { value: 'estoque_local', label: 'Estoque por Local', grupo: 'Estoque' },
   { value: 'saldo_simples', label: 'Saldo Simples por Produto', grupo: 'Estoque' },
   { value: 'estoque_lote', label: 'Estoque por Lote/Nota (FIFO)', grupo: 'Estoque' },
-  { value: 'valorizacao', label: 'Valorização de Estoque', grupo: 'Estoque' },
   { value: 'extrato_movimentacoes', label: 'Extrato de Movimentações', grupo: 'Movimentações' },
   { value: 'resumo_movimentacoes', label: 'Resumo de Movimentações por Produto', grupo: 'Movimentações' },
-  { value: 'movimentacoes_produto', label: 'Movimentações por Produto', grupo: 'Movimentações' },
-  { value: 'movimentacoes_local', label: 'Movimentações por Local', grupo: 'Movimentações' },
   { value: 'transferencias', label: 'Transferências', grupo: 'Movimentações' },
   { value: 'ajustes', label: 'Ajustes de Estoque', grupo: 'Movimentações' },
   { value: 'consumo_periodo', label: 'Consumo por Período', grupo: 'Consumo/Custos' },
-  { value: 'consumo_centro', label: 'Consumo por Centro de Custo', grupo: 'Consumo/Custos' },
-  { value: 'consumo_vinculo', label: 'Consumo por Vínculo (Lote/Área/Máquina)', grupo: 'Consumo/Custos' },
   { value: 'perdas_quebras', label: 'Perdas e Quebras', grupo: 'Perdas' },
-  { value: 'ranking_perdas', label: 'Ranking de Perdas por Produto', grupo: 'Perdas' },
   { value: 'entradas_fornecedor', label: 'Entradas por Fornecedor', grupo: 'Compras/Entradas' },
-  { value: 'entradas_analitico', label: 'Entradas Analítico', grupo: 'Compras/Entradas' },
   { value: 'kardex', label: 'Kardex do Produto', grupo: 'Auditoria' },
-  { value: 'saldos_negativos', label: 'Saldos Negativos', grupo: 'Auditoria' },
 ];
 
 const formatarNumero = (num, decimais = 2) => {
@@ -499,7 +490,7 @@ export default function RelatoriosEstoque() {
   const precisaData = ['extrato_movimentacoes', 'resumo_movimentacoes', 'consumo_periodo', 'perdas_quebras', 'entradas_fornecedor', 'kardex', 'transferencias', 'ajustes'].includes(modeloRelatorio);
   const precisaProduto = ['kardex'].includes(modeloRelatorio);
   const precisaFornecedor = ['entradas_fornecedor'].includes(modeloRelatorio);
-  const precisaCentroCusto = ['consumo_periodo', 'consumo_centro'].includes(modeloRelatorio);
+  const precisaCentroCusto = ['consumo_periodo'].includes(modeloRelatorio);
 
   // ========== RENDER ==========
   return (

@@ -42,8 +42,8 @@ const COLUNAS_ANALITICO = [
   { id: 'saldo', label: 'Saldo', default: true },
   { id: 'status', label: 'Status', default: true },
   { id: 'centro_custo', label: 'Centro Custo', default: false },
-  { id: 'safra', label: 'Safra', default: false },
-];
+  { id: 'plano_contas', label: 'Plano de Contas', default: false },
+  ];
 
 const COLUNAS_SINTETICO = [
   { id: 'agrupamento', label: 'Agrupamento', default: true },
@@ -80,7 +80,7 @@ export default function RelatorioFinanceiro() {
     queryKey: ['lancamentos_relatorio', empresaSelecionadaId],
     queryFn: async () => {
       const all = await base44.entities.LancamentoFinanceiro.list('-data_emissao');
-      return all.filter(l => l.empresa_id === empresaSelecionadaId && !l.lancamento_pai_id);
+      return all.filter(l => l.empresa_id === empresaSelecionadaId);
     },
     enabled: !!empresaSelecionadaId,
   });
@@ -125,9 +125,8 @@ export default function RelatorioFinanceiro() {
         switch (agrupamento) {
           case 'status': chave = l.status || 'Sem status'; break;
           case 'fornecedor': chave = l.fornecedor_nome || l.cliente_nome || 'Sem identificação'; break;
-          case 'centro_custo': chave = l.centro_custo_nome || 'Sem centro de custo'; break;
-          case 'safra': chave = l.safra_nome || 'Sem safra'; break;
-          case 'grupo': chave = l.grupo_nome || 'Sem grupo'; break;
+          case 'centro_custo': chave = (l.rateio_centros_custo || []).map(r => r.centro_custo_nome).filter(Boolean).join(', ') || 'Sem centro de custo'; break;
+          case 'grupo': chave = (l.rateio_grupos || []).map(r => r.grupo_financeiro_nome).filter(Boolean).join(', ') || 'Sem grupo'; break;
           default: chave = 'Sem classificação';
         }
         
@@ -262,7 +261,6 @@ export default function RelatorioFinanceiro() {
                       <SelectItem value="status">Status</SelectItem>
                       <SelectItem value="fornecedor">Fornecedor/Cliente</SelectItem>
                       <SelectItem value="centro_custo">Centro de Custo</SelectItem>
-                      <SelectItem value="safra">Safra</SelectItem>
                       <SelectItem value="grupo">Grupo Financeiro</SelectItem>
                     </SelectContent>
                   </Select>
@@ -289,7 +287,7 @@ export default function RelatorioFinanceiro() {
                 <PopoverContent className="w-64">
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm mb-2">Status</h4>
-                    {['Pendente', 'Pago Parcial', 'Pago', 'Vencido', 'Cancelado'].map(s => (
+                    {['Aberto', 'Parcial', 'Pago', 'Recebido', 'Cancelado'].map(s => (
                       <div key={s} className="flex items-center space-x-2">
                         <Checkbox checked={statusFiltro.includes(s)} onCheckedChange={() => toggleStatus(s)} />
                         <label className="text-sm cursor-pointer">{s}</label>
@@ -384,7 +382,7 @@ export default function RelatorioFinanceiro() {
                   {colunasVisiveis.includes('saldo') && <TableHead className="border border-black text-xs font-bold text-right py-1">Saldo</TableHead>}
                   {colunasVisiveis.includes('status') && <TableHead className="border border-black text-xs font-bold py-1">Status</TableHead>}
                   {colunasVisiveis.includes('centro_custo') && <TableHead className="border border-black text-xs font-bold py-1">C. Custo</TableHead>}
-                  {colunasVisiveis.includes('safra') && <TableHead className="border border-black text-xs font-bold py-1">Safra</TableHead>}
+                  {colunasVisiveis.includes('plano_contas') && <TableHead className="border border-black text-xs font-bold py-1">Plano Contas</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -400,8 +398,8 @@ export default function RelatorioFinanceiro() {
                     {colunasVisiveis.includes('valor_pago') && <TableCell className="border border-gray-300 text-xs text-right py-1">{formatarMoeda(l.valor_pago || 0)}</TableCell>}
                     {colunasVisiveis.includes('saldo') && <TableCell className="border border-gray-300 text-xs text-right py-1 font-semibold">{formatarMoeda((l.valor_total || 0) - (l.valor_pago || 0))}</TableCell>}
                     {colunasVisiveis.includes('status') && <TableCell className="border border-gray-300 text-xs py-1">{l.status}</TableCell>}
-                    {colunasVisiveis.includes('centro_custo') && <TableCell className="border border-gray-300 text-xs py-1">{l.centro_custo_nome || '-'}</TableCell>}
-                    {colunasVisiveis.includes('safra') && <TableCell className="border border-gray-300 text-xs py-1">{l.safra_nome || '-'}</TableCell>}
+                    {colunasVisiveis.includes('centro_custo') && <TableCell className="border border-gray-300 text-xs py-1">{(l.rateio_centros_custo || []).map(r => r.centro_custo_nome).filter(Boolean).join(', ') || '-'}</TableCell>}
+                    {colunasVisiveis.includes('plano_contas') && <TableCell className="border border-gray-300 text-xs py-1">{l.plano_contas_nome || '-'}</TableCell>}
                   </TableRow>
                 ))}
                 <TableRow className="bg-gray-100 font-bold">
