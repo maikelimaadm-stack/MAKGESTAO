@@ -674,6 +674,33 @@ export default function MovimentacoesEstoque() {
     movimentacoes.filter((m) => m.movimentacao_grupo_id === mov.movimentacao_grupo_id) :
     [mov];
 
+    // ===== Vínculo estoque↔financeiro =====
+    // Antes de excluir, verificar o lançamento financeiro vinculado:
+    //  - se tem baixa, bloquear (não pode excluir estoque de conta já paga);
+    //  - se não tem baixa, excluir o financeiro junto (ele foi criado pela movimentação).
+    const lancamentoOrigemId = mov.lancamento_origem_id ||
+    registrosParaExcluir.find((m) => m.lancamento_origem_id)?.lancamento_origem_id ||
+    null;
+
+    let parcelasFinanceirasParaExcluir = [];
+    if (lancamentoOrigemId) {
+      const lancOrigem = lancamentosFinanceiros.find((l) => l.id === lancamentoOrigemId);
+      const grupoFinId = lancOrigem?.parcelamento_grupo_id || null;
+      const parcelasRelacionadas = lancOrigem ?
+      (grupoFinId ? lancamentosFinanceiros.filter((l) => l.parcelamento_grupo_id === grupoFinId) : [lancOrigem]) :
+      [];
+
+      const possuiBaixa = parcelasRelacionadas.some((l) =>
+      baixasFinanceiras.some((b) => b.lancamento_id === l.id)
+      );
+      if (possuiBaixa) {
+        toast.error('Não é possível excluir: o financeiro vinculado já teve baixa. Cancele a baixa no financeiro primeiro.');
+        setDeleteConfirmId(null);
+        return;
+      }
+      parcelasFinanceirasParaExcluir = parcelasRelacionadas.map((l) => l.id);
+    }
+
     // Estorna os lotes consumidos numa saída/transferência (restaura o saldo disponível)
     const restaurarLotesConsumidos = async (reg) => {
       if (!Array.isArray(reg.lotes_consumidos)) return;
@@ -724,10 +751,17 @@ export default function MovimentacoesEstoque() {
         }
         await base44.entities.MovimentacaoEstoque.delete(reg.id);
       }
+
+      // Excluir as parcelas financeiras vinculadas (sem baixa) criadas pela movimentação
+      for (const idFin of parcelasFinanceirasParaExcluir) {
+        await base44.entities.LancamentoFinanceiro.delete(idFin);
+      }
     } catch (e) {
       queryClient.invalidateQueries({ queryKey: ['movimentacoes'] });
       queryClient.invalidateQueries({ queryKey: ['produtos'] });
       queryClient.invalidateQueries({ queryKey: ['estoque_lote_nota_movimentacao'] });
+      queryClient.invalidateQueries({ queryKey: ['lancamentos_financeiros'] });
+      queryClient.invalidateQueries({ queryKey: ['baixas_financeiro'] });
       toast.error(e.message || 'Erro ao excluir.');
       setDeleteConfirmId(null);
       return;
@@ -736,6 +770,8 @@ export default function MovimentacoesEstoque() {
     queryClient.invalidateQueries({ queryKey: ['movimentacoes'] });
     queryClient.invalidateQueries({ queryKey: ['produtos'] });
     queryClient.invalidateQueries({ queryKey: ['estoque_lote_nota_movimentacao'] });
+    queryClient.invalidateQueries({ queryKey: ['lancamentos_financeiros'] });
+    queryClient.invalidateQueries({ queryKey: ['baixas_financeiro'] });
     toast.success('Registro excluído com sucesso!');
     setDeleteConfirmId(null);
   };

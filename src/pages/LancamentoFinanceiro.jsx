@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Progress } from "@/components/ui/progress";
 import { Settings } from "lucide-react";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
+import { calcularStatusLancamento } from "@/lib/financeiroStatus";
 
 import FormularioCompraFinanceiro from "../components/financeiro/FormularioCompraFinanceiro.jsx";
 import TabelaFinanceiro from "../components/financeiro/TabelaFinanceiro.jsx";
@@ -89,31 +90,31 @@ export default function LancamentoFinanceiro() {
       const lancamento = lancamentos.find(l => l.id === id);
       const baixas = await base44.entities.BaixaFinanceira.list();
 
-      // Se é registro principal de um grupo, excluir todas as parcelas do grupo
-      if (lancamento?.parcelamento_grupo_id) {
-        const parcelasDoGrupo = lancamentos.filter(
-          l => l.parcelamento_grupo_id === lancamento.parcelamento_grupo_id
-        );
-        // Verificar se alguma parcela tem baixa
-        for (const parcela of parcelasDoGrupo) {
-          const baixaAssociada = baixas.find(b => b && b.lancamento_id === parcela.id);
-          if (baixaAssociada) {
-            throw new Error(`Parcela ${parcela.numero_parcela_seq || ''} possui baixa associada. Cancele a baixa primeiro.`);
-          }
+      // Coletar todos os IDs do grupo (parcelado) ou apenas o próprio (avulso)
+      const parcelasDoGrupo = lancamento?.parcelamento_grupo_id
+        ? lancamentos.filter(l => l.parcelamento_grupo_id === lancamento.parcelamento_grupo_id)
+        : [lancamento];
+      const idsParaExcluir = parcelasDoGrupo.map(p => p.id).filter(Boolean);
+
+      // 1) Bloquear se alguma parcela tem baixa
+      for (const parcela of parcelasDoGrupo) {
+        const baixaAssociada = baixas.find(b => b && b.lancamento_id === parcela.id);
+        if (baixaAssociada) {
+          throw new Error(`Parcela ${parcela.numero_parcela_seq || ''} possui baixa associada. Cancele a baixa primeiro.`);
         }
-        // Excluir todas as parcelas do grupo
-        for (const parcela of parcelasDoGrupo) {
-          await base44.entities.LancamentoFinanceiro.delete(parcela.id);
-        }
-        return;
       }
 
-      // Lançamento avulso (sem grupo)
-      const baixaAssociada = baixas.find(b => b && b.lancamento_id === id);
-      if (baixaAssociada) {
-        throw new Error('Não é possível excluir lançamento com baixa associada. Cancele a baixa primeiro.');
+      // 2) Bloquear se há movimentação de estoque vinculada (lancamento_origem_id)
+      const movimentacoes = await base44.entities.MovimentacaoEstoque.list();
+      const movsVinculadas = movimentacoes.filter(m => m.lancamento_origem_id && idsParaExcluir.includes(m.lancamento_origem_id));
+      if (movsVinculadas.length > 0) {
+        throw new Error('Existe movimentação de estoque vinculada a este lançamento. Exclua a movimentação de estoque primeiro (ela removerá este financeiro automaticamente).');
       }
-      return base44.entities.LancamentoFinanceiro.delete(id);
+
+      // 3) Excluir todas as parcelas
+      for (const idExcluir of idsParaExcluir) {
+        await base44.entities.LancamentoFinanceiro.delete(idExcluir);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lancamentos_financeiros'] });
@@ -386,9 +387,10 @@ export default function LancamentoFinanceiro() {
         usuario_responsavel: user.email
       });
 
+      const novoStatusLote = calcularStatusLancamento(lancamento.tipo, lancamento.valor_total, lancamento.valor_total);
       await base44.entities.LancamentoFinanceiro.update(lancamento.id, {
         valor_pago: lancamento.valor_total,
-        status: 'Pago'
+        status: novoStatusLote
       });
       queryClient.invalidateQueries({ queryKey: ['lancamentos_financeiros'] });
       queryClient.invalidateQueries({ queryKey: ['baixas_financeiro'] });

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { calcularStatusLancamento } from "@/lib/financeiroStatus";
 
 const FORMAS_PAGAMENTO_PADRAO = [
   'Dinheiro',
@@ -148,14 +149,7 @@ export default function BaixaFinanceira({ lancamento, onClose, onSuccess, dadosL
       const baixaCriada = await base44.entities.BaixaFinanceira.create(baixa);
 
       const totalPago = (lancamento.valor_pago || 0) + parseMoeda(data.valor_baixa);
-      const saldoRestante = (lancamento.valor_total || 0) - totalPago;
-      
-      let novoStatus = 'Pendente';
-      if (saldoRestante <= 0.01) {
-        novoStatus = 'Pago';
-      } else if (totalPago > 0) {
-        novoStatus = 'Pago Parcial';
-      }
+      const novoStatus = calcularStatusLancamento(lancamento.tipo, lancamento.valor_total, totalPago);
 
       const updateData = {
         valor_pago: totalPago,
@@ -163,6 +157,7 @@ export default function BaixaFinanceira({ lancamento, onClose, onSuccess, dadosL
       };
 
       // Se baixa parcial e tem próxima previsão, atualizar vencimento
+      const saldoRestante = (lancamento.valor_total || 0) - totalPago;
       if (saldoRestante > 0.01 && data.proxima_previsao) {
         updateData.data_vencimento = data.proxima_previsao;
       }
@@ -213,14 +208,7 @@ export default function BaixaFinanceira({ lancamento, onClose, onSuccess, dadosL
       const allBaixas = await base44.entities.BaixaFinanceira.list();
       const baixasDoLancamento = allBaixas.filter(b => b.lancamento_id === lancamento.id);
       const totalPago = baixasDoLancamento.reduce((sum, b) => sum + (b.valor_baixa || 0), 0);
-      const saldoRestante = (lancamento.valor_total || 0) - totalPago;
-      
-      let novoStatus = 'Pendente';
-      if (saldoRestante <= 0.01 && totalPago > 0) {
-        novoStatus = 'Pago';
-      } else if (totalPago > 0) {
-        novoStatus = 'Pago Parcial';
-      }
+      const novoStatus = calcularStatusLancamento(lancamento.tipo, lancamento.valor_total, totalPago);
 
       await base44.entities.LancamentoFinanceiro.update(lancamento.id, {
         valor_pago: totalPago,
@@ -246,18 +234,7 @@ export default function BaixaFinanceira({ lancamento, onClose, onSuccess, dadosL
       const allBaixas = await base44.entities.BaixaFinanceira.list();
       const baixasRestantes = allBaixas.filter(b => b.lancamento_id === lancamento.id);
       const totalPago = baixasRestantes.reduce((sum, b) => sum + (b.valor_baixa || 0), 0);
-      const saldoRestante = (lancamento.valor_total || 0) - totalPago;
-      
-      let novoStatus = 'Pendente';
-      if (saldoRestante <= 0.01 && totalPago > 0) {
-        novoStatus = 'Pago';
-      } else if (totalPago > 0) {
-        novoStatus = 'Pago Parcial';
-      }
-
-      if (totalPago === 0) {
-        novoStatus = 'Pendente';
-      }
+      const novoStatus = calcularStatusLancamento(lancamento.tipo, lancamento.valor_total, totalPago);
 
       await base44.entities.LancamentoFinanceiro.update(lancamento.id, {
         valor_pago: totalPago,
