@@ -170,6 +170,9 @@ export default function LancamentosAbastecimento() {
             setEditingItem(null);
             queryClient.invalidateQueries({ queryKey: ["abastecimentos"] });
             queryClient.invalidateQueries({ queryKey: ["maquinas-abastecimento"] });
+            queryClient.invalidateQueries({ queryKey: ["lotes-estoque-abastecimento"] });
+            queryClient.invalidateQueries({ queryKey: ["movimento-abastecimento"] });
+            queryClient.invalidateQueries({ queryKey: ["movimentacoes-estoque"] });
           }}
           onCancel={() => {setShowForm(false);setEditingItem(null);}} /> :
 

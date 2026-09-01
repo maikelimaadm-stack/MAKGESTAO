@@ -142,10 +142,45 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
     queryKey: ["lotes-estoque-abastecimento", empresaSelecionadaId],
     queryFn: async () => {
       const all = await base44.entities.EstoqueLoteNota.list();
-      return all.filter((l) => l.empresa_id === empresaSelecionadaId && l.status === "Disponivel" && (l.quantidade_disponivel || 0) > 0);
+      return all.filter((l) => l.empresa_id === empresaSelecionadaId);
     },
     enabled: !!empresaSelecionadaId
   });
+
+  // Buscar movimento de estoque vinculado ao abastecimento em edição (para reverter)
+  const { data: movimentoAntigo = [] } = useQuery({
+    queryKey: ["movimento-abastecimento", abastecimento?.id],
+    queryFn: async () => {
+      if (!abastecimento?.id) return [];
+      const porRef = abastecimento.referencia_movimentacao
+        ? await base44.entities.MovimentacaoEstoque.filter({ referencia_movimentacao: abastecimento.referencia_movimentacao })
+        : [];
+      const todas = await base44.entities.MovimentacaoEstoque.list();
+      const porObs = todas.filter((m) => m.observacoes === `Saída automática por abastecimento ${abastecimento.id}`);
+      const movs = [...porRef];
+      porObs.forEach((m) => { if (!movs.find((x) => x.id === m.id)) movs.push(m); });
+      return movs;
+    },
+    enabled: !!abastecimento?.id
+  });
+
+  const lotesConsumidosAntigo = useMemo(
+    () => (movimentoAntigo || []).flatMap((m) => m.lotes_consumidos || []),
+    [movimentoAntigo]
+  );
+
+  // Lotes efetivos: ao editar, adiciona de volta as quantidades consumidas no lançamento original
+  const lotesEstoqueEfetivo = useMemo(() => {
+    if (!abastecimento || lotesConsumidosAntigo.length === 0) return lotesEstoque;
+    return lotesEstoque.map((l) => {
+      const consumidoAntigo = lotesConsumidosAntigo
+        .filter((oc) => oc.lote_id === l.id)
+        .reduce((acc, oc) => acc + (oc.quantidade_consumida || 0), 0);
+      return consumidoAntigo > 0
+        ? { ...l, quantidade_disponivel: (l.quantidade_disponivel || 0) + consumidoAntigo }
+        : l;
+    });
+  }, [lotesEstoque, lotesConsumidosAntigo, abastecimento]);
 
   // Buscar todos os abastecimentos do ativo para pegar o último
   const { data: abastecimentosDoAtivo = [] } = useQuery({
@@ -170,25 +205,25 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
   const locaisFiltrados = useMemo(() => {
     if (produtosCombustivelIds.length === 0) return [];
     const locaisComSaldo = new Set();
-    lotesEstoque.forEach((lote) => {
+    lotesEstoqueEfetivo.forEach((lote) => {
       if (produtosCombustivelIds.includes(lote.produto_id) && (lote.quantidade_disponivel || 0) > 0) {
         locaisComSaldo.add(lote.local_estoque_id);
       }
     });
     return locais.filter((l) => locaisComSaldo.has(l.id));
-  }, [locais, lotesEstoque, produtosCombustivelIds]);
+  }, [locais, lotesEstoqueEfetivo, produtosCombustivelIds]);
 
   // Produtos disponíveis = combustíveis vinculados ao ativo que possuem saldo no local selecionado
   const produtosDisponiveis = useMemo(() => {
     if (!formData.local_estoque_id || produtosCombustivelIds.length === 0) return [];
     const produtosComSaldo = new Set();
-    lotesEstoque.forEach((lote) => {
+    lotesEstoqueEfetivo.forEach((lote) => {
       if (lote.local_estoque_id === formData.local_estoque_id && produtosCombustivelIds.includes(lote.produto_id) && (lote.quantidade_disponivel || 0) > 0) {
         produtosComSaldo.add(lote.produto_id);
       }
     });
     return todosProdutos.filter((p) => produtosComSaldo.has(p.id));
-  }, [todosProdutos, lotesEstoque, formData.local_estoque_id, produtosCombustivelIds]);
+  }, [todosProdutos, lotesEstoqueEfetivo, formData.local_estoque_id, produtosCombustivelIds]);
 
   const custoFifoPreview = useMemo(() => {
     const quantidade = Number(formData.quantidade_litros || 0);
@@ -196,7 +231,7 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
       return { valorUnitario: 0, valorTotal: 0, saldoInsuficiente: false };
     }
 
-    const lotesLocal = lotesEstoque
+    const lotesLocal = lotesEstoqueEfetivo
       .filter((l) => l.produto_id === formData.produto_id && l.local_estoque_id === formData.local_estoque_id)
       .sort((a, b) => new Date(a.data_documento || a.created_date) - new Date(b.data_documento || b.created_date));
 
@@ -218,7 +253,7 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
       valorTotal: Number(total.toFixed(2)),
       saldoInsuficiente: restante > 0,
     };
-  }, [formData.produto_id, formData.local_estoque_id, formData.quantidade_litros, lotesEstoque]);
+  }, [formData.produto_id, formData.local_estoque_id, formData.quantidade_litros, lotesEstoqueEfetivo]);
 
   const tiposFiltrados = useMemo(() => {
     if (!formData.grupo_atividade_id) return [];
@@ -300,19 +335,16 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
       setSaldoDisponivel(null);
       return;
     }
-    const saldo = lotesEstoque.
+    const saldo = lotesEstoqueEfetivo.
     filter((l) => l.produto_id === formData.produto_id && l.local_estoque_id === formData.local_estoque_id).
     reduce((acc, l) => acc + (l.quantidade_disponivel || 0), 0);
     setSaldoDisponivel(saldo);
-  }, [empresaSelecionadaId, formData.produto_id, formData.local_estoque_id, lotesEstoque]);
+  }, [empresaSelecionadaId, formData.produto_id, formData.local_estoque_id, lotesEstoqueEfetivo]);
 
   // ========== MUTATION ==========
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      if (abastecimento?.id) {
-        throw new Error("Este lançamento ainda não permite salvamento na edição");
-      }
       if (!maquinaSelecionada) throw new Error("Selecione um ativo");
       const produtoSelecionado = todosProdutos.find((p) => p.id === data.produto_id);
       if (!produtoSelecionado) throw new Error("Produto não encontrado");
@@ -322,15 +354,45 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
       if ((saldoDisponivel || 0) < quantidade) throw new Error("Saldo insuficiente no local selecionado");
 
       const novaMedicao = Number(data.medicao || 0);
+      const isEdit = !!abastecimento?.id;
 
       // Validação de medição com base no último abastecimento
       if (maquinaSelecionada.tipo_medicao !== "Nenhum") {
         if (medicaoAnterior != null && novaMedicao <= medicaoAnterior) {
           throw new Error(`Nova medição (${novaMedicao}) deve ser maior que a última medição (${medicaoAnterior})`);
         }
-        const medicaoAtualAtivo = Number(maquinaSelecionada.medicao_atual || 0);
-        if (medicaoAnterior != null && novaMedicao <= medicaoAtualAtivo) {
-          throw new Error(`Nova medição (${novaMedicao}) deve ser maior que a medição atual do ativo (${medicaoAtualAtivo})`);
+      }
+
+      // Se editando, reverter o movimento de estoque antigo antes de refazer
+      if (isEdit) {
+        // Bloquear edição se houver abastecimentos mais recentes (corromperia a cadeia de consumo)
+        if (maquinaSelecionada.tipo_medicao !== "Nenhum") {
+          const maisRecentes = abastecimentosDoAtivo.filter(
+            (a) => a.id !== abastecimento.id &&
+              new Date(a.data_abastecimento) > new Date(abastecimento.data_abastecimento)
+          );
+          if (maisRecentes.length > 0) {
+            throw new Error("Não é possível editar: existem abastecimentos mais recentes para este ativo. Exclua os registros mais novos primeiro.");
+          }
+        }
+
+        const porRef = abastecimento.referencia_movimentacao
+          ? await base44.entities.MovimentacaoEstoque.filter({ referencia_movimentacao: abastecimento.referencia_movimentacao })
+          : [];
+        const todas = await base44.entities.MovimentacaoEstoque.list();
+        const porObs = todas.filter((m) => m.observacoes === `Saída automática por abastecimento ${abastecimento.id}`);
+        const movsAntigas = [...porRef];
+        porObs.forEach((m) => { if (!movsAntigas.find((x) => x.id === m.id)) movsAntigas.push(m); });
+
+        for (const mov of movsAntigas) {
+          for (const lote of mov.lotes_consumidos || []) {
+            const loteAtual = await base44.entities.EstoqueLoteNota.get(lote.lote_id);
+            await base44.entities.EstoqueLoteNota.update(lote.lote_id, {
+              quantidade_disponivel: (loteAtual.quantidade_disponivel || 0) + (lote.quantidade_consumida || 0),
+              status: "Disponivel"
+            });
+          }
+          await base44.entities.MovimentacaoEstoque.delete(mov.id);
         }
       }
 
@@ -351,8 +413,8 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
         }
       }
 
-      // FIFO
-      const lotesLocal = lotesEstoque.
+      // FIFO (sobre lotes efetivos, já considerando a reversão ao editar)
+      const lotesLocal = lotesEstoqueEfetivo.
       filter((l) => l.produto_id === data.produto_id && l.local_estoque_id === data.local_estoque_id).
       sort((a, b) => new Date(a.data_documento || a.created_date) - new Date(b.data_documento || b.created_date));
 
@@ -381,7 +443,7 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
       const grupoSel = gruposAtividade.find((g) => g.id === data.grupo_atividade_id);
       const localEstoqueSel = locais.find((l) => l.id === data.local_estoque_id);
 
-      const abastecimentoCriado = await base44.entities.AbastecimentoMaquina.create({
+      const payloadAbast = {
         empresa_id: empresaSelecionadaId,
         maquina_id: maquinaSelecionada.id,
         maquina_nome: maquinaSelecionada.nome,
@@ -404,7 +466,14 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
         tipo_servico: data.tipo_servico,
         responsavel: data.responsavel,
         referencia_movimentacao: referenciaMovimentacao
-      });
+      };
+
+      let abastecimentoSalvo;
+      if (isEdit) {
+        abastecimentoSalvo = await base44.entities.AbastecimentoMaquina.update(abastecimento.id, payloadAbast);
+      } else {
+        abastecimentoSalvo = await base44.entities.AbastecimentoMaquina.create(payloadAbast);
+      }
 
       await base44.entities.MovimentacaoEstoque.create({
         empresa_id: empresaSelecionadaId,
@@ -426,7 +495,7 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
         tipo_vinculo: "maquina",
         lotes_consumidos: lotesConsumidos,
         referencia_movimentacao: referenciaMovimentacao,
-        observacoes: `Saída automática por abastecimento ${abastecimentoCriado.id}`,
+        observacoes: `Saída automática por abastecimento ${abastecimentoSalvo.id}`,
         status: "Ativa",
         origem_sistema: "manual",
         is_registro_principal: true,
@@ -449,10 +518,10 @@ export default function FormularioLancamentoAbastecimento({ abastecimento, onSav
         await base44.entities.Maquina.update(maquinaSelecionada.id, { medicao_atual: novaMedicao });
       }
 
-      return abastecimentoCriado;
+      return abastecimentoSalvo;
     },
     onSuccess: () => {
-      toast.success("Abastecimento lançado com sucesso");
+      toast.success(abastecimento?.id ? "Abastecimento atualizado com sucesso" : "Abastecimento lançado com sucesso");
       onSave();
     },
     onError: (error) => toast.error(error.message)
