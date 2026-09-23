@@ -67,6 +67,7 @@ const DEFAULT_MENU = [
 { id: "pesagens", title: "Pesagens", url: "Pesagens", icon: "Scale" },
 { id: "custos", title: "Custos de Safra", url: "CustosSafra", icon: "TrendingUp" },
 { id: "movimentacoes", title: "Movimentacoes Estoque", url: "MovimentacoesEstoque", icon: "ArrowRightLeft" },
+{ id: "importacao-xml-massa", title: "Importação XML em Massa", url: "ImportacaoXMLMassa", icon: "FileText" },
 {
   id: "cotacoes",
   title: "Cotacoes",

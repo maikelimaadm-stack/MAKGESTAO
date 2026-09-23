@@ -20,6 +20,7 @@ import Bebedouros from './pages/Bebedouros';
 import RelatorioGadoMapaGeral from './pages/RelatorioGadoMapaGeral';
 import RelatorioEstoqueDepositos from './pages/RelatorioEstoqueDepositos';
 import DiagnosticoDepositoCocho from './pages/DiagnosticoDepositoCocho';
+import ImportacaoXMLMassa from './pages/ImportacaoXMLMassa';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -129,6 +130,11 @@ const AuthenticatedApp = () => {
       <Route path="/DiagnosticoDepositoCocho" element={
         <LayoutWrapper currentPageName="DiagnosticoDepositoCocho">
           <DiagnosticoDepositoCocho />
+        </LayoutWrapper>
+      } />
+      <Route path="/ImportacaoXMLMassa" element={
+        <LayoutWrapper currentPageName="ImportacaoXMLMassa">
+          <ImportacaoXMLMassa />
         </LayoutWrapper>
       } />
       <Route path="*" element={<PageNotFound />} />
