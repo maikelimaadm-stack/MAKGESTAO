@@ -970,6 +970,9 @@ export default function MapaGeral() {
           showTarefasButton={podeUsarTarefasMapa}
           showInsightsButton={mapaGeralPermissions.visualizar_insights}
           showFiltrosButton={mapaGeralPermissions.visualizar_filtros_camadas}
+          showVegetacaoButton={mapaGeralPermissions.visualizar_areas}
+          vegetacaoAtivo={showNdvi}
+          onToggleVegetacao={() => {if (!mapaGeralPermissions.visualizar_areas) return;setShowNdvi((v) => !v);}}
           onOpenTarefas={() => {if (!podeUsarTarefasMapa) return;setTarefasContext({});setShowTarefas(true);}}
           onOpenInsights={() => {if (!mapaGeralPermissions.visualizar_insights) return;setShowInsights(true);}}
           onOpenFiltros={() => {if (!mapaGeralPermissions.visualizar_filtros_camadas) return;setShowFiltros(true);}} />
