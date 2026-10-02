@@ -338,7 +338,8 @@ export default function useMapRenderer(mapInstanceRef) {
 
     if (!show) return;
 
-    linhas.forEach(linha => {
+    linhas.forEach((linha, index) => {
+      const zIndex = 30 + index * 3;
       const coords = linha.coordenadas?.coords || [];
       if (coords.length < 2) return;
 
@@ -352,15 +353,15 @@ export default function useMapRenderer(mapInstanceRef) {
           existente.layers.forEach(layer => layer.setPath(paths));
           existente.assinatura = assinatura;
         }
-        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.65, strokeWeight: 4.2 });
-        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.85, strokeWeight: 3.2 });
-        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2 });
+        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 1, strokeWeight: 4.2, zIndex });
+        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.8, strokeWeight: 3.2, zIndex: zIndex + 1 });
+        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: zIndex + 2 });
         return;
       }
 
-      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.65, strokeWeight: 4.2, zIndex: 30, clickable: false, geodesic: true });
-      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.85, strokeWeight: 3.2, zIndex: 31, clickable: false, geodesic: true });
-      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: 32, geodesic: true });
+      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 1, strokeWeight: 4.2, zIndex, clickable: false, geodesic: true });
+      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.8, strokeWeight: 3.2, zIndex: zIndex + 1, clickable: false, geodesic: true });
+      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: zIndex + 2, geodesic: true });
 
       const infoWindow = new google.maps.InfoWindow({ maxWidth: 260 });
 
