@@ -909,7 +909,8 @@ export default function MapaGeral() {
   // ─── Renderização incremental ───
   useEffect(() => {
     if (!mapReady) return;
-    const somenteFoto = modoColoracao === 'satelite';
+    // Com a vegetação ligada a área fica só com o contorno, para a imagem não sair lavada.
+    const somenteFoto = modoColoracao === 'satelite' || showNdvi;
     renderer.syncAreas(
       areasFiltradas,
       mapaGeralPermissions.visualizar_areas && showAreas,
@@ -919,7 +920,7 @@ export default function MapaGeral() {
       somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento,
       somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover
     );
-  }, [areasFiltradas, showAreas, mapReady, modoColoracao, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
+  }, [areasFiltradas, showAreas, mapReady, modoColoracao, showNdvi, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
   // Função de texto extra para labels (UA/ha ou situação do pasto)
   const getLabelExtraText = useCallback((area) => {
     if (modoColoracao === 'ua_ha') {

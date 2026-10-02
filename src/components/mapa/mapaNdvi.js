@@ -19,10 +19,22 @@ const ANCORA_COMPOSICAO = Date.UTC(2000, 1, 18); // primeira composição de 8 d
 const PASSO_COMPOSICAO = 8 * 24 * 60 * 60 * 1000;
 const ATRASO_DIAS = 3; // margem para a composição mais recente já estar publicada
 const LIMITE_RECORTES = 1200; // memória dos tiles já recortados
-const OPACIDADE_BASE = 0.55; // mantém a imagem do Google visível sob a vegetação
-const ALFA_MINIMO = 0.45; // quanto a camada ainda aparece no zoom mais próximo
-const QUEDA_POR_ZOOM = 0.08; // a camada fica mais leve conforme o mapa aproxima
+const OPACIDADE_BASE = 0.82; // deixa a vegetação bem visível dentro das áreas
+const ALFA_MINIMO = 0.7; // quanto a camada ainda aparece no zoom mais próximo
+const QUEDA_POR_ZOOM = 0.03; // a camada cai um pouco conforme o mapa aproxima
 const LIMITE_MUNDO = 85.05112878; // limite da projeção de Mercator
+
+// ─── Foto de detalhe da vegetação (Sentinel-2, 30 m, NASA GIBS) ───
+// Entra por baixo da cor do NDVI apenas com a luz da imagem: dá nitidez e relevo
+// ao capim sem trocar a cor, que continua sendo a mesma da legenda e dos pontos.
+export const GIBS_FOTO = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/HLS_S30_Nadir_BRDF_Adjusted_Reflectance/default';
+export const TILE_MATRIX_FOTO = 'GoogleMapsCompatible_Level12';
+export const ZOOM_NATIVO_FOTO = 12; // ~30 m por pixel: bem mais detalhe que o NDVI (250 m)
+const ALFA_FOTO = 0.8;
+const ZOOM_TESTE_FOTO = 9; // tile pequeno usado só para saber se a data tem imagem da fazenda
+const MIN_BYTES_FOTO = 20000; // abaixo disso o satélite devolve tile vazio (sem imagem do dia)
+const DIAS_BUSCA_FOTO = 14; // procura a imagem mais recente dentro desse intervalo
+const FILTRO_NDVI = 'contrast(1.12) saturate(1.2)'; // realça o contraste da vegetação
 
 /** Imagem vazia (1x1) usada enquanto a foto do satélite ainda está baixando. */
 const TILE_VAZIO = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -121,6 +133,65 @@ const normalizarPoligonos = (poligonos) => {
 export const assinaturaDosPoligonos = (poligonos) =>
 normalizarPoligonos(poligonos).map((p) => `${p.pontos.length}-${p.resumo}`).join('|');
 
+// ─── Foto de detalhe: escolhe a data mais recente do Sentinel-2 com imagem da região ───
+const fotos = new Map();
+let fotoData = null;
+let fotoBusca = null;
+let fotoAnunciada = null;
+
+const carregarFoto = (data, zoom, x, y) => {
+  const chave = `${data}-${zoom}-${x}-${y}`;
+  const existente = fotos.get(chave);
+  if (existente) return existente;
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = `${GIBS_FOTO}/${data}/${TILE_MATRIX_FOTO}/${zoom}/${y}/${x}.png`;
+  fotos.set(chave, img);
+  return img;
+};
+
+/** Sem imagem do dia, o satélite devolve um arquivo quase vazio. */
+const dataTemImagem = async (data, x, y) => {
+  try {
+    const resposta = await fetch(`${GIBS_FOTO}/${data}/${TILE_MATRIX_FOTO}/${ZOOM_TESTE_FOTO}/${y}/${x}.png`);
+    if (!resposta.ok) return false;
+    return (await resposta.arrayBuffer()).byteLength >= MIN_BYTES_FOTO;
+  } catch {
+    return false;
+  }
+};
+
+/** Data (AAAA-MM-DD) da foto de detalhe em uso, quando já houver. */
+export const dataFotoReferencia = () => fotoData;
+
+/** Procura, uma única vez, a foto mais recente que cobre as áreas. */
+export const escolherDataFoto = (poligonos) => {
+  if (fotoData) return Promise.resolve(fotoData);
+  if (fotoBusca) return fotoBusca;
+
+  const areas = normalizarPoligonos(poligonos);
+  if (!areas.length) return Promise.resolve(null);
+
+  const escala = Math.pow(2, ZOOM_TESTE_FOTO);
+  const xCentro = Math.floor((Math.min(...areas.map((a) => a.limite.x0)) + Math.max(...areas.map((a) => a.limite.x1))) / 2 * escala);
+  const yCentro = Math.floor((Math.min(...areas.map((a) => a.limite.y0)) + Math.max(...areas.map((a) => a.limite.y1))) / 2 * escala);
+  const agora = Date.now();
+
+  fotoBusca = (async () => {
+    for (let dias = 2; dias <= DIAS_BUSCA_FOTO; dias++) {
+      const candidata = new Date(agora - dias * 86400000).toISOString().slice(0, 10);
+      if (await dataTemImagem(candidata, xCentro, yCentro)) {
+        fotoData = candidata;
+        return candidata;
+      }
+    }
+    return null;
+  })();
+
+  return fotoBusca;
+};
+
 /** Traça as áreas que aparecem no tile e deixa o recorte pronto para o clip. */
 const tracarAreas = (ctx, areas, zoom, x, y) => {
   const escala = Math.pow(2, zoom);
@@ -172,6 +243,14 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
     }, 120);
   };
 
+  // Procura a foto de detalhe mais recente; quando ela é achada a camada é montada de novo.
+  escolherDataFoto(poligonos).then((escolhida) => {
+    if (escolhida && fotoAnunciada !== escolhida) {
+      fotoAnunciada = escolhida;
+      avisar();
+    }
+  });
+
   /** Busca a imagem do satélite e avisa quando ela chega, para o tile ser refeito. */
   const prepararImagem = (zoom, x, y) => {
     const img = carregarImagem(data, zoom, x, y);
@@ -187,20 +266,52 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
     return img;
   };
 
-  /** Desenha o pedaço do satélite do tile, já recortado pelos polígonos das áreas. */
-  const desenharTile = (zoom, x, y, img, zoomFonte) => {
-    ctx.clearRect(0, 0, TAMANHO_TILE, TAMANHO_TILE);
-    if (!tracarAreas(ctx, areas, zoom, x, y)) return null;
+  /** Busca a foto de detalhe da região e avisa quando ela chega, para o tile ser refeito. */
+  const prepararFoto = (zoom, x, y) => {
+    const img = carregarFoto(fotoData, zoom, x, y);
+    if ((!img.complete || !img.naturalWidth) && !escutadas.has(img)) {
+      escutadas.add(img);
+      img.addEventListener('load', () => {
+        pendentes.clear();
+        avisar();
+      }, { once: true });
+    }
+    return img;
+  };
 
-    const deslocamento = zoom - zoomFonte;
+  /** Desenha o pedaço da imagem de satélite que corresponde ao tile pedido do mapa. */
+  const desenharFonte = (zoom, x, y, img, zoomFonte, composto) => {
+    const deslocamento = Math.max(0, zoom - zoomFonte);
     const escala = TAMANHO_TILE / Math.pow(2, deslocamento);
     const origemX = (x - ((x >> deslocamento) << deslocamento)) * escala;
     const origemY = (y - ((y >> deslocamento) << deslocamento)) * escala;
+    if (composto) ctx.globalCompositeOperation = composto;
+    ctx.drawImage(img, origemX, origemY, escala, escala, 0, 0, TAMANHO_TILE, TAMANHO_TILE);
+    ctx.globalCompositeOperation = 'source-over';
+  };
+
+  /**
+   * Desenha o pedaço do satélite do tile, já recortado pelos polígonos das áreas.
+   * A cor vem do NDVI (a mesma da legenda) e a luz/detalhe vem da foto do
+   * Sentinel-2, que é bem mais fina — a vegetação fica nítida e com contraste.
+   */
+  const desenharTile = (zoom, x, y, img, zoomFonte, fotoImg, zoomFonteFoto) => {
+    ctx.clearRect(0, 0, TAMANHO_TILE, TAMANHO_TILE);
+    if (!tracarAreas(ctx, areas, zoom, x, y)) return null;
 
     ctx.save();
     ctx.clip();
+
     ctx.globalAlpha = alfaPorZoom(zoom);
-    ctx.drawImage(img, origemX, origemY, escala, escala, 0, 0, TAMANHO_TILE, TAMANHO_TILE);
+    ctx.filter = FILTRO_NDVI;
+    desenharFonte(zoom, x, y, img, zoomFonte);
+    ctx.filter = 'none';
+
+    if (fotoImg) {
+      ctx.globalAlpha = ALFA_FOTO;
+      desenharFonte(zoom, x, y, fotoImg, zoomFonteFoto, 'luminosity');
+    }
+
     ctx.globalAlpha = 1;
     ctx.restore();
 
@@ -227,8 +338,18 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
         return TILE_VAZIO;
       }
 
+      // Foto de detalhe: se ainda estiver baixando, o tile sai sem ela e é refeito ao chegar.
+      let fotoImg = null;
+      let zoomFonteFoto = zoom;
+      if (fotoData) {
+        const deslocamentoFoto = Math.max(0, zoom - ZOOM_NATIVO_FOTO);
+        zoomFonteFoto = deslocamentoFoto ? ZOOM_NATIVO_FOTO : zoom;
+        const candidata = prepararFoto(zoomFonteFoto, coord.x >> deslocamentoFoto, coord.y >> deslocamentoFoto);
+        if (candidata.complete && candidata.naturalWidth) fotoImg = candidata;
+      }
+
       try {
-        const recorte = desenharTile(zoom, coord.x, coord.y, img, zoomFonte);
+        const recorte = desenharTile(zoom, coord.x, coord.y, img, zoomFonte, fotoImg, zoomFonteFoto);
         if (!recorte) return TILE_VAZIO;
         if (recortes.size > LIMITE_RECORTES) recortes.clear();
         recortes.set(chave, recorte);
