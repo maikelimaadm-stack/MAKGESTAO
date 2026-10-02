@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { assinaturaDosPoligonos, criarOverlayNdvi } from './mapaNdvi';
+import { ZOOM_NATIVO, assinaturaDosPoligonos, criarOverlayNdvi, precarregarImagens } from './mapaNdvi';
 
 /** Aplica e remove a camada de vegetação (NDVI) sobre o mapa, dentro dos polígonos das áreas. */
 export default function useNdviOverlay(mapInstanceRef, mapReady, ativo, poligonos) {
@@ -24,12 +24,12 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo, poligono
 
     let camadaAtiva = true;
 
-    // Quando uma imagem do satélite termina de baixar, os tiles são pedidos de
-    // novo para o mapa desenhar o recorte correto de cada área.
-    const recarregarTiles = () => {
+    // Monta a camada com os recortes das áreas. A imagem do satélite fica guardada,
+    // então remontar custa pouco e não recarrega nada da internet.
+    const montarCamada = () => {
       if (!camadaAtiva) return;
       removerOverlay();
-      overlayRef.current = criarOverlayNdvi(poligonosRef.current, recarregarTiles);
+      overlayRef.current = criarOverlayNdvi(poligonosRef.current, montarCamada);
       mapa.overlayMapTypes.push(overlayRef.current);
     };
 
@@ -38,13 +38,16 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo, poligono
       return;
     }
 
-    if (!overlayRef.current) {
-      overlayRef.current = criarOverlayNdvi(poligonosRef.current, recarregarTiles);
-      mapa.overlayMapTypes.push(overlayRef.current);
-    }
+    precarregarImagens(poligonosRef.current, mapa.getZoom() || ZOOM_NATIVO);
+    montarCamada();
+
+    const listenerZoom = mapa.addListener('zoom_changed', () => {
+      if (camadaAtiva) precarregarImagens(poligonosRef.current, mapa.getZoom() || ZOOM_NATIVO);
+    });
 
     return () => {
       camadaAtiva = false;
+      if (listenerZoom) window.google?.maps?.event?.removeListener(listenerZoom);
       removerOverlay();
     };
   }, [mapInstanceRef, mapReady, ativo, assinatura]);

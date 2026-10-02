@@ -40,6 +40,46 @@ export const NDVI_ESCALA = ['#dfcec1', '#b09b8a', '#bfde77', '#6eaa01', '#006401
 const urlDoTile = (data, zoom, x, y) =>
 `${GIBS_BASE}/${data}/${TILE_MATRIX}/${zoom}/${y}/${x}.png`;
 
+// ─── Imagens do satélite (mantidas em memória para não recarregar a cada recorte) ───
+const imagens = new Map();
+
+const carregarImagem = (data, zoom, x, y) => {
+  const chave = `${data}-${zoom}-${x}-${y}`;
+  const existente = imagens.get(chave);
+  if (existente) return existente;
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = urlDoTile(data, zoom, x, y);
+  imagens.set(chave, img);
+  return img;
+};
+
+/**
+ * Carrega desde já as imagens do satélite que cobrem os polígonos no zoom atual.
+ * Como a fazenda inteira cabe em poucos tiles, o recorte fica pronto na hora.
+ */
+export const precarregarImagens = (poligonos, zoom) => {
+  const areas = normalizarPoligonos(poligonos);
+  if (!areas.length) return;
+
+  const z = Math.round(zoom) || ZOOM_NATIVO;
+  const deslocamento = Math.max(0, z - ZOOM_NATIVO);
+  const zoomFonte = deslocamento ? ZOOM_NATIVO : z;
+  const escala = Math.pow(2, zoomFonte);
+  const data = dataReferenciaNdvi();
+
+  const x0 = Math.floor(Math.min(...areas.map((a) => a.limite.x0)) * escala);
+  const x1 = Math.floor(Math.max(...areas.map((a) => a.limite.x1)) * escala);
+  const y0 = Math.floor(Math.min(...areas.map((a) => a.limite.y0)) * escala);
+  const y1 = Math.floor(Math.max(...areas.map((a) => a.limite.y1)) * escala);
+  if ((x1 - x0 + 1) * (y1 - y0 + 1) > 64) return;
+
+  for (let x = x0; x <= x1; x++) {
+    for (let y = y0; y <= y1; y++) carregarImagem(data, zoomFonte, x, y);
+  }
+};
+
 /** Posição da coordenada na imagem do mundo (0 a 1), mesma origem usada pelo Google Maps. */
 const mundoX = (lng) => (lng + 180) / 360;
 const mundoY = (lat) => {
@@ -112,9 +152,9 @@ const tracarAreas = (ctx, areas, zoom, x, y) => {
 export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
   const data = dataReferenciaNdvi();
   const areas = normalizarPoligonos(poligonos);
-  const imagens = new Map(); // 'zoom-x-y' -> imagem original do satélite
   const recortes = new Map(); // 'zoom/x/y' -> pedaço já recortado
   const pendentes = new Set();
+  const escutadas = new WeakSet(); // imagens já aguardadas por esta camada
   const canvas = document.createElement('canvas');
   canvas.width = TAMANHO_TILE;
   canvas.height = TAMANHO_TILE;
@@ -132,23 +172,18 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
     }, 120);
   };
 
-  const garantirImagem = (zoom, x, y) => {
-    const chave = `${zoom}-${x}-${y}`;
-    const existente = imagens.get(chave);
-    if (existente) return existente;
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      if (recortes.size > LIMITE_RECORTES) recortes.clear();
-      if (pendentes.size) {
-        pendentes.clear();
-        avisar();
-      }
-    };
-    img.onerror = () => imagens.delete(chave);
-    img.src = urlDoTile(data, zoom, x, y);
-    imagens.set(chave, img);
+  /** Busca a imagem do satélite e avisa quando ela chega, para o tile ser refeito. */
+  const prepararImagem = (zoom, x, y) => {
+    const img = carregarImagem(data, zoom, x, y);
+    if ((!img.complete || !img.naturalWidth) && !escutadas.has(img)) {
+      escutadas.add(img);
+      img.addEventListener('load', () => {
+        if (pendentes.size) {
+          pendentes.clear();
+          avisar();
+        }
+      }, { once: true });
+    }
     return img;
   };
 
@@ -186,7 +221,7 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
 
       const deslocamento = Math.max(0, zoom - ZOOM_NATIVO);
       const zoomFonte = deslocamento ? ZOOM_NATIVO : zoom;
-      const img = garantirImagem(zoomFonte, coord.x >> deslocamento, coord.y >> deslocamento);
+      const img = prepararImagem(zoomFonte, coord.x >> deslocamento, coord.y >> deslocamento);
       if (!img.complete || !img.naturalWidth) {
         pendentes.add(chave);
         return TILE_VAZIO;
