@@ -28,6 +28,7 @@ import MapaFiltrosAvancados, {
 "../components/mapa/MapaFiltrosAvancados";
 import MapaLegenda from "../components/mapa/MapaLegenda";
 import useMapRenderer from "../components/mapa/useMapRenderer";
+import useNdviOverlay from "../components/mapa/useNdviOverlay";
 import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { useBebedouros } from "@/hooks/useBebedouros";
@@ -68,6 +69,7 @@ export default function MapaGeral() {
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [showNomesAreas, setShowNomesAreas] = useState(true);
   const [showHectaresAreas, setShowHectaresAreas] = useState(true);
+  const [showNdvi, setShowNdvi] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
 
   // Filtros avançados
@@ -126,6 +128,7 @@ export default function MapaGeral() {
     if (typeof state.showUserLocation === 'boolean') setShowUserLocation(state.showUserLocation);
     if (typeof state.showNomesAreas === 'boolean') setShowNomesAreas(state.showNomesAreas);
     if (typeof state.showHectaresAreas === 'boolean') setShowHectaresAreas(state.showHectaresAreas);
+    if (typeof state.showNdvi === 'boolean') setShowNdvi(state.showNdvi);
     if (typeof state.filtroCategoria === 'string') setFiltroCategoria(state.filtroCategoria);
     if (typeof state.filtroIdentificador === 'string') setFiltroIdentificador(state.filtroIdentificador);
     if (typeof state.filtroStatus === 'string') setFiltroStatus(state.filtroStatus);
@@ -154,6 +157,7 @@ export default function MapaGeral() {
       showUserLocation,
       showNomesAreas,
       showHectaresAreas,
+      showNdvi,
       filtroCategoria,
       filtroIdentificador,
       filtroStatus,
@@ -166,7 +170,7 @@ export default function MapaGeral() {
       filtroPesoMax,
       modoColoracao
     }));
-  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax, modoColoracao]);
+  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, showNdvi, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax, modoColoracao]);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -228,6 +232,8 @@ export default function MapaGeral() {
     if (currentUser?.role === 'admin' || permissaoAtual?.is_admin) return mapaGeralPermissions.visualizar_tarefas;
     return mapaGeralPermissions.visualizar_tarefas && canAccessPage(permissaoAtual, 'gt-lancamentos', 'gestao-tarefas');
   }, [currentUser?.role, permissaoAtual, mapaGeralPermissions.visualizar_tarefas]);
+
+  useNdviOverlay(mapInstanceRef, mapReady, mapaGeralPermissions.visualizar_areas && showNdvi);
 
   // ─── Queries ───
   const ST = 5 * 60 * 1000;
@@ -1018,6 +1024,7 @@ export default function MapaGeral() {
               showCochos={showCochos} setShowCochos={setShowCochos}
               showDepositos={showDepositos} setShowDepositos={setShowDepositos}
               showHectaresAreas={showHectaresAreas} setShowHectaresAreas={setShowHectaresAreas}
+              showNdvi={showNdvi} setShowNdvi={setShowNdvi}
               showAlertas={showAlertas} setShowAlertas={setShowAlertas}
               showUserLocation={showUserLocation} setShowUserLocation={setShowUserLocation}
               showNomesAreas={showNomesAreas} setShowNomesAreas={setShowNomesAreas}
