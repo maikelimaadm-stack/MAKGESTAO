@@ -14,14 +14,7 @@ export const MAPA_PALETA = {
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#f59e0b',
   linhaSombra: 'rgba(3, 7, 18, 0.5)',
-  linhaContorno: '#ffffff',
-
-  // Rótulos das áreas
-  rotuloFundo: 'rgba(9, 14, 25, 0.78)',
-  rotuloBorda: 'rgba(255, 255, 255, 0.22)',
-  rotuloTexto: '#ffffff',
-  rotuloSecundario: 'rgba(226, 232, 240, 0.85)',
-  rotuloDestaque: '#fde047'
+  linhaContorno: '#ffffff'
 };
 
 const CORES_LINHA_TIPO = [

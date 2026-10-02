@@ -251,10 +251,10 @@ export default function useMapRenderer(mapInstanceRef) {
 
       const labelDiv = document.createElement('div');
       labelDiv.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 9px;border-radius:9px;background:${MAPA_PALETA.rotuloFundo};border:1px solid ${MAPA_PALETA.rotuloBorda};box-shadow:0 2px 10px rgba(2,6,23,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);white-space:nowrap;pointer-events:none;font-family:Inter,Arial,sans-serif;">
-          <div class="label-title" style="font-size:11px;font-weight:700;color:${MAPA_PALETA.rotuloTexto};letter-spacing:0.2px;line-height:1.2;">${escapeHtml(area.nome)}</div>
-          <div class="label-hectares" style="font-size:10px;font-weight:500;color:${MAPA_PALETA.rotuloSecundario};line-height:1.2;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
-          <div class="label-extra" style="font-size:10px;font-weight:700;color:${MAPA_PALETA.rotuloDestaque};line-height:1.2;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap;pointer-events:none;font-family:Inter,Arial,sans-serif;text-align:center;text-shadow:0 1px 3px rgba(2,6,23,0.95),0 0 8px rgba(2,6,23,0.85);">
+          <div class="label-title" style="font-size:11.5px;font-weight:700;color:#ffffff;letter-spacing:0.3px;line-height:1.25;">${escapeHtml(area.nome)}</div>
+          <div class="label-hectares" style="font-size:10px;font-weight:600;color:#f1f5f9;line-height:1.25;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
+          <div class="label-extra" style="font-size:10px;font-weight:700;color:#fde68a;line-height:1.25;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
         </div>`;
 
       const overlay = new google.maps.OverlayView();
