@@ -357,7 +357,7 @@ export default function MapaGeral() {
   useNdviOverlay(
     mapInstanceRef,
     mapReady,
-    mapaGeralPermissions.visualizar_areas && showNdvi && showAreas,
+    mapaGeralPermissions.visualizar_areas && showNdvi,
     poligonosVegetacao
   );
 
