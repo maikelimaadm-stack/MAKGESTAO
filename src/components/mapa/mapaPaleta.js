@@ -5,26 +5,26 @@
 
 export const MAPA_PALETA = {
   // Áreas
-  areaPadrao: '#83cfc5',
+  areaPadrao: '#20bfa9',
   areaSemDados: '#a3b2b8',
   areaBordaForca: 0.08,
-  areaPreenchimento: 0.27,
-  areaPreenchimentoHover: 0.36,
+  areaPreenchimento: 0.38,
+  areaPreenchimentoHover: 0.48,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
-  linhaPadrao: '#d6bb83',
+  linhaPadrao: '#f3be4f',
   linhaSombra: '#182b30',
   linhaContorno: '#e5ede9'
 };
 
 const CORES_LINHA_TIPO = [
-{ chaves: ['CERCA ELETR', 'ELETRIFIC'], cor: '#dec996' },
-{ chaves: ['CERCA'], cor: '#d6bb83' },
-{ chaves: ['RIO', 'CORREGO', 'RIACHO', 'AGUA', 'NASCENTE'], cor: '#78b9cd' },
-{ chaves: ['ESTRADA', 'RODOVIA'], cor: '#dce3dc' },
-{ chaves: ['CARREADOR', 'TRILHA', 'PICADA'], cor: '#b3b4a2' },
-{ chaves: ['ACEIRO', 'DIVISA', 'LIMITE'], cor: '#cd9790' },
-{ chaves: ['TUBO', 'ADUTORA', 'CANO', 'ENCANAMENTO'], cor: '#80c2bb' }];
+{ chaves: ['CERCA ELETR', 'ELETRIFIC'], cor: '#f6d35c' },
+{ chaves: ['CERCA'], cor: '#f3be4f' },
+{ chaves: ['RIO', 'CORREGO', 'RIACHO', 'AGUA', 'NASCENTE'], cor: '#27bcef' },
+{ chaves: ['ESTRADA', 'RODOVIA'], cor: '#eef5ed' },
+{ chaves: ['CARREADOR', 'TRILHA', 'PICADA'], cor: '#c6c487' },
+{ chaves: ['ACEIRO', 'DIVISA', 'LIMITE'], cor: '#ef8475' },
+{ chaves: ['TUBO', 'ADUTORA', 'CANO', 'ENCANAMENTO'], cor: '#20cfb9' }];
 
 
 export const normalizarTipo = (valor) =>
@@ -63,8 +63,8 @@ const paraRgb = (hex) => {
 export const suavizarCor = (cor) => {
   const rgb = paraRgb(cor);
   if (!rgb) return cor;
-  const mix = (canal, neutro) => Math.round(canal * 0.4 + neutro * 0.6).toString(16).padStart(2, '0');
-  return `#${mix(rgb.r, 112)}${mix(rgb.g, 207)}${mix(rgb.b, 198)}`;
+  const mix = (canal, neutro) => Math.round(canal * 0.85 + neutro * 0.15).toString(16).padStart(2, '0');
+  return `#${mix(rgb.r, 32)}${mix(rgb.g, 191)}${mix(rgb.b, 169)}`;
 };
 
 /** Escurece uma cor (0 a 1) para gerar a borda das áreas com bom contraste. */
