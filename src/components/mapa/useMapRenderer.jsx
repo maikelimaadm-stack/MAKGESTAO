@@ -352,15 +352,15 @@ export default function useMapRenderer(mapInstanceRef) {
           existente.layers.forEach(layer => layer.setPath(paths));
           existente.assinatura = assinatura;
         }
-        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.22, strokeWeight: 3.6 });
-        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.45, strokeWeight: 2.5 });
-        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 0.95, strokeWeight: 1.5 });
+        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.65, strokeWeight: 4.2 });
+        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.85, strokeWeight: 3.2 });
+        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2 });
         return;
       }
 
-      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.22, strokeWeight: 3.6, zIndex: 30, clickable: false, geodesic: true });
-      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.45, strokeWeight: 2.5, zIndex: 31, clickable: false, geodesic: true });
-      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 0.95, strokeWeight: 1.5, zIndex: 32, geodesic: true });
+      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.65, strokeWeight: 4.2, zIndex: 30, clickable: false, geodesic: true });
+      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.85, strokeWeight: 3.2, zIndex: 31, clickable: false, geodesic: true });
+      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: 32, geodesic: true });
 
       const infoWindow = new google.maps.InfoWindow({ maxWidth: 260 });
 
@@ -381,8 +381,8 @@ export default function useMapRenderer(mapInstanceRef) {
         infoWindow.setPosition(bounds.getCenter());
         infoWindow.open(map);
       });
-      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 2.1 }));
-      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 1.5 }));
+      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 2.8 }));
+      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 2.2 }));
 
       [sombra, contorno, core].forEach(layer => layer.setMap(map));
       polylinesRef.current.set(linha.id, { layers: [sombra, contorno, core], core, info: infoWindow, assinatura });
