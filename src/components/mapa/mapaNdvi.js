@@ -16,6 +16,15 @@ const ANCORA_COMPOSICAO = Date.UTC(2000, 1, 18); // primeira composição de 8 d
 const PASSO_COMPOSICAO = 8 * 24 * 60 * 60 * 1000;
 const ATRASO_DIAS = 3; // margem para a composição mais recente já estar publicada
 const LIMITE_RECORTES = 1200; // memória dos tiles já recortados
+const OPACIDADE_BASE = 0.5; // mantém a imagem do Google visível sob a vegetação
+const ALFA_MINIMO = 0.3; // quanto a camada ainda aparece no zoom mais próximo
+const QUEDA_POR_ZOOM = 0.1; // a camada fica mais leve conforme o mapa aproxima
+
+/**
+ * A leitura é de 250 m por pixel: no zoom próximo ela não tem detalhe nenhum, então
+ * a camada vai ficando leve para não cobrir a foto do satélite com uma cor só.
+ */
+const alfaPorZoom = (zoom) => Math.max(ALFA_MINIMO, 1 - (zoom - ZOOM_NATIVO) * QUEDA_POR_ZOOM);
 
 /** Imagem vazia (1x1) usada enquanto a foto do satélite ainda está baixando. */
 const TILE_VAZIO = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -47,6 +56,8 @@ export const criarOverlayNdvi = (aoAtualizar) => {
   canvas.width = TAMANHO_TILE;
   canvas.height = TAMANHO_TILE;
   const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   let agendado = false;
 
   const avisar = () => {
@@ -87,7 +98,9 @@ export const criarOverlayNdvi = (aoAtualizar) => {
     const origemY = (y - (paiY << deslocamento)) * escala;
 
     ctx.clearRect(0, 0, TAMANHO_TILE, TAMANHO_TILE);
+    ctx.globalAlpha = alfaPorZoom(zoom);
     ctx.drawImage(img, origemX, origemY, escala, escala, 0, 0, TAMANHO_TILE, TAMANHO_TILE);
+    ctx.globalAlpha = 1;
     return canvas.toDataURL('image/png');
   };
 
@@ -120,6 +133,6 @@ export const criarOverlayNdvi = (aoAtualizar) => {
     }
   });
 
-  overlay.setOpacity(0.82);
+  overlay.setOpacity(OPACIDADE_BASE);
   return overlay;
 };

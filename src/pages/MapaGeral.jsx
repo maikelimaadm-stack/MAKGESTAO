@@ -16,7 +16,6 @@ import {
 "@/components/ui/sheet";
 import DetalhesLote from "../components/mapa/DetalhesLote";
 import DetalhesArea from "../components/mapa/DetalhesArea";
-import PainelVegetacaoArea from "../components/mapa/PainelVegetacaoArea";
 import DetalhesPontoSuplementacao from "../components/mapa/DetalhesPontoSuplementacao";
 import DetalhesBebedouro from "../components/bebedouros/DetalhesBebedouro";
 import TarefasMapaPanel from "../components/mapa/TarefasMapaPanel";
@@ -90,7 +89,6 @@ export default function MapaGeral() {
   const [showDetalhesLote, setShowDetalhesLote] = useState(false);
   const [selectedLote, setSelectedLote] = useState(null);
   const [showDetalhesArea, setShowDetalhesArea] = useState(false);
-  const [showVegetacaoArea, setShowVegetacaoArea] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
   const [showDetalhesPontoSupl, setShowDetalhesPontoSupl] = useState(false);
   const [selectedPontoSupl, setSelectedPontoSupl] = useState(null);
@@ -615,15 +613,9 @@ export default function MapaGeral() {
       return;
     }
 
-    const isCurral = area?.tipo_cultura === 'Infraestrutura' && String(area?.tipo_infraestrutura || area?.tipo_pastagem || '').trim().toLowerCase() === 'curral';
-
     setSelectedArea(area);
-    if (isCurral) {
-      setShowDetalhesArea(true);
-      return;
-    }
-    if (mapaGeralPermissions.visualizar_areas) setShowVegetacaoArea(true);
-  }, [selecionandoLocalTarefa, handleSelectTaskLocation, mapaGeralPermissions.visualizar_areas]);
+    setShowDetalhesArea(true);
+  }, [selecionandoLocalTarefa, handleSelectTaskLocation]);
 
   const handleRightClickArea = useCallback((area, coords) => {
     if (selecionandoLocalTarefa) {
@@ -1072,13 +1064,6 @@ export default function MapaGeral() {
         <DialogContent className="bg-background px-2 py-2 overflow-x-hidden sm:w-full sm:p-1 fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-2 border shadow-lg duration-200 sm:rounded-lg max-w-[95vw] md:max-w-[75vw] xl:max-w-[65vw] max-h-[95vh] overflow-y-auto">
           <DialogHeader></DialogHeader>
           {selectedArea && <DetalhesArea area={selectedArea} onClose={() => setShowDetalhesArea(false)} />}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showVegetacaoArea} onOpenChange={setShowVegetacaoArea}>
-        <DialogContent className="bg-background px-3 py-3 overflow-x-hidden sm:w-full fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-2 border shadow-lg duration-200 sm:rounded-lg max-w-[95vw] md:max-w-[520px] max-h-[95vh] overflow-y-auto">
-          <DialogHeader><DialogTitle translate="no">Massa de capim da área</DialogTitle></DialogHeader>
-          {selectedArea && <PainelVegetacaoArea area={selectedArea} />}
         </DialogContent>
       </Dialog>
 

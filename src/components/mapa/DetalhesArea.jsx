@@ -1,19 +1,24 @@
 import React from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import HistoricoAbateCurral from "./HistoricoAbateCurral";
+import PainelVegetacaoArea from "./PainelVegetacaoArea";
 
 export default function DetalhesArea({ area }) {
   const isCurral = area?.tipo_cultura === 'Infraestrutura' && String(area?.tipo_infraestrutura || area?.tipo_pastagem || '').trim().toLowerCase() === 'curral';
 
-  if (!isCurral) return null;
+  if (isCurral) {
+    return (
+      <div className="space-y-1" translate="no">
+        <Tabs defaultValue="historico" className="w-full">
+          <TabsContent value="historico" className="mt-0">
+            <HistoricoAbateCurral areaId={area.id} />
+          </TabsContent>
+        </Tabs>
+      </div>);
+  }
 
   return (
     <div className="space-y-1" translate="no">
-      <Tabs defaultValue="historico" className="w-full">
-        <TabsContent value="historico" className="mt-0">
-          <HistoricoAbateCurral areaId={area.id} />
-        </TabsContent>
-      </Tabs>
+      <PainelVegetacaoArea area={area} />
     </div>);
-
 }
