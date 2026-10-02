@@ -1,6 +1,6 @@
 /* global google */
 import { useRef, useCallback } from "react";
-import { MAPA_PALETA, corDaLinha, escurecer } from "./mapaPaleta";
+import { MAPA_PALETA, corDaLinha, escurecer, suavizarCor } from "./mapaPaleta";
 
 const escapeHtml = (valor) =>
 String(valor ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -136,7 +136,8 @@ export default function useMapRenderer(mapInstanceRef) {
       if (coords.length < 3) return;
 
       const paths = coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      const corBase = area.coordenadas?.cor || area.cor || MAPA_PALETA.areaPadrao;
+      const corSalva = area.coordenadas?.cor || area.cor;
+      const corBase = corSalva ? suavizarCor(corSalva) : MAPA_PALETA.areaPadrao;
       const cor = colorFn ? (colorFn(area) || corBase) : corBase;
       const borda = escurecer(cor);
 
@@ -164,8 +165,8 @@ export default function useMapRenderer(mapInstanceRef) {
       const polygon = new google.maps.Polygon({
         paths,
         strokeColor: borda,
-        strokeOpacity: 0.95,
-        strokeWeight: 2.2,
+        strokeOpacity: 0.8,
+        strokeWeight: 1.2,
         fillColor: cor,
         fillOpacity: MAPA_PALETA.areaPreenchimento,
         zIndex: 2,
@@ -176,10 +177,10 @@ export default function useMapRenderer(mapInstanceRef) {
       polygon._pathSignature = areaPathSignature(coords);
 
       polygon.addListener('mouseover', function () {
-        this.setOptions({ strokeColor: '#ffffff', strokeOpacity: 1, strokeWeight: 3.2, fillOpacity: MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
+        this.setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.95, strokeWeight: 1.8, fillOpacity: MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
       });
       polygon.addListener('mouseout', function () {
-        this.setOptions({ strokeColor: this._stroke, strokeOpacity: 0.95, strokeWeight: 2.2, fillOpacity: MAPA_PALETA.areaPreenchimento, zIndex: 2 });
+        this.setOptions({ strokeColor: this._stroke, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity: MAPA_PALETA.areaPreenchimento, zIndex: 2 });
       });
       polygon.addListener('click', function (e) {
         if (e.vertex === undefined) {
@@ -358,9 +359,9 @@ export default function useMapRenderer(mapInstanceRef) {
         return;
       }
 
-      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.6, strokeWeight: 9, zIndex: 30, clickable: false, geodesic: true });
-      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.92, strokeWeight: 6, zIndex: 31, clickable: false, geodesic: true });
-      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 3.2, zIndex: 32, geodesic: true });
+      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.22, strokeWeight: 3.6, zIndex: 30, clickable: false, geodesic: true });
+      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.45, strokeWeight: 2.5, zIndex: 31, clickable: false, geodesic: true });
+      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 0.95, strokeWeight: 1.5, zIndex: 32, geodesic: true });
 
       const infoWindow = new google.maps.InfoWindow({ maxWidth: 260 });
 
@@ -381,8 +382,8 @@ export default function useMapRenderer(mapInstanceRef) {
         infoWindow.setPosition(bounds.getCenter());
         infoWindow.open(map);
       });
-      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 5 }));
-      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 3.2 }));
+      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 2.1 }));
+      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 1.5 }));
 
       [sombra, contorno, core].forEach(layer => layer.setMap(map));
       polylinesRef.current.set(linha.id, { layers: [sombra, contorno, core], core, info: infoWindow, assinatura });

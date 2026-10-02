@@ -5,26 +5,26 @@
 
 export const MAPA_PALETA = {
   // Áreas
-  areaPadrao: '#2f9e6b',
-  areaSemDados: '#9aa4b2',
-  areaBordaForca: 0.42,
-  areaPreenchimento: 0.36,
-  areaPreenchimentoHover: 0.52,
+  areaPadrao: '#6aaf9b',
+  areaSemDados: '#a3b2b8',
+  areaBordaForca: 0.18,
+  areaPreenchimento: 0.20,
+  areaPreenchimentoHover: 0.30,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
-  linhaPadrao: '#f59e0b',
-  linhaSombra: 'rgba(3, 7, 18, 0.5)',
-  linhaContorno: '#ffffff'
+  linhaPadrao: '#d6bb83',
+  linhaSombra: '#182b30',
+  linhaContorno: '#e5ede9'
 };
 
 const CORES_LINHA_TIPO = [
-{ chaves: ['CERCA ELETR', 'ELETRIFIC'], cor: '#fbbf24' },
-{ chaves: ['CERCA'], cor: '#f59e0b' },
-{ chaves: ['RIO', 'CORREGO', 'RIACHO', 'AGUA', 'NASCENTE'], cor: '#38bdf8' },
-{ chaves: ['ESTRADA', 'RODOVIA'], cor: '#e2e8f0' },
-{ chaves: ['CARREADOR', 'TRILHA', 'PICADA'], cor: '#a8a29e' },
-{ chaves: ['ACEIRO', 'DIVISA', 'LIMITE'], cor: '#fb7185' },
-{ chaves: ['TUBO', 'ADUTORA', 'CANO', 'ENCANAMENTO'], cor: '#22d3ee' }];
+{ chaves: ['CERCA ELETR', 'ELETRIFIC'], cor: '#dec996' },
+{ chaves: ['CERCA'], cor: '#d6bb83' },
+{ chaves: ['RIO', 'CORREGO', 'RIACHO', 'AGUA', 'NASCENTE'], cor: '#78b9cd' },
+{ chaves: ['ESTRADA', 'RODOVIA'], cor: '#dce3dc' },
+{ chaves: ['CARREADOR', 'TRILHA', 'PICADA'], cor: '#b3b4a2' },
+{ chaves: ['ACEIRO', 'DIVISA', 'LIMITE'], cor: '#cd9790' },
+{ chaves: ['TUBO', 'ADUTORA', 'CANO', 'ENCANAMENTO'], cor: '#80c2bb' }];
 
 
 export const normalizarTipo = (valor) =>
@@ -33,7 +33,7 @@ String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUp
 /** Cor da linha: respeita a cor salva; senão infere pelo tipo; senão usa o padrão. */
 export const corDaLinha = (linha) => {
   const salva = linha?.coordenadas?.cor || linha?.cor;
-  if (salva) return salva;
+  if (salva) return suavizarCor(salva);
   const tipo = normalizarTipo(`${linha?.tipo || ''} ${linha?.nome || ''}`);
   const encontrada = CORES_LINHA_TIPO.find((item) => item.chaves.some((chave) => tipo.includes(normalizarTipo(chave))));
   return encontrada?.cor || MAPA_PALETA.linhaPadrao;
@@ -58,6 +58,14 @@ const paraRgb = (hex) => {
     };
   }
   return null;
+};
+
+/** Suaviza apenas a exibição, preservando a cor cadastrada. */
+export const suavizarCor = (cor) => {
+  const rgb = paraRgb(cor);
+  if (!rgb) return cor;
+  const mix = (canal, neutro) => Math.round(canal * 0.78 + neutro * 0.22);
+  return `rgb(${mix(rgb.r, 164)}, ${mix(rgb.g, 184)}, ${mix(rgb.b, 179)})`;
 };
 
 /** Escurece uma cor (0 a 1) para gerar a borda das áreas com bom contraste. */
