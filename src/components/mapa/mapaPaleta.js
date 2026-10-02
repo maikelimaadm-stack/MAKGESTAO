@@ -10,6 +10,9 @@ export const MAPA_PALETA = {
   areaBordaForca: 0.08,
   areaPreenchimento: 0.58,
   areaPreenchimentoHover: 0.66,
+  // Modo "Foto de Satélite": só o contorno da área, para a imagem do satélite aparecer limpa
+  areaPreenchimentoFoto: 0.05,
+  areaPreenchimentoFotoHover: 0.2,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#b77912',

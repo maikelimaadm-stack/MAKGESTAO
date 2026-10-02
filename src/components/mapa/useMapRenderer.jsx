@@ -121,7 +121,7 @@ export default function useMapRenderer(mapInstanceRef) {
   }, []);
 
   // ─── Áreas (Polígonos) com coloração dinâmica ───
-  const syncAreas = useCallback((areas, show, onClickArea, onRightClickArea, colorFn) => {
+  const syncAreas = useCallback((areas, show, onClickArea, onRightClickArea, colorFn, fillOpacity = MAPA_PALETA.areaPreenchimento, hoverOpacity = MAPA_PALETA.areaPreenchimentoHover) => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
@@ -156,7 +156,8 @@ export default function useMapRenderer(mapInstanceRef) {
           poly._pathSignature = nextSignature;
         }
 
-        poly.setOptions({ fillColor: cor, strokeColor: borda, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity: MAPA_PALETA.areaPreenchimento });
+        poly.setOptions({ fillColor: cor, strokeColor: borda, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity });
+        poly._fill = { base: fillOpacity, hover: hoverOpacity };
         polyColorRef.current.set(area.id, cor);
 
         poly._areaData = area;
@@ -171,19 +172,20 @@ export default function useMapRenderer(mapInstanceRef) {
         strokeOpacity: 0.8,
         strokeWeight: 1.2,
         fillColor: cor,
-        fillOpacity: MAPA_PALETA.areaPreenchimento,
+        fillOpacity,
         zIndex: 2,
       });
       polygon._areaData = area;
       polygon._color = cor;
       polygon._stroke = borda;
+      polygon._fill = { base: fillOpacity, hover: hoverOpacity };
       polygon._pathSignature = areaPathSignature(coords);
 
       polygon.addListener('mouseover', function () {
-        this.setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.95, strokeWeight: 1.8, fillOpacity: MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
+        this.setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.95, strokeWeight: 1.8, fillOpacity: this._fill?.hover ?? MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
       });
       polygon.addListener('mouseout', function () {
-        this.setOptions({ strokeColor: this._stroke, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity: MAPA_PALETA.areaPreenchimento, zIndex: 2 });
+        this.setOptions({ strokeColor: this._stroke, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity: this._fill?.base ?? MAPA_PALETA.areaPreenchimento, zIndex: 2 });
       });
       polygon.addListener('click', function (e) {
         if (e.vertex === undefined) {

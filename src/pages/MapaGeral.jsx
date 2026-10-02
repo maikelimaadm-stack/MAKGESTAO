@@ -907,7 +907,19 @@ export default function MapaGeral() {
   }, [mapReady, selecionandoLocalTarefa, abrirLancamentoTarefa, handleSelectTaskLocation, detectarAreaPorCoordenada, podeUsarTarefasMapa]);
 
   // ─── Renderização incremental ───
-  useEffect(() => {if (mapReady) renderer.syncAreas(areasFiltradas, mapaGeralPermissions.visualizar_areas && showAreas, handleClickArea, handleRightClickArea, getAreaColor);}, [areasFiltradas, showAreas, mapReady, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
+  useEffect(() => {
+    if (!mapReady) return;
+    const somenteFoto = modoColoracao === 'satelite';
+    renderer.syncAreas(
+      areasFiltradas,
+      mapaGeralPermissions.visualizar_areas && showAreas,
+      handleClickArea,
+      handleRightClickArea,
+      getAreaColor,
+      somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento,
+      somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover
+    );
+  }, [areasFiltradas, showAreas, mapReady, modoColoracao, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
   // Função de texto extra para labels (UA/ha ou situação do pasto)
   const getLabelExtraText = useCallback((area) => {
     if (modoColoracao === 'ua_ha') {

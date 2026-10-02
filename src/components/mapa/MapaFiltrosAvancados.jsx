@@ -59,6 +59,7 @@ export const CORES_CATEGORIA_GADO = [
 
 export const MODOS_COLORACAO = [
 { id: 'padrao', label: 'Padrão (cor da área)' },
+{ id: 'satelite', label: 'Foto de Satélite' },
 { id: 'tipo_cultura', label: 'Tipo de Cultura' },
 { id: 'aproveitamento', label: 'Aproveitamento' },
 { id: 'ocupacao', label: 'Ocupação' },
@@ -188,6 +189,7 @@ export default function MapaFiltrosAvancados({
                 </>
           }
               {modoColoracao === 'situacao_pasto' && Object.entries(CORES_SITUACAO_PASTO).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
+              {modoColoracao === 'satelite' && <div className="text-[10px] text-slate-500">Áreas só com o contorno: a imagem de satélite da fazenda aparece limpa por baixo.</div>}
             </div>
         }
         </div>
