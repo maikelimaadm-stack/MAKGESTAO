@@ -8,8 +8,8 @@ export const MAPA_PALETA = {
   areaPadrao: '#20bfa9',
   areaSemDados: '#a3b2b8',
   areaBordaForca: 0.08,
-  areaPreenchimento: 0.38,
-  areaPreenchimentoHover: 0.48,
+  areaPreenchimento: 0.58,
+  areaPreenchimentoHover: 0.66,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#f3be4f',
