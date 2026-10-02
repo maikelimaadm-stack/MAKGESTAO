@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { medirVegetacaoArea, CHAVE_TETO_MASSA, lerTetoMassaKgHa, massaKgHaDoVigor } from "./vegetacaoArea";
-import { classeDaMassa, MASSA_IDEAL_KG_HA } from "./vegetacaoZonas";
+import { classeDaMassa, CLASSE_MATA, MASSA_IDEAL_KG_HA } from "./vegetacaoZonas";
 import VegetacaoAreaResumo from "./VegetacaoAreaResumo";
 
 const faixaIdeal = `${MASSA_IDEAL_KG_HA.minimo.toLocaleString('pt-BR')} a ${MASSA_IDEAL_KG_HA.maximo.toLocaleString('pt-BR')} kg MS/ha`;
@@ -29,7 +29,7 @@ export default function PainelVegetacaoArea({ area }) {
 
   const massaKgHa = dados ? massaKgHaDoVigor(dados.vigorMedioAtivoPct, teto) : 0;
   const massaTotalT = dados ? massaKgHa * dados.produtivaHa / 1000 : 0;
-  const classe = dados ? classeDaMassa(massaKgHa) : null;
+  const classe = dados ? (dados.mataPct >= 50 ? CLASSE_MATA : classeDaMassa(massaKgHa)) : null;
   const [ano, mes, dia] = (dados?.data || '').split('-');
 
   return (
@@ -74,6 +74,13 @@ export default function PainelVegetacaoArea({ area }) {
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: classe.cor }} />
               <span className="text-xs font-semibold" style={{ color: classe.cor }}>{classe.nome}</span>
               <span className="text-[10px] text-slate-500">· ideal {faixaIdeal}</span>
+            </div>
+          }
+
+          {(dados.mataPct || 0) >= 5 &&
+          <div className="flex items-center gap-1.5 text-[10px] text-teal-800">
+              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: CLASSE_MATA.cor }} />
+              Mata / vegetação fechada em {Math.round(dados.mataPct)}% da área — não conta como capim
             </div>
           }
 

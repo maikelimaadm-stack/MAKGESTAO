@@ -940,6 +940,7 @@ export default function MapaGeral() {
   const getVegetacaoLabelText = useCallback((area) => {
     const info = vegetacaoPorArea.get(area.id);
     if (!info) return null;
+    if (info.classeId === 'mata') return 'ÁREA DE MATA';
     return `${info.classeNome.toUpperCase()} ${info.massaKgHa.toLocaleString('pt-BR')} kg MS/ha`;
   }, [vegetacaoPorArea]);
 

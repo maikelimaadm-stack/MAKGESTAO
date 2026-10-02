@@ -18,6 +18,12 @@ let paletaCache = null; // { data, cores }
 /** Tom da imagem a partir do qual a área é considerada com capim (verde). */
 export const LIMIAR_CAPIM = (INDICE_CAPIM - INDICE_MIN) / (INDICE_MAX - INDICE_MIN);
 
+/** Acima deste tom o satélite lê vegetação fechada (mata), que não é pasto. */
+export const LIMIAR_MATA = 0.8;
+
+/** Só é capim o que está na faixa de pasto: nem solo exposto, nem mata. */
+export const ehCapim = (vigor) => vigor >= LIMIAR_CAPIM && vigor < LIMIAR_MATA;
+
 /** Massa de capim (kg de matéria seca por hectare) no ponto de melhor vigor. */
 export const TETO_PADRAO_KG_HA = 6000;
 
@@ -212,7 +218,8 @@ export const medirVegetacaoArea = async (area) => {
   if (!amostra) return null;
 
   const { data, leituras, dentro } = amostra;
-  const ativas = leituras.filter((leitura) => leitura.vigor >= LIMIAR_CAPIM);
+  const ativas = leituras.filter((leitura) => ehCapim(leitura.vigor));
+  const mata = leituras.filter((leitura) => leitura.vigor >= LIMIAR_MATA);
   const latMedia = pontos.reduce((s, p) => s + p.lat, 0) / pontos.length;
   const areaHa = hectaresDoPoligono(pontos);
   const cobertura = leituras.length ? ativas.length / leituras.length : 0;
@@ -223,6 +230,7 @@ export const medirVegetacaoArea = async (area) => {
     leituras: leituras.length,
     semLeitura: dentro - leituras.length,
     coberturaPct: cobertura * 100,
+    mataPct: leituras.length ? mata.length / leituras.length * 100 : 0,
     produtivaHa: areaHa * cobertura,
     vigorMedioPct: leituras.length ? somarVigor(leituras) / leituras.length * 100 : 0,
     vigorMedioAtivoPct: ativas.length ? somarVigor(ativas) / ativas.length * 100 : 0,
