@@ -1,3 +1,4 @@
+/* global google */
 /**
  * Camada de vegetação (NDVI) — imagem pública da NASA GIBS, sem chave de API.
  * Camada apenas visual: não altera dado nem regra de negócio.

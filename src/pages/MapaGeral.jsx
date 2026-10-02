@@ -550,7 +550,9 @@ export default function MapaGeral() {
           mapViewRestoredRef.current = true;
           return;
         }
-      } catch {}
+      } catch {
+        // view salva inválida: segue para o enquadramento das áreas
+      }
     }
 
     const b = new google.maps.LatLngBounds();
