@@ -29,6 +29,9 @@ import MapaFiltrosAvancados, {
 import MapaLegenda from "../components/mapa/MapaLegenda";
 import useMapRenderer from "../components/mapa/useMapRenderer";
 import useNdviOverlay from "../components/mapa/useNdviOverlay";
+import { assinaturaDosPoligonos } from "../components/mapa/mapaNdvi";
+import { analisarZonasVegetacao } from "../components/mapa/vegetacaoZonas";
+import LegendaVegetacaoPontos from "../components/mapa/LegendaVegetacaoPontos";
 import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { useBebedouros } from "@/hooks/useBebedouros";
@@ -70,6 +73,9 @@ export default function MapaGeral() {
   const [showNomesAreas, setShowNomesAreas] = useState(true);
   const [showHectaresAreas, setShowHectaresAreas] = useState(true);
   const [showNdvi, setShowNdvi] = useState(false);
+  const [zonasVegetacao, setZonasVegetacao] = useState(null);
+  const [analisandoVegetacao, setAnalisandoVegetacao] = useState(false);
+  const [erroVegetacao, setErroVegetacao] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
 
   // Filtros avançados
@@ -360,6 +366,48 @@ export default function MapaGeral() {
     mapaGeralPermissions.visualizar_areas && showNdvi,
     poligonosVegetacao
   );
+
+  // ─── Leitura da vegetação: pontos de capim e áreas produtivas ───
+  const assinaturaVegetacao = useMemo(() => assinaturaDosPoligonos(poligonosVegetacao), [poligonosVegetacao]);
+  const areasVegetacaoRef = useRef(areasFiltradas);
+  areasVegetacaoRef.current = areasFiltradas;
+  const analiseVegetacaoRef = useRef(0);
+
+  useEffect(() => {
+    if (!(mapaGeralPermissions.visualizar_areas && showNdvi)) {
+      analiseVegetacaoRef.current++;
+      setZonasVegetacao(null);
+      setAnalisandoVegetacao(false);
+      setErroVegetacao(false);
+      return;
+    }
+
+    if (!navigator.onLine) {
+      setZonasVegetacao(null);
+      setAnalisandoVegetacao(false);
+      setErroVegetacao(true);
+      return;
+    }
+
+    const analise = ++analiseVegetacaoRef.current;
+    setAnalisandoVegetacao(true);
+    setErroVegetacao(false);
+
+    analisarZonasVegetacao(areasVegetacaoRef.current).
+    then((resultado) => {
+      if (analise !== analiseVegetacaoRef.current) return;
+      setZonasVegetacao(resultado);
+    }).
+    catch(() => {
+      if (analise !== analiseVegetacaoRef.current) return;
+      setZonasVegetacao(null);
+      setErroVegetacao(true);
+    }).
+    finally(() => {
+      if (analise !== analiseVegetacaoRef.current) return;
+      setAnalisandoVegetacao(false);
+    });
+  }, [showNdvi, assinaturaVegetacao, mapaGeralPermissions.visualizar_areas, empresaSelecionadaId]);
 
   // Filtrar lotes
   const lotesFiltrados = useMemo(() => lotesComAlerta.filter((lote) => {
@@ -883,15 +931,44 @@ export default function MapaGeral() {
     return null;
   }, [modoColoracao, uaPorAreaMap, situacaoPastoMap, getAreaEfetiva]);
 
+  // Produtividade da área (leitura do satélite) mostrada embaixo do nome
+  const vegetacaoPorArea = useMemo(
+    () => new Map((zonasVegetacao?.areas || []).map((areaVeg) => [areaVeg.id, areaVeg])),
+    [zonasVegetacao]
+  );
+
+  const getVegetacaoLabelText = useCallback((area) => {
+    const info = vegetacaoPorArea.get(area.id);
+    if (!info) return null;
+    return `${info.classeNome.toUpperCase()} ${Math.round(info.coberturaPct)}% CAPIM`;
+  }, [vegetacaoPorArea]);
+
   useEffect(() => {
     if (!mapReady) return;
     renderer.syncLabels(
       areasFiltradas,
       mapaGeralPermissions.visualizar_areas && mapaGeralPermissions.visualizar_nomes_areas && showNomesAreas && showAreas,
+      showNdvi && zonasVegetacao ? getVegetacaoLabelText :
       modoColoracao === 'ua_ha' || modoColoracao === 'situacao_pasto' ? getLabelExtraText : null,
       showHectaresAreas
     );
-  }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, mapReady, modoColoracao, getLabelExtraText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
+  }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, showNdvi, zonasVegetacao, mapReady, modoColoracao, getLabelExtraText, getVegetacaoLabelText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
+
+  // Pontos de vegetação: onde tem mais e onde tem menos capim
+  const handleClickPontoVegetacao = useCallback((ponto) => {
+    const area = areasFiltradas.find((a) => a.id === ponto.areaId);
+    if (area) handleClickArea(area, { lat: ponto.lat, lng: ponto.lng });
+  }, [areasFiltradas, handleClickArea]);
+
+  useEffect(() => {
+    if (!mapReady) return;
+    const pontosVegetacao = zonasVegetacao?.pontos || [];
+    renderer.syncVegetacaoPontos(
+      pontosVegetacao,
+      mapaGeralPermissions.visualizar_areas && showNdvi && pontosVegetacao.length > 0,
+      handleClickPontoVegetacao
+    );
+  }, [zonasVegetacao, showNdvi, mapReady, renderer.syncVegetacaoPontos, handleClickPontoVegetacao, mapaGeralPermissions.visualizar_areas]);
   // Filtrar pontos de referência: ocultar tipo "Cocho" quando cochos/suplementação estão ocultos
   const pontosFiltrados = useMemo(() => {
     return pontos.filter((p) => {
@@ -993,6 +1070,14 @@ export default function MapaGeral() {
           tiposPastagemCores={tiposPastagemCores} />
 
 
+        {/* Legenda da vegetação lida: pontos de capim e produtividade das áreas */}
+        {showNdvi && mapaGeralPermissions.visualizar_areas &&
+        <div className="absolute bottom-20 md:bottom-16 right-3 z-10">
+            <LegendaVegetacaoPontos resumo={zonasVegetacao} carregando={analisandoVegetacao} erro={erroVegetacao} />
+          </div>
+        }
+
+
         {/* Barra resumo inferior */}
         <div className="absolute bottom-2 left-2 right-2 z-10">
           <div className="bg-white/95 text-[10px] px-2 rounded-lg inline-flex max-w-full items-center gap-3 shadow-md border border-slate-200 pointer-events-auto">
@@ -1038,6 +1123,8 @@ export default function MapaGeral() {
               showDepositos={showDepositos} setShowDepositos={setShowDepositos}
               showHectaresAreas={showHectaresAreas} setShowHectaresAreas={setShowHectaresAreas}
               showNdvi={showNdvi} setShowNdvi={setShowNdvi}
+              vegetacaoResumo={zonasVegetacao}
+              vegetacaoCarregando={analisandoVegetacao}
               showAlertas={showAlertas} setShowAlertas={setShowAlertas}
               showUserLocation={showUserLocation} setShowUserLocation={setShowUserLocation}
               showNomesAreas={showNomesAreas} setShowNomesAreas={setShowNomesAreas}

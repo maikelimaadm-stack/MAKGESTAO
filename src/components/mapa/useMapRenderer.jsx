@@ -94,6 +94,9 @@ export default function useMapRenderer(mapInstanceRef) {
   // Guardar cor atual de cada polígono para poder atualizar sem recriar
   const polyColorRef = useRef(new Map());
   const lotesIndicatorsRef = useRef(new Map());
+  // Pontos de vegetação (NDVI) e assinatura de cada um, para não recriar sem necessidade
+  const vegPontosRef = useRef(new Map());
+  const vegStateCacheRef = useRef(new Map());
 
   const clearAll = useCallback(() => {
     polygonsRef.current.forEach(p => p.setMap(null));
@@ -105,6 +108,9 @@ export default function useMapRenderer(mapInstanceRef) {
       m.setMap(null);
     });
     markersRef.current.clear();
+    vegPontosRef.current.forEach(m => m.setMap(null));
+    vegPontosRef.current.clear();
+    vegStateCacheRef.current.clear();
     polylinesRef.current.forEach(entry => (entry.layers || [entry]).forEach(l => l.setMap(null)));
     polylinesRef.current.clear();
     polyColorRef.current.clear();
@@ -718,7 +724,61 @@ export default function useMapRenderer(mapInstanceRef) {
     }
   }, [mapInstanceRef]);
 
-  return { clearAll, syncAreas, syncLabels, syncPontos, syncLinhas, syncPontosSuplementacao, syncLotes, syncTarefas, syncUserLocation };
+  // ─── Pontos de vegetação (onde tem mais ou menos capim) ───
+  const syncVegetacaoPontos = useCallback((pontos, show, onClickPonto) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const currentIds = new Set(show ? pontos.map(p => `veg_${p.id}`) : []);
+
+    vegPontosRef.current.forEach((m, id) => {
+      if (!currentIds.has(id)) {
+        m.setMap(null);
+        vegPontosRef.current.delete(id);
+        vegStateCacheRef.current.delete(id);
+      }
+    });
+
+    if (!show) return;
+
+    pontos.forEach(ponto => {
+      const id = `veg_${ponto.id}`;
+      const nextState = `${ponto.lat.toFixed(6)}|${ponto.lng.toFixed(6)}|${ponto.classeId}`;
+      const icon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 5,
+        fillColor: ponto.cor,
+        fillOpacity: 0.9,
+        strokeColor: '#ffffff',
+        strokeWeight: 1.2
+      };
+
+      if (vegPontosRef.current.has(id)) {
+        if (vegStateCacheRef.current.get(id) === nextState) return;
+        const marker = vegPontosRef.current.get(id);
+        marker.setPosition({ lat: ponto.lat, lng: ponto.lng });
+        marker.setIcon(icon);
+        marker.setTitle(`${ponto.areaNome}: ${ponto.classeNome}`);
+        marker._vegetacao = ponto;
+        vegStateCacheRef.current.set(id, nextState);
+        return;
+      }
+
+      const m = new google.maps.Marker({
+        position: { lat: ponto.lat, lng: ponto.lng },
+        map,
+        icon,
+        zIndex: 20,
+        title: `${ponto.areaNome}: ${ponto.classeNome}`
+      });
+      m._vegetacao = ponto;
+      m.addListener('click', () => onClickPonto && onClickPonto(m._vegetacao));
+      vegPontosRef.current.set(id, m);
+      vegStateCacheRef.current.set(id, nextState);
+    });
+  }, [mapInstanceRef]);
+
+  return { clearAll, syncAreas, syncLabels, syncPontos, syncLinhas, syncPontosSuplementacao, syncLotes, syncTarefas, syncUserLocation, syncVegetacaoPontos };
 }
 
 function calcCentroid(paths) {

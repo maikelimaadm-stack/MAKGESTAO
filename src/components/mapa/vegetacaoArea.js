@@ -60,16 +60,29 @@ const carregarCores = async (data, tile) => {
   return mapa;
 };
 
-const carregarImagem = (url) =>
-new Promise((resolve, reject) => {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => resolve(img);
-  img.onerror = () => reject(new Error('Não foi possível baixar a imagem do satélite'));
-  img.src = url;
-});
+// Imagens do satélite ficam guardadas: a mesma foto serve para várias áreas.
+const imagens = new Map();
 
-const extrairPoligono = (area) => {
+const carregarImagem = (url) => {
+  const existente = imagens.get(url);
+  if (existente) return existente;
+
+  const promessa = new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      imagens.delete(url);
+      reject(new Error('Não foi possível baixar a imagem do satélite'));
+    };
+    img.src = url;
+  });
+
+  imagens.set(url, promessa);
+  return promessa;
+};
+
+export const extrairPoligono = (area) => {
   const coords = area?.coordenadas?.coords || [];
   return coords.
   map((c) => Array.isArray(c) ? { lat: Number(c[0]), lng: Number(c[1]) } : { lat: Number(c.lat), lng: Number(c.lng) }).
@@ -102,7 +115,7 @@ const dentroPoligono = (lng, lat, pontos) => {
 };
 
 /** Área do polígono em hectares. */
-const hectaresDoPoligono = (pontos) => {
+export const hectaresDoPoligono = (pontos) => {
   const latMedia = pontos.reduce((s, p) => s + p.lat, 0) / pontos.length;
   const metroLat = 110540;
   const metroLng = 111320 * Math.cos(latMedia * Math.PI / 180);
@@ -115,12 +128,12 @@ const hectaresDoPoligono = (pontos) => {
 };
 
 /**
- * Mede a vegetação dentro do polígono da área.
- * Retorna null quando a área não tem polígono ou é extensa demais para a leitura.
+ * Lê ponto a ponto a vegetação dentro do polígono (mesma grade usada na medição).
+ * Retorna as leituras com o vigor (0 a 1) e quantos pontos da grade caíram dentro.
+ * Retorna null quando o polígono é extenso demais para a leitura.
  */
-export const medirVegetacaoArea = async (area) => {
-  const pontos = extrairPoligono(area);
-  if (pontos.length < 3) return null;
+export const amostrarVegetacao = async (pontos) => {
+  if (!pontos || pontos.length < 3) return null;
 
   const data = dataReferenciaNdvi();
   let x0 = Infinity,x1 = -Infinity,y0 = Infinity,y1 = -Infinity;
@@ -141,7 +154,8 @@ export const medirVegetacaoArea = async (area) => {
   const ctx = canvas.getContext('2d');
   const passo = tiles.length > 4 ? 2 : 1;
 
-  let dentro = 0,comLeitura = 0,ativos = 0,somaVigor = 0,somaVigorAtivo = 0;
+  const leituras = [];
+  let dentro = 0;
 
   for (const tile of tiles) {
     const img = await carregarImagem(urlTile(data, ZOOM_NATIVO, tile.x, tile.y));
@@ -161,29 +175,42 @@ export const medirVegetacaoArea = async (area) => {
         const vigor = cores.get(`${px[off]},${px[off + 1]},${px[off + 2]}`);
         if (vigor === undefined) continue;
 
-        comLeitura++;
-        somaVigor += vigor;
-        if (vigor >= LIMIAR_CAPIM) {
-          ativos++;
-          somaVigorAtivo += vigor;
-        }
+        leituras.push({ lat, lng, vigor });
       }
     }
   }
 
+  return { data, leituras, dentro };
+};
+
+const somarVigor = (leituras) => leituras.reduce((soma, leitura) => soma + leitura.vigor, 0);
+
+/**
+ * Mede a vegetação dentro do polígono da área.
+ * Retorna null quando a área não tem polígono ou é extensa demais para a leitura.
+ */
+export const medirVegetacaoArea = async (area) => {
+  const pontos = extrairPoligono(area);
+  if (pontos.length < 3) return null;
+
+  const amostra = await amostrarVegetacao(pontos);
+  if (!amostra) return null;
+
+  const { data, leituras, dentro } = amostra;
+  const ativas = leituras.filter((leitura) => leitura.vigor >= LIMIAR_CAPIM);
   const latMedia = pontos.reduce((s, p) => s + p.lat, 0) / pontos.length;
   const areaHa = hectaresDoPoligono(pontos);
-  const cobertura = comLeitura ? ativos / comLeitura : 0;
+  const cobertura = leituras.length ? ativas.length / leituras.length : 0;
 
   return {
     data,
     areaHa,
-    leituras: comLeitura,
-    semLeitura: dentro - comLeitura,
+    leituras: leituras.length,
+    semLeitura: dentro - leituras.length,
     coberturaPct: cobertura * 100,
     produtivaHa: areaHa * cobertura,
-    vigorMedioPct: comLeitura ? somaVigor / comLeitura * 100 : 0,
-    vigorMedioAtivoPct: ativos ? somaVigorAtivo / ativos * 100 : 0,
+    vigorMedioPct: leituras.length ? somarVigor(leituras) / leituras.length * 100 : 0,
+    vigorMedioAtivoPct: ativas.length ? somarVigor(ativas) / ativas.length * 100 : 0,
     resolucaoM: RAIO_TERRA * Math.cos(latMedia * Math.PI / 180) / Math.pow(2, ZOOM_NATIVO)
   };
 };

@@ -81,6 +81,8 @@ export default function MapaFiltrosAvancados({
   showUserLocation, setShowUserLocation,
   showNomesAreas, setShowNomesAreas,
   showHectaresAreas, setShowHectaresAreas,
+  vegetacaoResumo = null,
+  vegetacaoCarregando = false,
   showNdvi, setShowNdvi,
   // Filtros de lotes
   filtroCategoria, setFiltroCategoria,
@@ -141,7 +143,7 @@ export default function MapaFiltrosAvancados({
                 </label>
             )}
             </div>
-            {showNdvi && <div className="px-1 pt-1.5"><MapaLegendaNdvi /></div>}
+            {showNdvi && <div className="px-1 pt-1.5"><MapaLegendaNdvi resumo={vegetacaoResumo} carregando={vegetacaoCarregando} /></div>}
           </div>
           <Separator />
         </>
