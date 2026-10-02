@@ -143,7 +143,6 @@ export default function useMapRenderer(mapInstanceRef) {
 
       if (polygonsRef.current.has(area.id)) {
         const poly = polygonsRef.current.get(area.id);
-        const prevCor = polyColorRef.current.get(area.id);
         const nextSignature = areaPathSignature(coords);
 
         if (poly._pathSignature !== nextSignature) {
@@ -151,10 +150,8 @@ export default function useMapRenderer(mapInstanceRef) {
           poly._pathSignature = nextSignature;
         }
 
-        if (prevCor !== cor) {
-          poly.setOptions({ fillColor: cor, strokeColor: borda });
-          polyColorRef.current.set(area.id, cor);
-        }
+        poly.setOptions({ fillColor: cor, strokeColor: borda, strokeOpacity: 0.8, strokeWeight: 1.2, fillOpacity: MAPA_PALETA.areaPreenchimento });
+        polyColorRef.current.set(area.id, cor);
 
         poly._areaData = area;
         poly._color = cor;
@@ -353,9 +350,11 @@ export default function useMapRenderer(mapInstanceRef) {
       if (existente) {
         if (existente.assinatura !== assinatura) {
           existente.layers.forEach(layer => layer.setPath(paths));
-          existente.core.setOptions({ strokeColor: cor });
           existente.assinatura = assinatura;
         }
+        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.22, strokeWeight: 3.6 });
+        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.45, strokeWeight: 2.5 });
+        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 0.95, strokeWeight: 1.5 });
         return;
       }
 

@@ -5,11 +5,11 @@
 
 export const MAPA_PALETA = {
   // Áreas
-  areaPadrao: '#6aaf9b',
+  areaPadrao: '#83cfc5',
   areaSemDados: '#a3b2b8',
-  areaBordaForca: 0.18,
-  areaPreenchimento: 0.20,
-  areaPreenchimentoHover: 0.30,
+  areaBordaForca: 0.08,
+  areaPreenchimento: 0.27,
+  areaPreenchimentoHover: 0.36,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#d6bb83',
@@ -30,13 +30,12 @@ const CORES_LINHA_TIPO = [
 export const normalizarTipo = (valor) =>
 String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase();
 
-/** Cor da linha: respeita a cor salva; senão infere pelo tipo; senão usa o padrão. */
+/** Paleta de exibição por tipo, sem alterar as cores cadastradas. */
 export const corDaLinha = (linha) => {
-  const salva = linha?.coordenadas?.cor || linha?.cor;
-  if (salva) return suavizarCor(salva);
   const tipo = normalizarTipo(`${linha?.tipo || ''} ${linha?.nome || ''}`);
   const encontrada = CORES_LINHA_TIPO.find((item) => item.chaves.some((chave) => tipo.includes(normalizarTipo(chave))));
-  return encontrada?.cor || MAPA_PALETA.linhaPadrao;
+  const salva = linha?.coordenadas?.cor || linha?.cor;
+  return encontrada?.cor || (salva ? suavizarCor(salva) : MAPA_PALETA.linhaPadrao);
 };
 
 /** Converte #rgb / #rrggbb em {r,g,b}. Retorna null para formatos não suportados. */
@@ -64,8 +63,8 @@ const paraRgb = (hex) => {
 export const suavizarCor = (cor) => {
   const rgb = paraRgb(cor);
   if (!rgb) return cor;
-  const mix = (canal, neutro) => Math.round(canal * 0.78 + neutro * 0.22);
-  return `rgb(${mix(rgb.r, 164)}, ${mix(rgb.g, 184)}, ${mix(rgb.b, 179)})`;
+  const mix = (canal, neutro) => Math.round(canal * 0.4 + neutro * 0.6).toString(16).padStart(2, '0');
+  return `#${mix(rgb.r, 112)}${mix(rgb.g, 207)}${mix(rgb.b, 198)}`;
 };
 
 /** Escurece uma cor (0 a 1) para gerar a borda das áreas com bom contraste. */
