@@ -46,7 +46,7 @@ export default function MapaLegendaNdvi({ resumo = null, carregando = false }) {
             </div>
         )}
 
-          <div className="text-[9px] font-bold text-emerald-900 uppercase pt-1">Áreas por produtividade</div>
+          <div className="text-[9px] font-bold text-emerald-900 uppercase pt-1">Áreas por massa de forragem</div>
           {CLASSES_AREA.map((classe) =>
         <div key={classe.id} className="flex items-center justify-between gap-2">
               <span className="flex items-center gap-1.5">

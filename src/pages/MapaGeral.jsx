@@ -940,7 +940,7 @@ export default function MapaGeral() {
   const getVegetacaoLabelText = useCallback((area) => {
     const info = vegetacaoPorArea.get(area.id);
     if (!info) return null;
-    return `${info.classeNome.toUpperCase()} ${Math.round(info.coberturaPct)}% CAPIM`;
+    return `${info.classeNome.toUpperCase()} ${info.massaKgHa.toLocaleString('pt-BR')} kg MS/ha`;
   }, [vegetacaoPorArea]);
 
   useEffect(() => {

@@ -21,6 +21,21 @@ export const LIMIAR_CAPIM = (INDICE_CAPIM - INDICE_MIN) / (INDICE_MAX - INDICE_M
 /** Massa de capim (kg de matéria seca por hectare) no ponto de melhor vigor. */
 export const TETO_PADRAO_KG_HA = 6000;
 
+/** Onde fica guardado o teto de massa ajustado pelo usuário. */
+export const CHAVE_TETO_MASSA = 'vegetacao_teto_kg_ha';
+
+export const lerTetoMassaKgHa = () => {
+  const salvo = Number(localStorage.getItem(CHAVE_TETO_MASSA));
+  return salvo > 0 ? salvo : TETO_PADRAO_KG_HA;
+};
+
+/** Converte o vigor do capim (0 a 100%) em massa de forragem (kg MS/ha). */
+export const massaKgHaDoVigor = (vigorMedioPct, teto = lerTetoMassaKgHa()) => {
+  const limiarPct = LIMIAR_CAPIM * 100;
+  const normalizado = Math.max(0, (vigorMedioPct - limiarPct) / (100 - limiarPct));
+  return Math.round(teto * normalizado);
+};
+
 const urlTile = (data, z, x, y) => `${GIBS_BASE}/${data}/${TILE_MATRIX}/${z}/${y}/${x}.png`;
 
 /** Lê a paleta real da imagem do satélite (mesma paleta em todos os tiles). */

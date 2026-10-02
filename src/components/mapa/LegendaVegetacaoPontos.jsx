@@ -1,6 +1,6 @@
 import React from "react";
 import { Leaf, Loader2, WifiOff } from "lucide-react";
-import { CLASSES_AREA, CLASSES_VEGETACAO } from "./vegetacaoZonas";
+import { CLASSES_AREA, CLASSES_VEGETACAO, MASSA_IDEAL_KG_HA } from "./vegetacaoZonas";
 
 const Linha = ({ cor, nome, valor }) =>
 <div className="flex items-center justify-between gap-2">
@@ -47,14 +47,18 @@ export default function LegendaVegetacaoPontos({ resumo, carregando = false, err
           )}
           </div>
 
-          <div className="text-[9px] font-bold text-emerald-900 uppercase mt-1.5 mb-1 pt-1.5 border-t border-slate-200">Áreas</div>
+          <div className="text-[9px] font-bold text-emerald-900 uppercase mt-1.5 mb-1 pt-1.5 border-t border-slate-200">Áreas por massa de forragem</div>
           <div className="space-y-0.5">
             {CLASSES_AREA.map((classe) =>
           <Linha key={classe.id} cor={classe.cor} nome={classe.plural} valor={contagemAreas[classe.id] || 0} />
           )}
           </div>
 
-          <p className="text-[9px] text-slate-400 mt-1.5 leading-snug">
+          <p className="text-[9px] text-slate-500 mt-1.5 leading-snug">
+            Ideal: {MASSA_IDEAL_KG_HA.minimo.toLocaleString('pt-BR')} a {MASSA_IDEAL_KG_HA.maximo.toLocaleString('pt-BR')} kg MS/ha
+          </p>
+
+          <p className="text-[9px] text-slate-400 mt-1 leading-snug">
             Toque em um ponto para abrir a área{data ? ` · ${data}` : ''}
           </p>
         </>

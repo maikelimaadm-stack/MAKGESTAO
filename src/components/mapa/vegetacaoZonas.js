@@ -1,9 +1,9 @@
 /**
  * Classificação da vegetação lida do satélite (mesma imagem NDVI da camada de
  * vegetação): aponta, dentro de cada área, onde tem mais capim e onde tem pouco
- * capim ou solo exposto, e resume a área em produtiva/intermediária/improdutiva.
+ * capim ou solo exposto, e resume a área pela massa de forragem (kg MS/ha).
  */
-import { LIMIAR_CAPIM, amostrarVegetacao, extrairPoligono, hectaresDoPoligono } from './vegetacaoArea';
+import { LIMIAR_CAPIM, massaKgHaDoVigor, amostrarVegetacao, extrairPoligono, hectaresDoPoligono } from './vegetacaoArea';
 
 /** Classes de cada ponto lido no satélite (do mais para o menos capim). */
 export const CLASSES_VEGETACAO = [
@@ -13,18 +13,23 @@ export const CLASSES_VEGETACAO = [
 { id: 'solo', nome: 'Solo exposto', cor: '#b45309', minimo: 0 }];
 
 
-/** Classes da área inteira, pela parte da área que tem capim. */
+/** Faixa de massa de forragem considerada ideal para pastejo (kg MS/ha). */
+export const MASSA_IDEAL_KG_HA = { minimo: 1500, maximo: 2500 };
+
+/** Classes da área inteira, pela massa de forragem (kg MS/ha) estimada nela. */
 export const CLASSES_AREA = [
-{ id: 'produtiva', nome: 'Produtiva', plural: 'Produtivas', cor: '#166534', minimo: 60 },
-{ id: 'intermediaria', nome: 'Intermediária', plural: 'Intermediárias', cor: '#f59e0b', minimo: 30 },
-{ id: 'improdutiva', nome: 'Improdutiva', plural: 'Improdutivas', cor: '#b45309', minimo: 0 }];
+{ id: 'excesso', nome: 'Excesso de massa', plural: 'Com excesso', cor: '#0e7490', minimo: MASSA_IDEAL_KG_HA.maximo },
+{ id: 'ideal', nome: 'Na faixa ideal', plural: 'Na faixa ideal', cor: '#166534', minimo: MASSA_IDEAL_KG_HA.minimo },
+{ id: 'baixa', nome: 'Abaixo da meta', plural: 'Abaixo da meta', cor: '#f59e0b', minimo: 1000 },
+{ id: 'sobrepastejada', nome: 'Sobrepastejada', plural: 'Sobrepastejadas', cor: '#b45309', minimo: 0 }];
 
 
 export const classeDoVigor = (vigor) =>
 CLASSES_VEGETACAO.find((classe) => vigor >= classe.minimo) || CLASSES_VEGETACAO[CLASSES_VEGETACAO.length - 1];
 
-export const classeDaCobertura = (coberturaPct) =>
-CLASSES_AREA.find((classe) => coberturaPct >= classe.minimo) || CLASSES_AREA[CLASSES_AREA.length - 1];
+/** Classe da área pela massa de forragem média lida (kg MS/ha). */
+export const classeDaMassa = (massaKgHa) =>
+CLASSES_AREA.find((classe) => massaKgHa >= classe.minimo) || CLASSES_AREA[CLASSES_AREA.length - 1];
 
 const MAX_PONTOS_POR_AREA = 18; // acima disso o mapa fica carregado demais
 const MIN_PONTOS_POR_AREA = 3;
@@ -62,7 +67,7 @@ export const analisarZonasVegetacao = async (areas) => {
 
   const pontos = [];
   const areasResumo = [];
-  const contagemAreas = { produtiva: 0, intermediaria: 0, improdutiva: 0, semLeitura: 0 };
+  const contagemAreas = { excesso: 0, ideal: 0, baixa: 0, sobrepastejada: 0, semLeitura: 0 };
   let data = '';
 
   comPoligono.forEach(({ area, anel }, indice) => {
@@ -75,9 +80,11 @@ export const analisarZonasVegetacao = async (areas) => {
     data = data || amostra.data;
 
     const areaHa = hectaresDoPoligono(anel);
-    const comCapim = amostra.leituras.filter((leitura) => leitura.vigor >= LIMIAR_CAPIM).length;
-    const coberturaPct = amostra.leituras.length ? comCapim / amostra.leituras.length * 100 : 0;
-    const classe = classeDaCobertura(coberturaPct);
+    const capim = amostra.leituras.filter((leitura) => leitura.vigor >= LIMIAR_CAPIM);
+    const coberturaPct = amostra.leituras.length ? capim.length / amostra.leituras.length * 100 : 0;
+    const vigorMedioPct = capim.length ? capim.reduce((soma, leitura) => soma + leitura.vigor, 0) / capim.length * 100 : 0;
+    const massaKgHa = massaKgHaDoVigor(vigorMedioPct);
+    const classe = classeDaMassa(massaKgHa);
     contagemAreas[classe.id]++;
 
     areasResumo.push({
@@ -85,6 +92,8 @@ export const analisarZonasVegetacao = async (areas) => {
       nome: area.nome || '',
       areaHa,
       coberturaPct,
+      vigorMedioPct,
+      massaKgHa,
       classeId: classe.id,
       classeNome: classe.nome,
       cor: classe.cor

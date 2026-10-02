@@ -4,16 +4,14 @@ import { Leaf, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { medirVegetacaoArea, LIMIAR_CAPIM, TETO_PADRAO_KG_HA } from "./vegetacaoArea";
+import { medirVegetacaoArea, CHAVE_TETO_MASSA, lerTetoMassaKgHa, massaKgHaDoVigor } from "./vegetacaoArea";
+import { classeDaMassa, MASSA_IDEAL_KG_HA } from "./vegetacaoZonas";
 import VegetacaoAreaResumo from "./VegetacaoAreaResumo";
 
-const CHAVE_TETO = 'vegetacao_teto_kg_ha';
+const faixaIdeal = `${MASSA_IDEAL_KG_HA.minimo.toLocaleString('pt-BR')} a ${MASSA_IDEAL_KG_HA.maximo.toLocaleString('pt-BR')} kg MS/ha`;
 
 export default function PainelVegetacaoArea({ area }) {
-  const [teto, setTeto] = useState(() => {
-    const salvo = Number(localStorage.getItem(CHAVE_TETO));
-    return salvo > 0 ? salvo : TETO_PADRAO_KG_HA;
-  });
+  const [teto, setTeto] = useState(lerTetoMassaKgHa);
 
   const { data: dados, isLoading, isError, refetch } = useQuery({
     queryKey: ['vegetacao-area', area?.id],
@@ -26,13 +24,12 @@ export default function PainelVegetacaoArea({ area }) {
   const atualizarTeto = (valor) => {
     const numero = Number(valor);
     setTeto(numero);
-    if (numero > 0) localStorage.setItem(CHAVE_TETO, String(numero));
+    if (numero > 0) localStorage.setItem(CHAVE_TETO_MASSA, String(numero));
   };
 
-  const limiarPct = LIMIAR_CAPIM * 100;
-  const vigorNormalizado = dados ? Math.max(0, (dados.vigorMedioAtivoPct - limiarPct) / (100 - limiarPct)) : 0;
-  const massaKgHa = dados ? Math.round(teto * vigorNormalizado) : 0;
+  const massaKgHa = dados ? massaKgHaDoVigor(dados.vigorMedioAtivoPct, teto) : 0;
   const massaTotalT = dados ? massaKgHa * dados.produtivaHa / 1000 : 0;
+  const classe = dados ? classeDaMassa(massaKgHa) : null;
   const [ano, mes, dia] = (dados?.data || '').split('-');
 
   return (
@@ -72,6 +69,14 @@ export default function PainelVegetacaoArea({ area }) {
 
       {!isLoading && dados && dados.leituras > 0 &&
       <>
+          {classe &&
+          <div className="flex items-center gap-1.5 flex-wrap border rounded-lg px-2.5 py-2 bg-white" style={{ borderColor: classe.cor }}>
+              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: classe.cor }} />
+              <span className="text-xs font-semibold" style={{ color: classe.cor }}>{classe.nome}</span>
+              <span className="text-[10px] text-slate-500">· ideal {faixaIdeal}</span>
+            </div>
+          }
+
           <VegetacaoAreaResumo dados={dados} massaKgHa={massaKgHa} massaTotalT={massaTotalT} />
 
           <div className="flex items-end gap-2">
