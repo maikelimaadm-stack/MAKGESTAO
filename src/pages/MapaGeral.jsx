@@ -233,8 +233,6 @@ export default function MapaGeral() {
     return mapaGeralPermissions.visualizar_tarefas && canAccessPage(permissaoAtual, 'gt-lancamentos', 'gestao-tarefas');
   }, [currentUser?.role, permissaoAtual, mapaGeralPermissions.visualizar_tarefas]);
 
-  useNdviOverlay(mapInstanceRef, mapReady, mapaGeralPermissions.visualizar_areas && showNdvi);
-
   // ─── Queries ───
   const ST = 5 * 60 * 1000;
   const createMapaQuery = (cacheKey, options = {}) => ({
@@ -349,6 +347,19 @@ export default function MapaGeral() {
   }), [areas, filtroSetor, filtroTipoCultura, filtroTipoPastagem]);
 
   const areaIdsFiltrados = useMemo(() => new Set(areasFiltradas.map((area) => area.id)), [areasFiltradas]);
+
+  // Polígonos das áreas visíveis: a camada de vegetação só aparece dentro deles.
+  const poligonosVegetacao = useMemo(
+    () => areasFiltradas.map((area) => area.coordenadas?.coords || []).filter((anel) => anel.length > 2),
+    [areasFiltradas]
+  );
+
+  useNdviOverlay(
+    mapInstanceRef,
+    mapReady,
+    mapaGeralPermissions.visualizar_areas && showNdvi && showAreas,
+    poligonosVegetacao
+  );
 
   // Filtrar lotes
   const lotesFiltrados = useMemo(() => lotesComAlerta.filter((lote) => {

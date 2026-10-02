@@ -1,9 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { criarOverlayNdvi } from './mapaNdvi';
+import { assinaturaDosPoligonos, criarOverlayNdvi } from './mapaNdvi';
 
-/** Aplica e remove a camada de vegetação (NDVI) sobre o mapa. */
-export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
+/** Aplica e remove a camada de vegetação (NDVI) sobre o mapa, dentro dos polígonos das áreas. */
+export default function useNdviOverlay(mapInstanceRef, mapReady, ativo, poligonos) {
   const overlayRef = useRef(null);
+  const poligonosRef = useRef(poligonos);
+  poligonosRef.current = poligonos;
+
+  // A assinatura muda quando as áreas mudam, o que refaz os recortes da camada.
+  const assinatura = assinaturaDosPoligonos(poligonos);
 
   useEffect(() => {
     const mapa = mapInstanceRef.current;
@@ -24,7 +29,7 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
     const recarregarTiles = () => {
       if (!camadaAtiva) return;
       removerOverlay();
-      overlayRef.current = criarOverlayNdvi(recarregarTiles);
+      overlayRef.current = criarOverlayNdvi(poligonosRef.current, recarregarTiles);
       mapa.overlayMapTypes.push(overlayRef.current);
     };
 
@@ -34,7 +39,7 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
     }
 
     if (!overlayRef.current) {
-      overlayRef.current = criarOverlayNdvi(recarregarTiles);
+      overlayRef.current = criarOverlayNdvi(poligonosRef.current, recarregarTiles);
       mapa.overlayMapTypes.push(overlayRef.current);
     }
 
@@ -42,5 +47,5 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
       camadaAtiva = false;
       removerOverlay();
     };
-  }, [mapInstanceRef, mapReady, ativo]);
+  }, [mapInstanceRef, mapReady, ativo, assinatura]);
 }
