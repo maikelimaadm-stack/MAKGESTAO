@@ -1,5 +1,9 @@
 /* global google */
 import { useRef, useCallback } from "react";
+import { MAPA_PALETA, corDaLinha, escurecer } from "./mapaPaleta";
+
+const escapeHtml = (valor) =>
+String(valor ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const iconSizeCache = new Map();
 const markerStateCache = new Map();
@@ -101,7 +105,7 @@ export default function useMapRenderer(mapInstanceRef) {
       m.setMap(null);
     });
     markersRef.current.clear();
-    polylinesRef.current.forEach(l => l.setMap(null));
+    polylinesRef.current.forEach(entry => (entry.layers || [entry]).forEach(l => l.setMap(null)));
     polylinesRef.current.clear();
     polyColorRef.current.clear();
     lotesIndicatorsRef.current.forEach(i => i.setMap(null));
@@ -132,8 +136,9 @@ export default function useMapRenderer(mapInstanceRef) {
       if (coords.length < 3) return;
 
       const paths = coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      const corBase = area.coordenadas?.cor || area.cor || '#61aad9';
+      const corBase = area.coordenadas?.cor || area.cor || MAPA_PALETA.areaPadrao;
       const cor = colorFn ? (colorFn(area) || corBase) : corBase;
+      const borda = escurecer(cor);
 
       if (polygonsRef.current.has(area.id)) {
         const poly = polygonsRef.current.get(area.id);
@@ -146,29 +151,36 @@ export default function useMapRenderer(mapInstanceRef) {
         }
 
         if (prevCor !== cor) {
-          poly.setOptions({ fillColor: cor, strokeColor: cor });
+          poly.setOptions({ fillColor: cor, strokeColor: borda });
           polyColorRef.current.set(area.id, cor);
         }
 
         poly._areaData = area;
         poly._color = cor;
+        poly._stroke = borda;
         return;
       }
 
       const polygon = new google.maps.Polygon({
         paths,
-        strokeColor: cor,
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
+        strokeColor: borda,
+        strokeOpacity: 0.95,
+        strokeWeight: 2.2,
         fillColor: cor,
-        fillOpacity: 0.45,
+        fillOpacity: MAPA_PALETA.areaPreenchimento,
+        zIndex: 2,
       });
       polygon._areaData = area;
       polygon._color = cor;
+      polygon._stroke = borda;
       polygon._pathSignature = areaPathSignature(coords);
 
-      polygon.addListener('mouseover', () => polygon.setOptions({ strokeColor: '#ffffff', strokeOpacity: 1, strokeWeight: 3 }));
-      polygon.addListener('mouseout', function () { this.setOptions({ strokeColor: this._color, strokeOpacity: 0.8, strokeWeight: 2 }); });
+      polygon.addListener('mouseover', function () {
+        this.setOptions({ strokeColor: '#ffffff', strokeOpacity: 1, strokeWeight: 3.2, fillOpacity: MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
+      });
+      polygon.addListener('mouseout', function () {
+        this.setOptions({ strokeColor: this._stroke, strokeOpacity: 0.95, strokeWeight: 2.2, fillOpacity: MAPA_PALETA.areaPreenchimento, zIndex: 2 });
+      });
       polygon.addListener('click', function (e) {
         if (e.vertex === undefined) {
           const coords = e?.latLng ? { lat: e.latLng.lat(), lng: e.latLng.lng() } : null;
@@ -239,10 +251,10 @@ export default function useMapRenderer(mapInstanceRef) {
 
       const labelDiv = document.createElement('div');
       labelDiv.innerHTML = `
-        <div style="color:white;text-align:center;white-space:nowrap;text-shadow:1px 1px 3px rgba(0,0,0,0.8);pointer-events:none;font-family:Arial,sans-serif;">
-          <div class="label-title" style="font-size:11px;font-weight:700;">${area.nome || ''}</div>
-          <div class="label-hectares" style="font-size:10px;font-weight:400;opacity:0.95;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
-          <div class="label-extra" style="font-size:10px;font-weight:600;color:#fef08a;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 9px;border-radius:9px;background:${MAPA_PALETA.rotuloFundo};border:1px solid ${MAPA_PALETA.rotuloBorda};box-shadow:0 2px 10px rgba(2,6,23,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);white-space:nowrap;pointer-events:none;font-family:Inter,Arial,sans-serif;">
+          <div class="label-title" style="font-size:11px;font-weight:700;color:${MAPA_PALETA.rotuloTexto};letter-spacing:0.2px;line-height:1.2;">${escapeHtml(area.nome)}</div>
+          <div class="label-hectares" style="font-size:10px;font-weight:500;color:${MAPA_PALETA.rotuloSecundario};line-height:1.2;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
+          <div class="label-extra" style="font-size:10px;font-weight:700;color:${MAPA_PALETA.rotuloDestaque};line-height:1.2;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
         </div>`;
 
       const overlay = new google.maps.OverlayView();
@@ -312,28 +324,68 @@ export default function useMapRenderer(mapInstanceRef) {
     });
   }, [mapInstanceRef]);
 
-  // ─── Linhas Geográficas ───
+  // ─── Linhas Geográficas (traçado cartográfico em camadas) ───
   const syncLinhas = useCallback((linhas, show) => {
     const map = mapInstanceRef.current;
     if (!map) return;
     const currentIds = new Set(show ? linhas.map(l => l.id) : []);
-    polylinesRef.current.forEach((pl, id) => { if (!currentIds.has(id)) { pl.setMap(null); polylinesRef.current.delete(id); } });
+
+    polylinesRef.current.forEach((entry, id) => {
+      if (!currentIds.has(id)) {
+        (entry.layers || [entry]).forEach(layer => layer.setMap(null));
+        entry.info?.close();
+        polylinesRef.current.delete(id);
+      }
+    });
+
     if (!show) return;
+
     linhas.forEach(linha => {
-      if (polylinesRef.current.has(linha.id)) return;
       const coords = linha.coordenadas?.coords || [];
       if (coords.length < 2) return;
+
       const paths = coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      const cor = linha.coordenadas?.cor || linha.cor || '#f59e0b';
-      const polyline = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 3 });
-      polyline.addListener('click', () => {
-        const b = new google.maps.LatLngBounds(); paths.forEach(p => b.extend(p));
-        new google.maps.InfoWindow({ content: `<div style="padding:10px;"><strong>${linha.nome}</strong><br/><span style="color:#666;">${linha.tipo} - ${linha.comprimento_metros ? (linha.comprimento_metros / 1000).toFixed(2) + ' km' : 'N/A'}</span></div>` }).setPosition(b.getCenter()) || void 0;
-        const iw = new google.maps.InfoWindow({ content: `<div style="padding:10px;"><strong>${linha.nome}</strong><br/><span style="color:#666;">${linha.tipo}</span></div>` });
-        iw.setPosition(b.getCenter()); iw.open(map);
+      const cor = corDaLinha(linha);
+      const assinatura = `${cor}|${paths.map(p => `${p.lat},${p.lng}`).join(';')}`;
+      const existente = polylinesRef.current.get(linha.id);
+
+      if (existente) {
+        if (existente.assinatura !== assinatura) {
+          existente.layers.forEach(layer => layer.setPath(paths));
+          existente.core.setOptions({ strokeColor: cor });
+          existente.assinatura = assinatura;
+        }
+        return;
+      }
+
+      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 0.6, strokeWeight: 9, zIndex: 30, clickable: false, geodesic: true });
+      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.92, strokeWeight: 6, zIndex: 31, clickable: false, geodesic: true });
+      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 3.2, zIndex: 32, geodesic: true });
+
+      const infoWindow = new google.maps.InfoWindow({ maxWidth: 260 });
+
+      core.addListener('click', () => {
+        const bounds = new google.maps.LatLngBounds();
+        paths.forEach(p => bounds.extend(p));
+        const metros = linha.comprimento_metros || (window.google?.maps?.geometry?.spherical ? google.maps.geometry.spherical.computeLength(paths) : null);
+        const comprimento = metros ? `${(metros / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} km` : null;
+        infoWindow.setContent(`
+          <div style="font-family:Inter,Arial,sans-serif;min-width:150px;padding:2px 1px;">
+            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px;">${escapeHtml(linha.nome)}</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#475569;">
+              <span style="width:16px;height:4px;border-radius:2px;background:${cor};display:inline-block;"></span>
+              ${escapeHtml(linha.tipo || '')}
+            </div>
+            ${comprimento ? `<div style="font-size:11px;color:#475569;margin-top:3px;">${comprimento}</div>` : ''}
+          </div>`);
+        infoWindow.setPosition(bounds.getCenter());
+        infoWindow.open(map);
       });
-      polyline.setMap(map);
-      polylinesRef.current.set(linha.id, polyline);
+      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 5 }));
+      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 3.2 }));
+
+      [sombra, contorno, core].forEach(layer => layer.setMap(map));
+      polylinesRef.current.set(linha.id, { layers: [sombra, contorno, core], core, info: infoWindow, assinatura });
     });
   }, [mapInstanceRef]);
 

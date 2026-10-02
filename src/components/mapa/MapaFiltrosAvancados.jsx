@@ -33,7 +33,7 @@ export const CORES_OCUPACAO = {
 
 // Cores por faixa de UA/ha (baseado em dados Embrapa/Scot Consultoria)
 export const CORES_UA_HA = {
-  'Sem gado': '#d1d5db',
+  'Sem gado': '#9aa4b2',
   'Sublotação (< 0,8 UA/ha)': '#86efac',
   'Moderada (0,8 - 1,2 UA/ha)': '#22c55e',
   'Ideal (1,2 - 1,8 UA/ha)': '#3b82f6',
@@ -43,7 +43,7 @@ export const CORES_UA_HA = {
 
 // Cores por situação do pasto (Ocupado vs Vazio)
 export const CORES_SITUACAO_PASTO = {
-  'Vazio - Sem histórico': '#d1d5db',
+  'Vazio - Sem histórico': '#9aa4b2',
   'Vazio - Em descanso': '#86efac',
   'Ocupado - Normal': '#3b82f6',
   'Ocupado - Atenção (> 45d)': '#f59e0b',
@@ -327,7 +327,7 @@ export default function MapaFiltrosAvancados({
 function LegendaItem({ cor, label }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-3 h-3 rounded-sm border border-white/50" style={{ backgroundColor: cor }} />
+      <div className="w-4 h-3 rounded-[4px] shadow-sm" style={{ backgroundColor: cor, boxShadow: '0 0 0 1px rgba(15,23,42,0.25) inset' }} />
       <span className="text-[11px] text-slate-700">{label}</span>
     </div>);
 

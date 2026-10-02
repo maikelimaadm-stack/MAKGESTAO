@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Palette } from "lucide-react";
 import {
   CORES_TIPO_CULTURA,
   CORES_APROVEITAMENTO,
@@ -37,20 +36,25 @@ export default function MapaLegenda({ modoColoracao, categoriasGadoCores, tiposP
   if (items.length === 0) return null;
 
   return (
-    <div className="absolute bottom-20 md:bottom-16 left-3 z-10 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg max-w-[200px]">
+    <div className="absolute bottom-20 md:bottom-16 left-3 z-10 w-[212px] rounded-xl overflow-hidden bg-slate-900/80 backdrop-blur-md border border-white/15 shadow-xl">
       <button
         onClick={() => setCollapsed(c => !c)}
-        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-bold text-slate-700 uppercase"
-      >
-        <span>{modoLabel}</span>
-        {collapsed ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        className="w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold text-white/90 uppercase tracking-wide">
+        <span className="flex items-center gap-1.5">
+          <Palette className="w-3 h-3 text-emerald-300" />
+          {modoLabel}
+        </span>
+        {collapsed ? <ChevronUp className="w-3 h-3 text-white/60" /> : <ChevronDown className="w-3 h-3 text-white/60" />}
       </button>
       {!collapsed && (
-        <div className="px-3 pb-2 space-y-1">
+        <div className="px-3 pb-2.5 pt-0.5 space-y-1.5 max-h-[42vh] overflow-y-auto">
           {items.map(([label, cor]) => (
             <div key={label} className="flex items-center gap-2">
-              <div className="w-3 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: cor, border: '1px solid rgba(0,0,0,0.15)' }} />
-              <span className="text-[10px] text-slate-700 leading-tight">{label}</span>
+              <span
+                className="w-4 h-3 rounded-[4px] flex-shrink-0"
+                style={{ backgroundColor: cor, boxShadow: '0 0 0 1px rgba(255,255,255,0.35) inset' }}
+              />
+              <span className="text-[10px] text-white/85 leading-tight">{label}</span>
             </div>
           ))}
         </div>

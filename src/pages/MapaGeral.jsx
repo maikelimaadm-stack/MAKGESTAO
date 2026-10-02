@@ -28,6 +28,7 @@ import MapaFiltrosAvancados, {
 "../components/mapa/MapaFiltrosAvancados";
 import MapaLegenda from "../components/mapa/MapaLegenda";
 import useMapRenderer from "../components/mapa/useMapRenderer";
+import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { useBebedouros } from "@/hooks/useBebedouros";
 import { getCochoIndicator, getDepositoIndicator, buildProgressIconUrl } from "../components/mapa/pontoStatusUtils";
@@ -454,14 +455,14 @@ export default function MapaGeral() {
     if (modoColoracao === 'tipo_pastagem') return tiposPastagemCores[area.tipo_pastagem] || '#94a3b8';
     if (modoColoracao === 'categoria_gado') {
       const lotesNaArea = lotes.filter((l) => l.area_atual_id === area.id);
-      if (lotesNaArea.length === 0) return '#d1d5db';
+      if (lotesNaArea.length === 0) return MAPA_PALETA.areaSemDados;
       const cat = lotesNaArea[0].categoria;
       return categoriasGadoCores[cat] || '#94a3b8';
     }
     if (modoColoracao === 'ua_ha') {
       const info = uaPorAreaMap[area.id];
       const ha = getAreaEfetiva(area); // Usa área efetiva!
-      if (!info || info.ua === 0) return '#d1d5db'; // sem gado
+      if (!info || info.ua === 0) return MAPA_PALETA.areaSemDados; // sem gado
       if (ha <= 0) return '#94a3b8';
       const uaHa = info.ua / ha;
       // Faixas baseadas em Embrapa/Scot (pastagem tropical, ~20% margem)
@@ -473,8 +474,8 @@ export default function MapaGeral() {
     }
     if (modoColoracao === 'situacao_pasto') {
       const info = situacaoPastoMap[area.id];
-      if (!info) return '#d1d5db';
-      if (info.tipo === 'vazia') return '#d1d5db'; // sem histórico
+      if (!info) return MAPA_PALETA.areaSemDados;
+      if (info.tipo === 'vazia') return MAPA_PALETA.areaSemDados; // sem histórico
       if (info.tipo === 'descanso') return '#86efac'; // em descanso
       // Ocupado
       if (info.dias <= 45) return '#3b82f6'; // normal
