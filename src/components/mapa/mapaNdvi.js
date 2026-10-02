@@ -8,9 +8,9 @@
  * exatamente o pedaço correspondente do satélite (sem repetir imagem).
  */
 
-const GIBS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_8Day/default';
-const TILE_MATRIX = 'GoogleMapsCompatible_Level9';
-const ZOOM_NATIVO = 9; // resolução nativa da imagem (~250 m por pixel)
+export const GIBS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_8Day/default';
+export const TILE_MATRIX = 'GoogleMapsCompatible_Level9';
+export const ZOOM_NATIVO = 9; // resolução nativa da imagem (~250 m por pixel)
 const TAMANHO_TILE = 256;
 const ANCORA_COMPOSICAO = Date.UTC(2000, 1, 18); // primeira composição de 8 dias do produto
 const PASSO_COMPOSICAO = 8 * 24 * 60 * 60 * 1000;
