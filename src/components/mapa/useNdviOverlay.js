@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { criarOverlayNdvi, NDVI_FILTRO } from './mapaNdvi';
-
-const ESTILO_ID = 'ndvi-vegetacao-realce';
+import { criarOverlayNdvi } from './mapaNdvi';
 
 /** Aplica e remove a camada de vegetação (NDVI) sobre o mapa. */
 export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
@@ -19,27 +17,30 @@ export default function useNdviOverlay(mapInstanceRef, mapReady, ativo) {
       overlayRef.current = null;
     };
 
+    let camadaAtiva = true;
+
+    // Quando uma imagem do satélite termina de baixar, os tiles são pedidos de
+    // novo para o mapa desenhar o recorte correto de cada área.
+    const recarregarTiles = () => {
+      if (!camadaAtiva) return;
+      removerOverlay();
+      overlayRef.current = criarOverlayNdvi(recarregarTiles);
+      mapa.overlayMapTypes.push(overlayRef.current);
+    };
+
     if (!ativo) {
       removerOverlay();
-      document.getElementById(ESTILO_ID)?.remove();
       return;
     }
 
     if (!overlayRef.current) {
-      overlayRef.current = criarOverlayNdvi();
+      overlayRef.current = criarOverlayNdvi(recarregarTiles);
       mapa.overlayMapTypes.push(overlayRef.current);
     }
 
-    // Realce de cor somente nas imagens da camada de vegetação.
-    if (!document.getElementById(ESTILO_ID)) {
-      const estilo = document.createElement('style');
-      estilo.id = ESTILO_ID;
-      estilo.textContent = `img[src*="gibs.earthdata.nasa.gov"]{filter:${NDVI_FILTRO};}`;
-      document.head.appendChild(estilo);
-    }
-
     return () => {
-      document.getElementById(ESTILO_ID)?.remove();
+      camadaAtiva = false;
+      removerOverlay();
     };
   }, [mapInstanceRef, mapReady, ativo]);
 }
