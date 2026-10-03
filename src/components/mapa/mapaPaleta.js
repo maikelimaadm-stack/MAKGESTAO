@@ -17,7 +17,7 @@ export const MAPA_PALETA = {
   areaPreenchimentoVegetacao: 0,
   areaPreenchimentoVegetacaoHover: 0.15,
   // Divisões das áreas no modo vegetação: linha branca, como num mapa de pastos
-  areaBordaVegetacao: { color: '#ffffff', opacity: 1, weight: 1.6 },
+  areaBordaVegetacao: { color: '#ffffff', opacity: 1, weight: 1 },
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#b77912',

@@ -60,8 +60,7 @@ export default function MapaLegendaNdvi({ resumo = null, carregando = false }) {
       }
 
       <p className="text-[9px] text-slate-500 leading-snug">
-        Cor da vegetação: NDVI do satélite MODIS (250 m · composição de 8 dias de {dia}/{mes}/{ano}). Detalhe do capim:
-        imagem Sentinel-2 (30 m) da data disponível mais recente. Requer internet.
+        Cor da vegetação: NDVI do satélite MODIS (250 m · composição de 8 dias de {dia}/{mes}/{ano}). Requer internet.
       </p>
     </div>);
 }
