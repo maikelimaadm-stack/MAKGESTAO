@@ -31,7 +31,6 @@ import useMapRenderer from "../components/mapa/useMapRenderer";
 import useNdviOverlay from "../components/mapa/useNdviOverlay";
 import { assinaturaDosPoligonos } from "../components/mapa/mapaNdvi";
 import { analisarZonasVegetacao } from "../components/mapa/vegetacaoZonas";
-import LegendaVegetacaoPontos from "../components/mapa/LegendaVegetacaoPontos";
 import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { useBebedouros } from "@/hooks/useBebedouros";
@@ -911,14 +910,20 @@ export default function MapaGeral() {
     if (!mapReady) return;
     // Com a vegetação ligada a área fica só com o contorno, para a imagem não sair lavada.
     const somenteFoto = modoColoracao === 'satelite' || showNdvi;
+    const preenchimentoArea = showNdvi ?
+    MAPA_PALETA.areaPreenchimentoVegetacao :
+    somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento;
+    const preenchimentoAreaHover = showNdvi ?
+    MAPA_PALETA.areaPreenchimentoVegetacaoHover :
+    somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover;
     renderer.syncAreas(
       areasFiltradas,
       mapaGeralPermissions.visualizar_areas && showAreas,
       handleClickArea,
       handleRightClickArea,
       getAreaColor,
-      somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento,
-      somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover
+      preenchimentoArea,
+      preenchimentoAreaHover
     );
   }, [areasFiltradas, showAreas, mapReady, modoColoracao, showNdvi, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
   // Função de texto extra para labels (UA/ha ou situação do pasto)
@@ -944,29 +949,16 @@ export default function MapaGeral() {
     return null;
   }, [modoColoracao, uaPorAreaMap, situacaoPastoMap, getAreaEfetiva]);
 
-  // Produtividade da área (leitura do satélite) mostrada embaixo do nome
-  const vegetacaoPorArea = useMemo(
-    () => new Map((zonasVegetacao?.areas || []).map((areaVeg) => [areaVeg.id, areaVeg])),
-    [zonasVegetacao]
-  );
-
-  const getVegetacaoLabelText = useCallback((area) => {
-    const info = vegetacaoPorArea.get(area.id);
-    if (!info) return null;
-    if (info.classeId === 'mata') return 'ÁREA DE MATA';
-    return `${info.classeNome.toUpperCase()} ${info.massaKgHa.toLocaleString('pt-BR')} kg MS/ha`;
-  }, [vegetacaoPorArea]);
-
+  // Rótulos das áreas: com a vegetação ligada o mapa fica só com a imagem do satélite e os contornos
   useEffect(() => {
     if (!mapReady) return;
     renderer.syncLabels(
       areasFiltradas,
       mapaGeralPermissions.visualizar_areas && mapaGeralPermissions.visualizar_nomes_areas && showNomesAreas && showAreas,
-      showNdvi && zonasVegetacao ? getVegetacaoLabelText :
       modoColoracao === 'ua_ha' || modoColoracao === 'situacao_pasto' ? getLabelExtraText : null,
       showHectaresAreas
     );
-  }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, showNdvi, zonasVegetacao, mapReady, modoColoracao, getLabelExtraText, getVegetacaoLabelText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
+  }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, mapReady, modoColoracao, getLabelExtraText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
 
   // Pontos de vegetação: onde tem mais e onde tem menos capim
   const handleClickPontoVegetacao = useCallback((ponto) => {
@@ -1083,13 +1075,6 @@ export default function MapaGeral() {
           categoriasGadoCores={categoriasGadoCores}
           tiposPastagemCores={tiposPastagemCores} />
 
-
-        {/* Legenda da vegetação lida: pontos de capim e produtividade das áreas */}
-        {showNdvi && mapaGeralPermissions.visualizar_areas &&
-        <div className="absolute bottom-20 md:bottom-16 right-3 z-10">
-            <LegendaVegetacaoPontos resumo={zonasVegetacao} carregando={analisandoVegetacao} erro={erroVegetacao} />
-          </div>
-        }
 
 
         {/* Barra resumo inferior */}

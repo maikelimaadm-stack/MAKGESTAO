@@ -13,6 +13,9 @@ export const MAPA_PALETA = {
   // Modo "Foto de Satélite": só o contorno da área, para a imagem do satélite aparecer limpa
   areaPreenchimentoFoto: 0.05,
   areaPreenchimentoFotoHover: 0.2,
+  // Com a leitura de vegetação ligada: área sem preenchimento, deixando só a imagem e os contornos
+  areaPreenchimentoVegetacao: 0,
+  areaPreenchimentoVegetacaoHover: 0.15,
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#b77912',
