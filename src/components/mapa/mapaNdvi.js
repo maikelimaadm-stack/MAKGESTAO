@@ -9,7 +9,12 @@
  *
  * A vegetação aparece somente dentro dos polígonos das áreas: cada tile é
  * recortado pelas áreas antes de ir para o mapa.
+ *
+ * A cor de cada pedaço é a classe da vegetação naquele ponto — solo exposto,
+ * pouco capim, capim médio, muito capim e mata — sempre com as mesmas cores da
+ * legenda, para o mapa mostrar onde tem forragem e onde não tem.
  */
+import { classeDoVigor } from './vegetacaoClasses';
 
 export const GIBS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_NDVI_8Day/default';
 export const TILE_MATRIX = 'GoogleMapsCompatible_Level9';
@@ -34,9 +39,6 @@ export const dataReferenciaNdvi = () => {
 /** Tons originais da imagem do satélite: bege = pouca vegetação, verde escuro = muita vegetação. */
 const ESCALA_ORIGEM = ['#dfcec1', '#b09b8a', '#bfde77', '#6eaa01', '#006401'];
 
-/** Paleta da vegetação mostrada no mapa: do pasto mais raso ao mais vigoroso. */
-export const NDVI_ESCALA = ['#d9ed92', '#99d98c', '#52b788'];
-
 const paraRgb = (hex) => [
 parseInt(hex.slice(1, 3), 16),
 parseInt(hex.slice(3, 5), 16),
@@ -44,7 +46,6 @@ parseInt(hex.slice(5, 7), 16)];
 
 
 const CORES_ORIGEM = ESCALA_ORIGEM.map(paraRgb);
-const CORES_VEGETACAO = NDVI_ESCALA.map(paraRgb);
 
 /** Nível de vegetação (0 a 1) de um tom original e distância até a escala publicada pelo satélite. */
 const medirCor = (r, g, b) => {
@@ -70,21 +71,6 @@ const medirCor = (r, g, b) => {
   return [melhorNivel, menorDistancia];
 };
 
-/** Cor da paleta para um nível de vegetação (0 a 1), interpolando entre os tons. */
-const corDoNivel = (nivel) => {
-  const posicao = Math.min(0.999, Math.max(0, nivel)) * (CORES_VEGETACAO.length - 1);
-  const trecho = Math.floor(posicao);
-  const t = posicao - trecho;
-  const [r0, g0, b0] = CORES_VEGETACAO[trecho];
-  const [r1, g1, b1] = CORES_VEGETACAO[Math.min(CORES_VEGETACAO.length - 1, trecho + 1)];
-
-  return [
-  Math.round(r0 + (r1 - r0) * t),
-  Math.round(g0 + (g1 - g0) * t),
-  Math.round(b0 + (b1 - b0) * t)];
-
-};
-
 /** Tons que não pertencem à escala do satélite (sem dado, nuvem, água) ficam como estão. */
 const LIMITE_ESCALA = 2500;
 
@@ -97,7 +83,7 @@ const TABELA_VEGETACAO = (() => {
     const g = Math.round((i >> 5 & 31) * 255 / 31);
     const b = Math.round((i & 31) * 255 / 31);
     const [nivel, distancia] = medirCor(r, g, b);
-    const [nr, ng, nb] = corDoNivel(nivel);
+    const [nr, ng, nb] = paraRgb(classeDoVigor(nivel).cor);
     tabela.cores[i * 3] = nr;
     tabela.cores[i * 3 + 1] = ng;
     tabela.cores[i * 3 + 2] = nb;

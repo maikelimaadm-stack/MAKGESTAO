@@ -1,6 +1,6 @@
 import React from "react";
 import { Leaf, Loader2 } from "lucide-react";
-import { dataReferenciaNdvi, NDVI_ESCALA } from "./mapaNdvi";
+import { dataReferenciaNdvi } from "./mapaNdvi";
 import { CLASSES_AREA, CLASSES_VEGETACAO } from "./vegetacaoZonas";
 
 export default function MapaLegendaNdvi({ resumo = null, carregando = false }) {
@@ -15,16 +15,19 @@ export default function MapaLegendaNdvi({ resumo = null, carregando = false }) {
         <span className="text-[10px] font-bold text-emerald-900 uppercase">Vegetação por satélite</span>
       </div>
 
-      <div className="flex h-3 rounded overflow-hidden">
-        {NDVI_ESCALA.map((cor) =>
-        <div key={cor} className="flex-1" style={{ backgroundColor: cor }} />
+      <div className="space-y-1">
+        {CLASSES_VEGETACAO.map((classe) =>
+        <div key={classe.id} className="flex items-center gap-1.5">
+            <span className="w-4 h-3 rounded-[4px] border border-white shadow-sm shrink-0" style={{ backgroundColor: classe.cor }} />
+            <span className="text-[9px] text-slate-700">{classe.nome}</span>
+          </div>
         )}
       </div>
 
-      <div className="flex justify-between text-[9px] text-slate-600">
-        <span>Menos capim</span>
-        <span>Mais capim</span>
-      </div>
+      <p className="text-[9px] text-slate-500 leading-snug">
+        Verde = capim (mais escuro, mais forragem). Amarelo e marrom = pouco capim e solo exposto. Verde-azulado =
+        mata, que não conta como forragem.
+      </p>
 
       {carregando &&
       <div className="flex items-center gap-1.5 text-[9px] text-slate-600 pt-1">

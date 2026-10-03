@@ -5,21 +5,13 @@
  * verde claro = capim iniciando, verde escuro = capim alto.
  */
 import { GIBS_BASE, TILE_MATRIX, ZOOM_NATIVO, dataReferenciaNdvi } from './mapaNdvi';
+import { INDICE_MIN, INDICE_MAX, LIMIAR_CAPIM, LIMIAR_MATA } from './vegetacaoClasses';
 
 const TAM = 256;
-const INDICE_MIN = 3; // primeiro tom da escala do produto
-const INDICE_MAX = 142; // último tom da escala do produto
-const INDICE_CAPIM = 63; // a partir deste tom a imagem já é verde (capim ativo)
 const MAX_TILES = 16;
 const RAIO_TERRA = 156543.03;
 
 let paletaCache = null; // { data, cores }
-
-/** Tom da imagem a partir do qual a área é considerada com capim (verde). */
-export const LIMIAR_CAPIM = (INDICE_CAPIM - INDICE_MIN) / (INDICE_MAX - INDICE_MIN);
-
-/** Acima deste tom o satélite lê vegetação fechada (mata), que não é pasto. */
-export const LIMIAR_MATA = 0.8;
 
 /** Só é capim o que está na faixa de pasto: nem solo exposto, nem mata. */
 export const ehCapim = (vigor) => vigor >= LIMIAR_CAPIM && vigor < LIMIAR_MATA;

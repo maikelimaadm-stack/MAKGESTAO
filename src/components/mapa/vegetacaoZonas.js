@@ -4,15 +4,10 @@
  * capim, onde é só mata e onde é solo exposto, e resume a área pela massa de
  * forragem (kg MS/ha) — a mata não entra na conta de capim.
  */
-import { LIMIAR_CAPIM, LIMIAR_MATA, ehCapim, massaKgHaDoVigor, amostrarVegetacao, extrairPoligono, hectaresDoPoligono } from './vegetacaoArea';
-
-/** Classes de cada ponto lido no satélite (do mais para o menos capim). */
-export const CLASSES_VEGETACAO = [
-{ id: 'mata', nome: 'Mata', cor: '#0f766e', minimo: LIMIAR_MATA },
-{ id: 'alto', nome: 'Muito capim', cor: '#166534', minimo: 0.6 },
-{ id: 'medio', nome: 'Capim médio', cor: '#84cc16', minimo: LIMIAR_CAPIM },
-{ id: 'baixo', nome: 'Pouco capim', cor: '#f59e0b', minimo: 0.2 },
-{ id: 'solo', nome: 'Solo exposto', cor: '#b45309', minimo: 0 }];
+import { ehCapim, massaKgHaDoVigor, amostrarVegetacao, extrairPoligono, hectaresDoPoligono } from './vegetacaoArea';
+// Classes, limiares e cores da vegetação vêm de um só lugar e daqui seguem para as legendas.
+import { LIMIAR_MATA, CLASSES_VEGETACAO, classeDoVigor } from './vegetacaoClasses';
+export { CLASSES_VEGETACAO, classeDoVigor };
 
 
 /** Faixa de massa de forragem considerada ideal para pastejo (kg MS/ha). */
@@ -29,9 +24,6 @@ export const CLASSES_AREA = [
 { id: 'sobrepastejada', nome: 'Sobrepastejada', plural: 'Sobrepastejadas', cor: '#b45309', minimo: 0 },
 CLASSE_MATA];
 
-
-export const classeDoVigor = (vigor) =>
-CLASSES_VEGETACAO.find((classe) => vigor >= classe.minimo) || CLASSES_VEGETACAO[CLASSES_VEGETACAO.length - 1];
 
 /** Classe da área pela massa de forragem média lida (kg MS/ha). */
 export const classeDaMassa = (massaKgHa) =>
