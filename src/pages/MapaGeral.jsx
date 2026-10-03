@@ -923,7 +923,8 @@ export default function MapaGeral() {
       handleRightClickArea,
       getAreaColor,
       preenchimentoArea,
-      preenchimentoAreaHover
+      preenchimentoAreaHover,
+      showNdvi ? MAPA_PALETA.areaBordaVegetacao : null
     );
   }, [areasFiltradas, showAreas, mapReady, modoColoracao, showNdvi, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
   // Função de texto extra para labels (UA/ha ou situação do pasto)

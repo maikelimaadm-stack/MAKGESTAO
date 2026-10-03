@@ -16,6 +16,8 @@ export const MAPA_PALETA = {
   // Com a leitura de vegetação ligada: área sem preenchimento, deixando só a imagem e os contornos
   areaPreenchimentoVegetacao: 0,
   areaPreenchimentoVegetacaoHover: 0.15,
+  // Divisões das áreas no modo vegetação: linha branca, como num mapa de pastos
+  areaBordaVegetacao: { color: '#ffffff', opacity: 1, weight: 1.6 },
 
   // Linhas (traçado em 3 camadas: sombra, contorno, cor)
   linhaPadrao: '#b77912',

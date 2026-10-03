@@ -19,9 +19,9 @@ const ANCORA_COMPOSICAO = Date.UTC(2000, 1, 18); // primeira composição de 8 d
 const PASSO_COMPOSICAO = 8 * 24 * 60 * 60 * 1000;
 const ATRASO_DIAS = 3; // margem para a composição mais recente já estar publicada
 const LIMITE_RECORTES = 1200; // memória dos tiles já recortados
-const OPACIDADE_BASE = 0.82; // deixa a vegetação bem visível dentro das áreas
-const ALFA_MINIMO = 0.7; // quanto a camada ainda aparece no zoom mais próximo
-const QUEDA_POR_ZOOM = 0.03; // a camada cai um pouco conforme o mapa aproxima
+const OPACIDADE_BASE = 1; // cor da vegetação limpa dentro das áreas
+const ALFA_MINIMO = 0.85; // quanto a camada ainda aparece no zoom mais próximo
+const QUEDA_POR_ZOOM = 0.02; // a camada cai um pouco conforme o mapa aproxima
 const LIMITE_MUNDO = 85.05112878; // limite da projeção de Mercator
 
 // ─── Foto de detalhe da vegetação (Sentinel-2, 30 m, NASA GIBS) ───
@@ -30,11 +30,10 @@ const LIMITE_MUNDO = 85.05112878; // limite da projeção de Mercator
 export const GIBS_FOTO = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/HLS_S30_Nadir_BRDF_Adjusted_Reflectance/default';
 export const TILE_MATRIX_FOTO = 'GoogleMapsCompatible_Level12';
 export const ZOOM_NATIVO_FOTO = 12; // ~30 m por pixel: bem mais detalhe que o NDVI (250 m)
-const ALFA_FOTO = 0.8;
+const ALFA_FOTO = 0.5;
 const ZOOM_TESTE_FOTO = 9; // tile pequeno usado só para saber se a data tem imagem da fazenda
 const MIN_BYTES_FOTO = 20000; // abaixo disso o satélite devolve tile vazio (sem imagem do dia)
 const DIAS_BUSCA_FOTO = 14; // procura a imagem mais recente dentro desse intervalo
-const FILTRO_NDVI = 'contrast(1.12) saturate(1.2)'; // realça o contraste da vegetação
 
 /** Imagem vazia (1x1) usada enquanto a foto do satélite ainda está baixando. */
 const TILE_VAZIO = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -47,7 +46,100 @@ export const dataReferenciaNdvi = () => {
 };
 
 /** Tons originais da imagem do satélite: bege = pouca vegetação, verde escuro = muita vegetação. */
-export const NDVI_ESCALA = ['#dfcec1', '#b09b8a', '#bfde77', '#6eaa01', '#006401'];
+const ESCALA_ORIGEM = ['#dfcec1', '#b09b8a', '#bfde77', '#6eaa01', '#006401'];
+
+/** Paleta da vegetação mostrada no mapa: do pasto mais raso ao mais vigoroso. */
+export const NDVI_ESCALA = ['#d9ed92', '#99d98c', '#52b788'];
+
+const paraRgb = (hex) => [
+parseInt(hex.slice(1, 3), 16),
+parseInt(hex.slice(3, 5), 16),
+parseInt(hex.slice(5, 7), 16)];
+
+
+const CORES_ORIGEM = ESCALA_ORIGEM.map(paraRgb);
+const CORES_VEGETACAO = NDVI_ESCALA.map(paraRgb);
+
+/** Nível de vegetação (0 a 1) de um tom original e distância até a escala publicada pelo satélite. */
+const medirCor = (r, g, b) => {
+  let melhorNivel = 0;
+  let menorDistancia = Infinity;
+
+  for (let i = 0; i < CORES_ORIGEM.length - 1; i++) {
+    const [r0, g0, b0] = CORES_ORIGEM[i];
+    const [r1, g1, b1] = CORES_ORIGEM[i + 1];
+    const dr = r1 - r0;
+    const dg = g1 - g0;
+    const db = b1 - b0;
+    const comprimento = dr * dr + dg * dg + db * db || 1;
+    const t = Math.min(1, Math.max(0, ((r - r0) * dr + (g - g0) * dg + (b - b0) * db) / comprimento));
+    const distancia = (r - (r0 + dr * t)) ** 2 + (g - (g0 + dg * t)) ** 2 + (b - (b0 + db * t)) ** 2;
+
+    if (distancia < menorDistancia) {
+      menorDistancia = distancia;
+      melhorNivel = (i + t) / (CORES_ORIGEM.length - 1);
+    }
+  }
+
+  return [melhorNivel, menorDistancia];
+};
+
+/** Cor da paleta para um nível de vegetação (0 a 1), interpolando entre os tons. */
+const corDoNivel = (nivel) => {
+  const posicao = Math.min(0.999, Math.max(0, nivel)) * (CORES_VEGETACAO.length - 1);
+  const trecho = Math.floor(posicao);
+  const t = posicao - trecho;
+  const [r0, g0, b0] = CORES_VEGETACAO[trecho];
+  const [r1, g1, b1] = CORES_VEGETACAO[Math.min(CORES_VEGETACAO.length - 1, trecho + 1)];
+
+  return [
+  Math.round(r0 + (r1 - r0) * t),
+  Math.round(g0 + (g1 - g0) * t),
+  Math.round(b0 + (b1 - b0) * t)];
+
+};
+
+/** Tons que não pertencem à escala do satélite (sem dado, nuvem, água) ficam como estão. */
+const LIMITE_ESCALA = 2500;
+
+/** Tabela de cor pronta (5 bits por canal) usada para trocar os tons sem custo por pixel. */
+const TABELA_VEGETACAO = (() => {
+  const tabela = { cores: new Uint8ClampedArray(32768 * 3), distancias: new Float32Array(32768) };
+
+  for (let i = 0; i < 32768; i++) {
+    const r = Math.round((i >> 10 & 31) * 255 / 31);
+    const g = Math.round((i >> 5 & 31) * 255 / 31);
+    const b = Math.round((i & 31) * 255 / 31);
+    const [nivel, distancia] = medirCor(r, g, b);
+    const [nr, ng, nb] = corDoNivel(nivel);
+    tabela.cores[i * 3] = nr;
+    tabela.cores[i * 3 + 1] = ng;
+    tabela.cores[i * 3 + 2] = nb;
+    tabela.distancias[i] = distancia;
+  }
+
+  return tabela;
+})();
+
+/** Troca os tons originais do satélite pela paleta da vegetação, preservando o nível de cada pixel. */
+const recolorir = (ctx) => {
+  const { width, height } = ctx.canvas;
+  const dados = ctx.getImageData(0, 0, width, height);
+  const px = dados.data;
+  const { cores, distancias } = TABELA_VEGETACAO;
+
+  for (let i = 0; i < px.length; i += 4) {
+    if (!px[i + 3]) continue;
+    const indice = (px[i] >> 3 << 10) | (px[i + 1] >> 3 << 5) | px[i + 2] >> 3;
+    if (distancias[indice] > LIMITE_ESCALA) continue;
+    const j = indice * 3;
+    px[i] = cores[j];
+    px[i + 1] = cores[j + 1];
+    px[i + 2] = cores[j + 2];
+  }
+
+  ctx.putImageData(dados, 0, 0);
+};
 
 const urlDoTile = (data, zoom, x, y) =>
 `${GIBS_BASE}/${data}/${TILE_MATRIX}/${zoom}/${y}/${x}.png`;
@@ -292,8 +384,8 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
 
   /**
    * Desenha o pedaço do satélite do tile, já recortado pelos polígonos das áreas.
-   * A cor vem do NDVI (a mesma da legenda) e a luz/detalhe vem da foto do
-   * Sentinel-2, que é bem mais fina — a vegetação fica nítida e com contraste.
+   * O dado de cada pixel vem do NDVI e a cor vem da paleta da vegetação; a foto do
+   * Sentinel-2 entra só com a luz, para dar textura ao capim sem alterar a cor.
    */
   const desenharTile = (zoom, x, y, img, zoomFonte, fotoImg, zoomFonteFoto) => {
     ctx.clearRect(0, 0, TAMANHO_TILE, TAMANHO_TILE);
@@ -301,19 +393,21 @@ export const criarOverlayNdvi = (poligonos, aoAtualizar) => {
 
     ctx.save();
     ctx.clip();
-
     ctx.globalAlpha = alfaPorZoom(zoom);
-    ctx.filter = FILTRO_NDVI;
     desenharFonte(zoom, x, y, img, zoomFonte);
-    ctx.filter = 'none';
+    ctx.restore();
+
+    recolorir(ctx);
 
     if (fotoImg) {
+      ctx.save();
+      ctx.clip();
       ctx.globalAlpha = ALFA_FOTO;
       desenharFonte(zoom, x, y, fotoImg, zoomFonteFoto, 'luminosity');
+      ctx.restore();
     }
 
     ctx.globalAlpha = 1;
-    ctx.restore();
 
     return canvas.toDataURL('image/png');
   };
