@@ -960,21 +960,11 @@ export default function MapaGeral() {
     );
   }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, mapReady, modoColoracao, getLabelExtraText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
 
-  // Pontos de vegetação: onde tem mais e onde tem menos capim
-  const handleClickPontoVegetacao = useCallback((ponto) => {
-    const area = areasFiltradas.find((a) => a.id === ponto.areaId);
-    if (area) handleClickArea(area, { lat: ponto.lat, lng: ponto.lng });
-  }, [areasFiltradas, handleClickArea]);
-
+  // Pontos de forragem desativados: com a vegetação ligada o mapa mostra só a cor da imagem
   useEffect(() => {
     if (!mapReady) return;
-    const pontosVegetacao = zonasVegetacao?.pontos || [];
-    renderer.syncVegetacaoPontos(
-      pontosVegetacao,
-      mapaGeralPermissions.visualizar_areas && showNdvi && pontosVegetacao.length > 0,
-      handleClickPontoVegetacao
-    );
-  }, [zonasVegetacao, showNdvi, mapReady, renderer.syncVegetacaoPontos, handleClickPontoVegetacao, mapaGeralPermissions.visualizar_areas]);
+    renderer.syncVegetacaoPontos([], false);
+  }, [mapReady, showNdvi, renderer.syncVegetacaoPontos]);
   // Filtrar pontos de referência: ocultar tipo "Cocho" quando cochos/suplementação estão ocultos
   const pontosFiltrados = useMemo(() => {
     return pontos.filter((p) => {
