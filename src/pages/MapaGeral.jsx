@@ -28,9 +28,6 @@ import MapaFiltrosAvancados, {
 "../components/mapa/MapaFiltrosAvancados";
 import MapaLegenda from "../components/mapa/MapaLegenda";
 import useMapRenderer from "../components/mapa/useMapRenderer";
-import useNdviOverlay from "../components/mapa/useNdviOverlay";
-import { assinaturaDosPoligonos } from "../components/mapa/mapaNdvi";
-import { analisarZonasVegetacao } from "../components/mapa/vegetacaoZonas";
 import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
 import { useBebedouros } from "@/hooks/useBebedouros";
@@ -71,10 +68,6 @@ export default function MapaGeral() {
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [showNomesAreas, setShowNomesAreas] = useState(true);
   const [showHectaresAreas, setShowHectaresAreas] = useState(true);
-  const [showNdvi, setShowNdvi] = useState(false);
-  const [zonasVegetacao, setZonasVegetacao] = useState(null);
-  const [analisandoVegetacao, setAnalisandoVegetacao] = useState(false);
-  const [erroVegetacao, setErroVegetacao] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
 
   // Filtros avançados
@@ -133,7 +126,6 @@ export default function MapaGeral() {
     if (typeof state.showUserLocation === 'boolean') setShowUserLocation(state.showUserLocation);
     if (typeof state.showNomesAreas === 'boolean') setShowNomesAreas(state.showNomesAreas);
     if (typeof state.showHectaresAreas === 'boolean') setShowHectaresAreas(state.showHectaresAreas);
-    if (typeof state.showNdvi === 'boolean') setShowNdvi(state.showNdvi);
     if (typeof state.filtroCategoria === 'string') setFiltroCategoria(state.filtroCategoria);
     if (typeof state.filtroIdentificador === 'string') setFiltroIdentificador(state.filtroIdentificador);
     if (typeof state.filtroStatus === 'string') setFiltroStatus(state.filtroStatus);
@@ -162,7 +154,6 @@ export default function MapaGeral() {
       showUserLocation,
       showNomesAreas,
       showHectaresAreas,
-      showNdvi,
       filtroCategoria,
       filtroIdentificador,
       filtroStatus,
@@ -175,7 +166,7 @@ export default function MapaGeral() {
       filtroPesoMax,
       modoColoracao
     }));
-  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, showNdvi, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax, modoColoracao]);
+  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax, modoColoracao]);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -353,60 +344,6 @@ export default function MapaGeral() {
 
   const areaIdsFiltrados = useMemo(() => new Set(areasFiltradas.map((area) => area.id)), [areasFiltradas]);
 
-  // Polígonos das áreas visíveis: a camada de vegetação só aparece dentro deles.
-  const poligonosVegetacao = useMemo(
-    () => areasFiltradas.map((area) => area.coordenadas?.coords || []).filter((anel) => anel.length > 2),
-    [areasFiltradas]
-  );
-
-  useNdviOverlay(
-    mapInstanceRef,
-    mapReady,
-    mapaGeralPermissions.visualizar_areas && showNdvi,
-    poligonosVegetacao
-  );
-
-  // ─── Leitura da vegetação: pontos de capim e áreas produtivas ───
-  const assinaturaVegetacao = useMemo(() => assinaturaDosPoligonos(poligonosVegetacao), [poligonosVegetacao]);
-  const areasVegetacaoRef = useRef(areasFiltradas);
-  areasVegetacaoRef.current = areasFiltradas;
-  const analiseVegetacaoRef = useRef(0);
-
-  useEffect(() => {
-    if (!(mapaGeralPermissions.visualizar_areas && showNdvi)) {
-      analiseVegetacaoRef.current++;
-      setZonasVegetacao(null);
-      setAnalisandoVegetacao(false);
-      setErroVegetacao(false);
-      return;
-    }
-
-    if (!navigator.onLine) {
-      setZonasVegetacao(null);
-      setAnalisandoVegetacao(false);
-      setErroVegetacao(true);
-      return;
-    }
-
-    const analise = ++analiseVegetacaoRef.current;
-    setAnalisandoVegetacao(true);
-    setErroVegetacao(false);
-
-    analisarZonasVegetacao(areasVegetacaoRef.current).
-    then((resultado) => {
-      if (analise !== analiseVegetacaoRef.current) return;
-      setZonasVegetacao(resultado);
-    }).
-    catch(() => {
-      if (analise !== analiseVegetacaoRef.current) return;
-      setZonasVegetacao(null);
-      setErroVegetacao(true);
-    }).
-    finally(() => {
-      if (analise !== analiseVegetacaoRef.current) return;
-      setAnalisandoVegetacao(false);
-    });
-  }, [showNdvi, assinaturaVegetacao, mapaGeralPermissions.visualizar_areas, empresaSelecionadaId]);
 
   // Filtrar lotes
   const lotesFiltrados = useMemo(() => lotesComAlerta.filter((lote) => {
@@ -908,14 +845,9 @@ export default function MapaGeral() {
   // ─── Renderização incremental ───
   useEffect(() => {
     if (!mapReady) return;
-    // Com a vegetação ligada a área fica só com o contorno, para a imagem não sair lavada.
-    const somenteFoto = modoColoracao === 'satelite' || showNdvi;
-    const preenchimentoArea = showNdvi ?
-    MAPA_PALETA.areaPreenchimentoVegetacao :
-    somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento;
-    const preenchimentoAreaHover = showNdvi ?
-    MAPA_PALETA.areaPreenchimentoVegetacaoHover :
-    somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover;
+    const somenteFoto = modoColoracao === 'satelite';
+    const preenchimentoArea = somenteFoto ? MAPA_PALETA.areaPreenchimentoFoto : MAPA_PALETA.areaPreenchimento;
+    const preenchimentoAreaHover = somenteFoto ? MAPA_PALETA.areaPreenchimentoFotoHover : MAPA_PALETA.areaPreenchimentoHover;
     renderer.syncAreas(
       areasFiltradas,
       mapaGeralPermissions.visualizar_areas && showAreas,
@@ -923,10 +855,9 @@ export default function MapaGeral() {
       handleRightClickArea,
       getAreaColor,
       preenchimentoArea,
-      preenchimentoAreaHover,
-      showNdvi ? MAPA_PALETA.areaBordaVegetacao : null
+      preenchimentoAreaHover
     );
-  }, [areasFiltradas, showAreas, mapReady, modoColoracao, showNdvi, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
+  }, [areasFiltradas, showAreas, mapReady, modoColoracao, getAreaColor, handleClickArea, handleRightClickArea, mapaGeralPermissions.visualizar_areas, renderer.syncAreas]);
   // Função de texto extra para labels (UA/ha ou situação do pasto)
   const getLabelExtraText = useCallback((area) => {
     if (modoColoracao === 'ua_ha') {
@@ -950,7 +881,7 @@ export default function MapaGeral() {
     return null;
   }, [modoColoracao, uaPorAreaMap, situacaoPastoMap, getAreaEfetiva]);
 
-  // Rótulos das áreas: com a vegetação ligada o mapa fica só com a imagem do satélite e os contornos
+  // Rótulos das áreas
   useEffect(() => {
     if (!mapReady) return;
     renderer.syncLabels(
@@ -961,11 +892,6 @@ export default function MapaGeral() {
     );
   }, [areasFiltradas, showNomesAreas, showAreas, showHectaresAreas, mapReady, modoColoracao, getLabelExtraText, mapaGeralPermissions.visualizar_areas, mapaGeralPermissions.visualizar_nomes_areas]);
 
-  // Pontos de forragem desativados: com a vegetação ligada o mapa mostra só a cor da imagem
-  useEffect(() => {
-    if (!mapReady) return;
-    renderer.syncVegetacaoPontos([], false);
-  }, [mapReady, showNdvi, renderer.syncVegetacaoPontos]);
   // Filtrar pontos de referência: ocultar tipo "Cocho" quando cochos/suplementação estão ocultos
   const pontosFiltrados = useMemo(() => {
     return pontos.filter((p) => {
@@ -1052,9 +978,6 @@ export default function MapaGeral() {
           showTarefasButton={podeUsarTarefasMapa}
           showInsightsButton={mapaGeralPermissions.visualizar_insights}
           showFiltrosButton={mapaGeralPermissions.visualizar_filtros_camadas}
-          showVegetacaoButton={mapaGeralPermissions.visualizar_areas}
-          vegetacaoAtivo={showNdvi}
-          onToggleVegetacao={() => {if (!mapaGeralPermissions.visualizar_areas) return;setShowNdvi((v) => !v);}}
           onOpenTarefas={() => {if (!podeUsarTarefasMapa) return;setTarefasContext({});setShowTarefas(true);}}
           onOpenInsights={() => {if (!mapaGeralPermissions.visualizar_insights) return;setShowInsights(true);}}
           onOpenFiltros={() => {if (!mapaGeralPermissions.visualizar_filtros_camadas) return;setShowFiltros(true);}} />
@@ -1112,9 +1035,6 @@ export default function MapaGeral() {
               showCochos={showCochos} setShowCochos={setShowCochos}
               showDepositos={showDepositos} setShowDepositos={setShowDepositos}
               showHectaresAreas={showHectaresAreas} setShowHectaresAreas={setShowHectaresAreas}
-              showNdvi={showNdvi} setShowNdvi={setShowNdvi}
-              vegetacaoResumo={zonasVegetacao}
-              vegetacaoCarregando={analisandoVegetacao}
               showAlertas={showAlertas} setShowAlertas={setShowAlertas}
               showUserLocation={showUserLocation} setShowUserLocation={setShowUserLocation}
               showNomesAreas={showNomesAreas} setShowNomesAreas={setShowNomesAreas}

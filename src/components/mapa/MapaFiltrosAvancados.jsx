@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import MapaLegendaNdvi from "./MapaLegendaNdvi";
 
 // Cores por tipo de cultura
 export const CORES_TIPO_CULTURA = {
@@ -82,9 +81,6 @@ export default function MapaFiltrosAvancados({
   showUserLocation, setShowUserLocation,
   showNomesAreas, setShowNomesAreas,
   showHectaresAreas, setShowHectaresAreas,
-  vegetacaoResumo = null,
-  vegetacaoCarregando = false,
-  showNdvi, setShowNdvi,
   // Filtros de lotes
   filtroCategoria, setFiltroCategoria,
   filtroIdentificador, setFiltroIdentificador,
@@ -113,7 +109,6 @@ export default function MapaFiltrosAvancados({
   permissions?.visualizar_areas !== false && { label: 'Mapa de Áreas', checked: showAreas, onChange: () => setShowAreas((v) => !v) },
   permissions?.visualizar_nomes_areas !== false && permissions?.visualizar_areas !== false && { label: 'Detalhes Áreas', checked: showNomesAreas, onChange: () => setShowNomesAreas((v) => !v) },
   permissions?.visualizar_areas !== false && { label: 'Hectares', checked: showHectaresAreas, onChange: () => setShowHectaresAreas((v) => !v) },
-  permissions?.visualizar_areas !== false && { label: 'Vegetação (satélite)', checked: showNdvi, onChange: () => setShowNdvi((v) => !v) },
   permissions?.visualizar_pontos_referencia !== false && { label: 'Pontos Referência', checked: showPontos, onChange: () => setShowPontos((v) => !v) },
   permissions?.visualizar_tarefas !== false && { label: 'Tarefas', checked: showTarefas, onChange: () => setShowTarefas((v) => !v) },
   permissions?.visualizar_lotes !== false && { label: 'Lotes', checked: showLotes, onChange: () => setShowLotes((v) => !v) },
@@ -144,7 +139,6 @@ export default function MapaFiltrosAvancados({
                 </label>
             )}
             </div>
-            {showNdvi && <div className="px-1 pt-1.5"><MapaLegendaNdvi resumo={vegetacaoResumo} carregando={vegetacaoCarregando} /></div>}
           </div>
           <Separator />
         </>

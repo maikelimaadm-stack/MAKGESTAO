@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { X, Filter, Target, RefreshCw, ClipboardList, Move, Leaf } from "lucide-react";
+import { X, Filter, Target, RefreshCw, ClipboardList, Move } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function MapaControlesMobile({
@@ -10,10 +10,7 @@ export default function MapaControlesMobile({
   onOpenTarefas, onOpenInsights, onOpenFiltros,
   showTarefasButton = true,
   showInsightsButton = true,
-  showFiltrosButton = true,
-  showVegetacaoButton = false,
-  vegetacaoAtivo = false,
-  onToggleVegetacao
+  showFiltrosButton = true
 }) {
   const navigate = useNavigate();
 
@@ -82,17 +79,6 @@ export default function MapaControlesMobile({
             title={dragEnabled ? "Arrasto ativo" : "Ativar arrasto"}>
             <Move className="w-4 h-4" />
           </Button>
-          {showVegetacaoButton &&
-          <Button
-            type="button"
-            variant="secondary"
-            size="icon"
-            onClick={onToggleVegetacao}
-            className={`inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-7 w-7 rounded-full shadow-md pointer-events-auto ${vegetacaoAtivo ? 'bg-black hover:bg-black text-white' : 'bg-neutral-50 hover:bg-neutral-100 text-slate-700'}`}
-            title={vegetacaoAtivo ? "Vegetação ativa" : "Ver vegetação (satélite)"}>
-            <Leaf className="w-4 h-4" />
-          </Button>
-          }
         </div>
       </div>
     </>);

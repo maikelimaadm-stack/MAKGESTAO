@@ -1,7 +1,6 @@
 import React from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import HistoricoAbateCurral from "./HistoricoAbateCurral";
-import PainelVegetacaoArea from "./PainelVegetacaoArea";
 
 export default function DetalhesArea({ area }) {
   const isCurral = area?.tipo_cultura === 'Infraestrutura' && String(area?.tipo_infraestrutura || area?.tipo_pastagem || '').trim().toLowerCase() === 'curral';
@@ -17,8 +16,5 @@ export default function DetalhesArea({ area }) {
       </div>);
   }
 
-  return (
-    <div className="space-y-1" translate="no">
-      <PainelVegetacaoArea area={area} />
-    </div>);
+  return null;
 }
