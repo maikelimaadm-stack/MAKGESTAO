@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GerenciadorIcones from "../components/configuracoes/GerenciadorIcones";
+import { pagesConfig } from "@/pages.config";
 
 const DEFAULT_MENU = [
   { id: "dashboard", title: "Dashboard", url: "Home", icon: "Home" },
@@ -97,47 +98,64 @@ const ICONS_DISPONIVEIS = [
   'FolderOpen', 'FileText', 'Shield', 'Package', 'Users', 'Settings'
 ];
 
-const PAGINAS_DISPONIVEIS = [
-  { nome: "AtivosFixos", titulo: "Ativos Fixos" },
-  { nome: "CadastroLotes", titulo: "Cadastro de Lotes" },
-  { nome: "CaixaBancos", titulo: "Caixa & Bancos" },
-  { nome: "Categorias", titulo: "Categorias" },
-  { nome: "CategoriasManejo", titulo: "Categorias de Manejo" },
-  { nome: "CentrosCusto", titulo: "Centros de Custo" },
-  { nome: "ConfiguracaoFatoresConsumo", titulo: "Configuração Fatores Consumo" },
-  { nome: "ConfiguracoesGerais", titulo: "Configurações Gerais" },
-  { nome: "CustosSafra", titulo: "Custos de Safra" },
-  { nome: "DashboardSuplementacao", titulo: "Dashboard Suplementação" },
-  { nome: "Empresa", titulo: "Empresa" },
-  { nome: "FluxoCaixa", titulo: "Fluxo de Caixa" },
-  { nome: "FormasPagamento", titulo: "Formas de Pagamento" },
-  { nome: "Fornecedores", titulo: "Fornecedores/Clientes" },
-  { nome: "GerenciarCidades", titulo: "Cidades" },
-  { nome: "GerenciarSafras", titulo: "Safras" },
-  { nome: "GruposFinanceiros", titulo: "Grupos Financeiros" },
-  { nome: "HistoricoMovimentacoesPecuaria", titulo: "Histórico de Movimentações" },
-  { nome: "Home", titulo: "Dashboard" },
-  { nome: "LancamentoFinanceiro", titulo: "Lançamento Financeiro" },
-  { nome: "LivroCaixa", titulo: "Livro-Caixa" },
-  { nome: "LivrosFiscais", titulo: "Livros Fiscais" },
-  { nome: "LocaisEstoque", titulo: "Locais de Estoque" },
-  { nome: "MapaCadastro", titulo: "Mapa - Áreas/Pontos/Linhas" },
-  { nome: "MapaGeral", titulo: "Mapa Geral - Manejo" },
-  { nome: "MovimentacoesEstoque", titulo: "Movimentações Estoque" },
-  { nome: "Pesagens", titulo: "Pesagens" },
-  { nome: "PlanoContas", titulo: "Plano de Contas" },
-  { nome: "Produtos", titulo: "Produtos" },
-  { nome: "RelatorioCustosSafra", titulo: "Relatório de Custos Safra" },
-  { nome: "RelatorioEstoque", titulo: "Relatório de Estoque" },
-  { nome: "RelatorioFinanceiro", titulo: "Relatório Financeiro" },
-  { nome: "RelatorioFornecedores", titulo: "Lista de Fornecedores" },
-  { nome: "RelatorioHistoricoEntregas", titulo: "Histórico de Entregas" },
-  { nome: "RelatorioPesagens", titulo: "Relatório de Pesagens" },
-  { nome: "RelatorioProdutos", titulo: "Lista de Produtos" },
-  { nome: "RelatorioSuplementacao", titulo: "Relatório Suplementação" },
-  { nome: "UnidadesMedida", titulo: "Unidades de Medida" },
-  { nome: "Usuarios", titulo: "Usuários" },
-].sort((a, b) => a.titulo.localeCompare(b.titulo));
+// Títulos amigáveis das telas (telas sem título aqui usam o próprio nome).
+const TITULOS_PAGINAS = {
+  AtivosFixos: "Ativos Fixos",
+  CadastroLotes: "Cadastro de Lotes",
+  CaixaBancos: "Caixa & Bancos",
+  Categorias: "Categorias",
+  CategoriasManejo: "Categorias de Manejo",
+  CentrosCusto: "Centros de Custo",
+  ConfiguracaoFatoresConsumo: "Configuração Fatores Consumo",
+  ConfiguracoesGerais: "Configurações Gerais",
+  CustosSafra: "Custos de Safra",
+  DashboardSuplementacao: "Dashboard Suplementação",
+  Empresa: "Empresa",
+  FluxoCaixa: "Fluxo de Caixa",
+  FormasPagamento: "Formas de Pagamento",
+  Fornecedores: "Fornecedores/Clientes",
+  GerenciarCidades: "Cidades",
+  GerenciarSafras: "Safras",
+  GruposFinanceiros: "Grupos Financeiros",
+  HistoricoMovimentacoesPecuaria: "Histórico de Movimentações",
+  Home: "Dashboard",
+  LancamentoFinanceiro: "Lançamento Financeiro",
+  LivroCaixa: "Livro-Caixa",
+  LivrosFiscais: "Livros Fiscais",
+  LocaisEstoque: "Locais de Estoque",
+  MapaCadastro: "Mapa - Áreas/Pontos/Linhas",
+  MapaGeral: "Mapa Geral - Manejo",
+  MovimentacoesEstoque: "Movimentações Estoque",
+  Pesagens: "Pesagens",
+  PlanoContas: "Plano de Contas",
+  Produtos: "Produtos",
+  RelatorioCustosSafra: "Relatório de Custos Safra",
+  RelatorioEstoque: "Relatório de Estoque",
+  RelatorioFinanceiro: "Relatório Financeiro",
+  RelatorioFornecedores: "Lista de Fornecedores",
+  RelatorioHistoricoEntregas: "Histórico de Entregas",
+  RelatorioPesagens: "Relatório de Pesagens",
+  RelatorioProdutos: "Lista de Produtos",
+  RelatorioSuplementacao: "Relatório Suplementação",
+  UnidadesMedida: "Unidades de Medida",
+  Usuarios: "Usuários",
+};
+
+// Telas com rota declarada diretamente no App.jsx (não estão em pages.config).
+const PAGINAS_ROTAS_APP = [
+  "ManejosTecnicosRebanho",
+  "MovimentacoesLote",
+  "ContasFinanceiras",
+  "TiposDocumento",
+  "MotivosCompra",
+  "Marcas",
+  "LancamentosAbastecimento",
+  "ConfiguracaoPesagens",
+  "Bebedouros",
+  "RelatorioGadoMapaGeral",
+  "RelatorioEstoqueDepositos",
+  "DiagnosticoDepositoCocho",
+];
 
 export default function ConfiguracoesGerais() {
   const [menuItems, setMenuItems] = useState(() => {
@@ -163,6 +181,15 @@ export default function ConfiguracoesGerais() {
   );
 
   const isAdmin = currentUser?.role === 'admin' || permissaoAtual?.is_admin === true;
+
+  // Todas as telas cadastradas no sistema ficam disponíveis para entrar no menu.
+  const paginasDisponiveis = useMemo(() => {
+    const registradas = Object.keys(pagesConfig.Pages || {});
+    return Array.from(new Set([...registradas, ...PAGINAS_ROTAS_APP]))
+      .filter((nome) => nome !== "OAuthConsent")
+      .map((nome) => ({ nome, titulo: TITULOS_PAGINAS[nome] || nome }))
+      .sort((a, b) => a.titulo.localeCompare(b.titulo));
+  }, []);
 
   const [expandedMenus, setExpandedMenus] = useState({});
   const [showAddMenuItem, setShowAddMenuItem] = useState(false);
@@ -315,7 +342,10 @@ export default function ConfiguracoesGerais() {
 
   const handleResetMenu = () => {
     if (window.confirm('⚠️ Resetar menu? Todas personalizações serão perdidas.')) {
-      saveMenu(DEFAULT_MENU);
+      // Remove o menu salvo: o sistema volta a carregar o menu padrão completo.
+      localStorage.removeItem('custom_menu');
+      localStorage.removeItem('menu_version');
+      window.location.reload();
     }
   };
 
@@ -583,12 +613,12 @@ export default function ConfiguracoesGerais() {
             <div className="space-y-1.5">
               <Label className="text-xs">Página *</Label>
               <Select value={newMenuItem.url} onValueChange={(v) => {
-                const paginaSelecionada = PAGINAS_DISPONIVEIS.find(p => p.nome === v);
+                const paginaSelecionada = paginasDisponiveis.find(p => p.nome === v);
                 setNewMenuItem({ ...newMenuItem, url: v, title: newMenuItem.title || paginaSelecionada?.titulo || "" });
               }}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione a página" /></SelectTrigger>
                 <SelectContent>
-                  {PAGINAS_DISPONIVEIS.map(pag => (
+                  {paginasDisponiveis.map(pag => (
                     <SelectItem key={pag.nome} value={pag.nome} className="text-xs">{pag.titulo}</SelectItem>
                   ))}
                 </SelectContent>
@@ -638,12 +668,12 @@ export default function ConfiguracoesGerais() {
             <div className="space-y-1.5">
               <Label className="text-xs">Página *</Label>
               <Select value={newSubmenuItem.url} onValueChange={(v) => {
-                const paginaSelecionada = PAGINAS_DISPONIVEIS.find(p => p.nome === v);
+                const paginaSelecionada = paginasDisponiveis.find(p => p.nome === v);
                 setNewSubmenuItem({ ...newSubmenuItem, url: v, title: newSubmenuItem.title || paginaSelecionada?.titulo || "" });
               }}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione a página" /></SelectTrigger>
                 <SelectContent>
-                  {PAGINAS_DISPONIVEIS.map(pag => (
+                  {paginasDisponiveis.map(pag => (
                     <SelectItem key={pag.nome} value={pag.nome} className="text-xs">{pag.titulo}</SelectItem>
                   ))}
                 </SelectContent>
@@ -695,12 +725,12 @@ export default function ConfiguracoesGerais() {
             <div className="space-y-1.5">
               <Label className="text-xs">Página *</Label>
               <Select value={newSubSubmenuItem.url} onValueChange={(v) => {
-                const paginaSelecionada = PAGINAS_DISPONIVEIS.find(p => p.nome === v);
+                const paginaSelecionada = paginasDisponiveis.find(p => p.nome === v);
                 setNewSubSubmenuItem({ ...newSubSubmenuItem, url: v, title: newSubSubmenuItem.title || paginaSelecionada?.titulo || "" });
               }}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione a página" /></SelectTrigger>
                 <SelectContent>
-                  {PAGINAS_DISPONIVEIS.map(pag => (
+                  {paginasDisponiveis.map(pag => (
                     <SelectItem key={pag.nome} value={pag.nome} className="text-xs">{pag.titulo}</SelectItem>
                   ))}
                 </SelectContent>
@@ -732,7 +762,7 @@ export default function ConfiguracoesGerais() {
                   <Select value={editingItem.url || ''} onValueChange={(v) => setEditingItem({ ...editingItem, url: v })}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione a página" /></SelectTrigger>
                     <SelectContent>
-                      {PAGINAS_DISPONIVEIS.map(pag => (
+                      {paginasDisponiveis.map(pag => (
                         <SelectItem key={pag.nome} value={pag.nome} className="text-xs">{pag.titulo}</SelectItem>
                       ))}
                     </SelectContent>
