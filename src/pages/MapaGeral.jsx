@@ -26,7 +26,6 @@ import MapaFiltrosAvancados, {
   CORES_TIPO_CULTURA, CORES_APROVEITAMENTO, CORES_OCUPACAO, CORES_CATEGORIA_GADO,
   CORES_UA_HA, CORES_SITUACAO_PASTO } from
 "../components/mapa/MapaFiltrosAvancados";
-import MapaLegenda from "../components/mapa/MapaLegenda";
 import useMapRenderer from "../components/mapa/useMapRenderer";
 import { MAPA_PALETA } from "../components/mapa/mapaPaleta";
 import useSetorAreas from "@/hooks/useSetorAreas";
@@ -81,7 +80,8 @@ export default function MapaGeral() {
   const [filtroSetor, setFiltroSetor] = useState('todos');
   const [filtroPesoMin, setFiltroPesoMin] = useState(null);
   const [filtroPesoMax, setFiltroPesoMax] = useState(null);
-  const [modoColoracao, setModoColoracao] = useState('padrao');
+  // Áreas sempre com a própria cor cadastrada (sem modos de demarcação)
+  const modoColoracao = 'padrao';
 
   // Painéis
   const [showDetalhesLote, setShowDetalhesLote] = useState(false);
@@ -136,7 +136,6 @@ export default function MapaGeral() {
     if (typeof state.filtroSetor === 'string') setFiltroSetor(state.filtroSetor);
     setFiltroPesoMin(state.filtroPesoMin ?? null);
     setFiltroPesoMax(state.filtroPesoMax ?? null);
-    if (typeof state.modoColoracao === 'string') setModoColoracao(state.modoColoracao);
   }, [empresaSelecionadaId]);
 
   useEffect(() => {
@@ -163,10 +162,9 @@ export default function MapaGeral() {
       filtroTipoPastagem,
       filtroSetor,
       filtroPesoMin,
-      filtroPesoMax,
-      modoColoracao
+      filtroPesoMax
     }));
-  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax, modoColoracao]);
+  }, [empresaSelecionadaId, mapType, showAreas, showPontos, showLinhas, showLotes, showTaskIcons, dragLotesEnabled, showCochos, showDepositos, showAlertas, showUserLocation, showNomesAreas, showHectaresAreas, filtroCategoria, filtroIdentificador, filtroStatus, filtroSistema, filtroAlertaTipo, filtroTipoCultura, filtroTipoPastagem, filtroSetor, filtroPesoMin, filtroPesoMax]);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -983,13 +981,6 @@ export default function MapaGeral() {
           onOpenFiltros={() => {if (!mapaGeralPermissions.visualizar_filtros_camadas) return;setShowFiltros(true);}} />
 
 
-        {/* Legenda */}
-        <MapaLegenda
-          modoColoracao={modoColoracao}
-          categoriasGadoCores={categoriasGadoCores}
-          tiposPastagemCores={tiposPastagemCores} />
-
-
 
         {/* Barra resumo inferior */}
         <div className="absolute bottom-2 left-2 right-2 z-10">
@@ -1048,7 +1039,6 @@ export default function MapaGeral() {
               filtroTipoPastagem={filtroTipoPastagem} setFiltroTipoPastagem={setFiltroTipoPastagem}
               filtroPesoMin={filtroPesoMin} setFiltroPesoMin={setFiltroPesoMin}
               filtroPesoMax={filtroPesoMax} setFiltroPesoMax={setFiltroPesoMax}
-              modoColoracao={modoColoracao} setModoColoracao={setModoColoracao}
               categorias={categorias}
               identificadores={identificadores}
               tiposPastagem={tiposPastagem}

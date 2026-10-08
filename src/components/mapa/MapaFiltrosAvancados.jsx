@@ -1,6 +1,4 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -56,18 +54,6 @@ export const CORES_CATEGORIA_GADO = [
 '#d946ef', '#0ea5e9', '#84cc16', '#f43f5e', '#a855f7'];
 
 
-export const MODOS_COLORACAO = [
-{ id: 'padrao', label: 'Padrão (cor da área)' },
-{ id: 'satelite', label: 'Foto de Satélite' },
-{ id: 'tipo_cultura', label: 'Tipo de Cultura' },
-{ id: 'aproveitamento', label: 'Aproveitamento' },
-{ id: 'ocupacao', label: 'Ocupação' },
-{ id: 'categoria_gado', label: 'Categoria de Manejo' },
-{ id: 'tipo_pastagem', label: 'Tipo de Pastagem' },
-{ id: 'ua_ha', label: 'UA por Hectare' },
-{ id: 'situacao_pasto', label: 'Situação do Pasto' }];
-
-
 export default function MapaFiltrosAvancados({
   // Visibilidade
   showAreas, setShowAreas,
@@ -93,8 +79,6 @@ export default function MapaFiltrosAvancados({
   filtroSetor, setFiltroSetor,
   filtroTipoCultura, setFiltroTipoCultura,
   filtroTipoPastagem, setFiltroTipoPastagem,
-  // Coloração
-  modoColoracao, setModoColoracao,
   // Dados para opções
   categorias = [],
   identificadores = [],
@@ -143,53 +127,6 @@ export default function MapaFiltrosAvancados({
           <Separator />
         </>
       }
-
-      {/* ─── Modo de Coloração das Áreas ─── */}
-      {permissions?.visualizar_areas !== false &&
-      <div>
-          <div className="mb-3">
-            <span className="text-xs font-bold text-slate-800 uppercase">DEMARCAR ÁREAS POR</span>
-          </div>
-          <div className="grid grid-cols-2 gap-1">
-            {MODOS_COLORACAO.map((modo) => {
-            const ativo = modoColoracao === modo.id;
-            return (
-              <Button
-                key={modo.id}
-                variant={ativo ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setModoColoracao(modo.id)}
-                className={`h-8 text-[10px] justify-start ${ativo ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}>
-                
-                  <span className="truncate">{modo.label}</span>
-                </Button>);
-
-          })}
-          </div>
-
-          {/* Legenda do modo ativo */}
-          {modoColoracao !== 'padrao' &&
-        <div className="mt-3 bg-slate-50 rounded-lg p-2.5 space-y-1">
-              <div className="text-[10px] font-bold text-slate-600 uppercase mb-1">Legenda</div>
-              {modoColoracao === 'tipo_cultura' && Object.entries(CORES_TIPO_CULTURA).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
-              {modoColoracao === 'aproveitamento' && Object.entries(CORES_APROVEITAMENTO).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
-              {modoColoracao === 'ocupacao' && Object.entries(CORES_OCUPACAO).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
-              {modoColoracao === 'categoria_gado' && <div className="text-[10px] text-slate-500">Cada categoria de manejo terá uma cor distinta</div>}
-              {modoColoracao === 'tipo_pastagem' && <div className="text-[10px] text-slate-500">Cada tipo de pastagem terá uma cor distinta</div>}
-              {modoColoracao === 'ua_ha' &&
-          <>
-                  {Object.entries(CORES_UA_HA).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
-                  <div className="text-[9px] text-slate-500 mt-1 italic">* Usa área efetiva (pastejada). 1 UA = 450 kg PV</div>
-                </>
-          }
-              {modoColoracao === 'situacao_pasto' && Object.entries(CORES_SITUACAO_PASTO).map(([k, c]) => <LegendaItem key={k} cor={c} label={k} />)}
-              {modoColoracao === 'satelite' && <div className="text-[10px] text-slate-500">Áreas só com o contorno: a imagem de satélite da fazenda aparece limpa por baixo.</div>}
-            </div>
-        }
-        </div>
-      }
-
-      {permissions?.visualizar_areas !== false && <Separator />}
 
       {/* ─── Filtros de Áreas ─── */}
       {permissions?.visualizar_areas !== false &&
@@ -321,16 +258,6 @@ export default function MapaFiltrosAvancados({
           </div>
         </div>
       }
-    </div>);
-
-
-}
-
-function LegendaItem({ cor, label }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="w-4 h-3 rounded-[4px] shadow-sm" style={{ backgroundColor: cor, boxShadow: '0 0 0 1px rgba(15,23,42,0.25) inset' }} />
-      <span className="text-[11px] text-slate-700">{label}</span>
     </div>);
 
 }
