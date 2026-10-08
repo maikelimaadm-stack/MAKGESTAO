@@ -636,9 +636,9 @@ export default function Layout({ children, currentPageName }) {
 
               {isAdminUser &&
               <Link to={createPageUrl("ConfiguracoesGerais")}>
-                  
-
-                
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Configurações">
+                    <Settings className="w-4 h-4 text-slate-600" />
+                  </Button>
                 </Link>
               }
 
@@ -668,16 +668,16 @@ export default function Layout({ children, currentPageName }) {
                   {isAdminUser &&
                   <>
                       <DropdownMenuItem asChild className="text-xs">
-                        
-
-
-                      
+                        <Link to={createPageUrl("ConfiguracoesGerais")}>
+                          <Settings className="w-3 h-3 mr-2" />
+                          Configurações
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-xs">
-                        
-
-
-                      
+                        <Link to={createPageUrl("Usuarios")}>
+                          <Users className="w-3 h-3 mr-2" />
+                          Usuários
+                        </Link>
                       </DropdownMenuItem>
                     </>
                   }
