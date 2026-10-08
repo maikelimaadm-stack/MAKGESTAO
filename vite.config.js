@@ -12,8 +12,5 @@ export default defineConfig({
       visualEditAgent: true // Esta linha foi adicionada para habilitar o editor visual
     }),
     react(),
-  ],
-  resolve: {
-    dedupe: ['react', 'react-dom']
-  }
+  ]
 });

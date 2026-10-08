@@ -63,15 +63,11 @@ export const loteRepository = {
       campos_personalizados: data.campos_personalizados || {}
     });
 
-    try {
-      await base44.functions.invoke("syncEntityReferences", {
-        event: { type: "update", entity_name: "Lote" },
-        data: updated,
-        old_data: oldData
-      });
-    } catch (syncError) {
-      console.warn("syncEntityReferences indisponível, registro atualizado sem sincronização de referências:", syncError?.message || syncError);
-    }
+    await base44.functions.invoke("syncEntityReferences", {
+      event: { type: "update", entity_name: "Lote" },
+      data: updated,
+      old_data: oldData
+    });
 
     return updated;
   },

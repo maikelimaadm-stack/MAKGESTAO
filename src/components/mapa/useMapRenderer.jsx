@@ -1,9 +1,5 @@
 /* global google */
 import { useRef, useCallback } from "react";
-import { MAPA_PALETA, corDaLinha, escurecer, suavizarCor } from "./mapaPaleta";
-
-const escapeHtml = (valor) =>
-String(valor ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const iconSizeCache = new Map();
 const markerStateCache = new Map();
@@ -55,7 +51,7 @@ const applyMarkerIconPreservingAspectRatio = (marker, iconUrl, baseSize = 44, wi
       url: iconUrl,
       scaledSize: new google.maps.Size(width, height),
       anchor: new google.maps.Point(width / 2, height / 2),
-      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, Math.max(9, height * 0.58)) } : {})
+      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, Math.max(9, height * 0.34)) } : {})
     });
   };
 
@@ -94,6 +90,7 @@ export default function useMapRenderer(mapInstanceRef) {
   // Guardar cor atual de cada polígono para poder atualizar sem recriar
   const polyColorRef = useRef(new Map());
   const lotesIndicatorsRef = useRef(new Map());
+
   const clearAll = useCallback(() => {
     polygonsRef.current.forEach(p => p.setMap(null));
     polygonsRef.current.clear();
@@ -104,7 +101,7 @@ export default function useMapRenderer(mapInstanceRef) {
       m.setMap(null);
     });
     markersRef.current.clear();
-    polylinesRef.current.forEach(entry => (entry.layers || [entry]).forEach(l => l.setMap(null)));
+    polylinesRef.current.forEach(l => l.setMap(null));
     polylinesRef.current.clear();
     polyColorRef.current.clear();
     lotesIndicatorsRef.current.forEach(i => i.setMap(null));
@@ -114,7 +111,7 @@ export default function useMapRenderer(mapInstanceRef) {
   }, []);
 
   // ─── Áreas (Polígonos) com coloração dinâmica ───
-  const syncAreas = useCallback((areas, show, onClickArea, onRightClickArea, colorFn, fillOpacity = MAPA_PALETA.areaPreenchimento, hoverOpacity = MAPA_PALETA.areaPreenchimentoHover, strokeStyle = null) => {
+  const syncAreas = useCallback((areas, show, onClickArea, onRightClickArea, colorFn) => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
@@ -135,15 +132,12 @@ export default function useMapRenderer(mapInstanceRef) {
       if (coords.length < 3) return;
 
       const paths = coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      const corSalva = area.coordenadas?.cor || area.cor;
-      const corBase = corSalva ? suavizarCor(corSalva) : MAPA_PALETA.areaPadrao;
+      const corBase = area.coordenadas?.cor || area.cor || '#61aad9';
       const cor = colorFn ? (colorFn(area) || corBase) : corBase;
-      const borda = strokeStyle?.color || escurecer(cor);
-      const bordaOpacidade = strokeStyle?.opacity ?? 0.8;
-      const bordaForca = strokeStyle?.weight ?? 1.2;
 
       if (polygonsRef.current.has(area.id)) {
         const poly = polygonsRef.current.get(area.id);
+        const prevCor = polyColorRef.current.get(area.id);
         const nextSignature = areaPathSignature(coords);
 
         if (poly._pathSignature !== nextSignature) {
@@ -151,41 +145,30 @@ export default function useMapRenderer(mapInstanceRef) {
           poly._pathSignature = nextSignature;
         }
 
-        poly.setOptions({ fillColor: cor, strokeColor: borda, strokeOpacity: bordaOpacidade, strokeWeight: bordaForca, fillOpacity });
-        poly._fill = { base: fillOpacity, hover: hoverOpacity };
-        poly._strokeOpacity = bordaOpacidade;
-        poly._strokeWeight = bordaForca;
-        polyColorRef.current.set(area.id, cor);
+        if (prevCor !== cor) {
+          poly.setOptions({ fillColor: cor, strokeColor: cor });
+          polyColorRef.current.set(area.id, cor);
+        }
 
         poly._areaData = area;
         poly._color = cor;
-        poly._stroke = borda;
         return;
       }
 
       const polygon = new google.maps.Polygon({
         paths,
-        strokeColor: borda,
-        strokeOpacity: bordaOpacidade,
-        strokeWeight: bordaForca,
+        strokeColor: cor,
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
         fillColor: cor,
-        fillOpacity,
-        zIndex: 2,
+        fillOpacity: 0.45,
       });
       polygon._areaData = area;
       polygon._color = cor;
-      polygon._stroke = borda;
-      polygon._strokeOpacity = bordaOpacidade;
-      polygon._strokeWeight = bordaForca;
-      polygon._fill = { base: fillOpacity, hover: hoverOpacity };
       polygon._pathSignature = areaPathSignature(coords);
 
-      polygon.addListener('mouseover', function () {
-        this.setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.95, strokeWeight: 1.8, fillOpacity: this._fill?.hover ?? MAPA_PALETA.areaPreenchimentoHover, zIndex: 6 });
-      });
-      polygon.addListener('mouseout', function () {
-        this.setOptions({ strokeColor: this._stroke, strokeOpacity: this._strokeOpacity ?? 0.8, strokeWeight: this._strokeWeight ?? 1.2, fillOpacity: this._fill?.base ?? MAPA_PALETA.areaPreenchimento, zIndex: 2 });
-      });
+      polygon.addListener('mouseover', () => polygon.setOptions({ strokeColor: '#ffffff', strokeOpacity: 1, strokeWeight: 3 }));
+      polygon.addListener('mouseout', function () { this.setOptions({ strokeColor: this._color, strokeOpacity: 0.8, strokeWeight: 2 }); });
       polygon.addListener('click', function (e) {
         if (e.vertex === undefined) {
           const coords = e?.latLng ? { lat: e.latLng.lat(), lng: e.latLng.lng() } : null;
@@ -256,10 +239,10 @@ export default function useMapRenderer(mapInstanceRef) {
 
       const labelDiv = document.createElement('div');
       labelDiv.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap;pointer-events:none;font-family:Inter,Arial,sans-serif;text-align:center;text-shadow:0 1px 3px rgba(2,6,23,0.95),0 0 8px rgba(2,6,23,0.85);">
-          <div class="label-title" style="font-size:11.5px;font-weight:700;color:#ffffff;letter-spacing:0.3px;line-height:1.25;">${escapeHtml(area.nome)}</div>
-          <div class="label-hectares" style="font-size:10px;font-weight:600;color:#f1f5f9;line-height:1.25;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
-          <div class="label-extra" style="font-size:10px;font-weight:700;color:#fde68a;line-height:1.25;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
+        <div style="color:white;text-align:center;white-space:nowrap;text-shadow:1px 1px 3px rgba(0,0,0,0.8);pointer-events:none;font-family:Arial,sans-serif;">
+          <div class="label-title" style="font-size:11px;font-weight:700;">${area.nome || ''}</div>
+          <div class="label-hectares" style="font-size:10px;font-weight:400;opacity:0.95;${hectaresText ? '' : 'display:none;'}">${hectaresText || ''}</div>
+          <div class="label-extra" style="font-size:10px;font-weight:600;color:#fef08a;${extraText ? '' : 'display:none;'}">${extraText || ''}</div>
         </div>`;
 
       const overlay = new google.maps.OverlayView();
@@ -329,71 +312,28 @@ export default function useMapRenderer(mapInstanceRef) {
     });
   }, [mapInstanceRef]);
 
-  // ─── Linhas Geográficas (traçado cartográfico em camadas) ───
+  // ─── Linhas Geográficas ───
   const syncLinhas = useCallback((linhas, show) => {
     const map = mapInstanceRef.current;
     if (!map) return;
     const currentIds = new Set(show ? linhas.map(l => l.id) : []);
-
-    polylinesRef.current.forEach((entry, id) => {
-      if (!currentIds.has(id)) {
-        (entry.layers || [entry]).forEach(layer => layer.setMap(null));
-        entry.info?.close();
-        polylinesRef.current.delete(id);
-      }
-    });
-
+    polylinesRef.current.forEach((pl, id) => { if (!currentIds.has(id)) { pl.setMap(null); polylinesRef.current.delete(id); } });
     if (!show) return;
-
-    linhas.forEach((linha, index) => {
-      const zIndex = 30 + index * 3;
+    linhas.forEach(linha => {
+      if (polylinesRef.current.has(linha.id)) return;
       const coords = linha.coordenadas?.coords || [];
       if (coords.length < 2) return;
-
       const paths = coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      const cor = corDaLinha(linha);
-      const assinatura = `${cor}|${paths.map(p => `${p.lat},${p.lng}`).join(';')}`;
-      const existente = polylinesRef.current.get(linha.id);
-
-      if (existente) {
-        if (existente.assinatura !== assinatura) {
-          existente.layers.forEach(layer => layer.setPath(paths));
-          existente.assinatura = assinatura;
-        }
-        existente.layers[0].setOptions({ strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 1, strokeWeight: 4.2, zIndex });
-        existente.layers[1].setOptions({ strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.8, strokeWeight: 3.2, zIndex: zIndex + 1 });
-        existente.core.setOptions({ strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: zIndex + 2 });
-        return;
-      }
-
-      const sombra = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaSombra, strokeOpacity: 1, strokeWeight: 4.2, zIndex, clickable: false, geodesic: true });
-      const contorno = new google.maps.Polyline({ path: paths, strokeColor: MAPA_PALETA.linhaContorno, strokeOpacity: 0.8, strokeWeight: 3.2, zIndex: zIndex + 1, clickable: false, geodesic: true });
-      const core = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 2.2, zIndex: zIndex + 2, geodesic: true });
-
-      const infoWindow = new google.maps.InfoWindow({ maxWidth: 260 });
-
-      core.addListener('click', () => {
-        const bounds = new google.maps.LatLngBounds();
-        paths.forEach(p => bounds.extend(p));
-        const metros = linha.comprimento_metros || (window.google?.maps?.geometry?.spherical ? google.maps.geometry.spherical.computeLength(paths) : null);
-        const comprimento = metros ? `${(metros / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} km` : null;
-        infoWindow.setContent(`
-          <div style="font-family:Inter,Arial,sans-serif;min-width:150px;padding:2px 1px;">
-            <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px;">${escapeHtml(linha.nome)}</div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#475569;">
-              <span style="width:16px;height:4px;border-radius:2px;background:${cor};display:inline-block;"></span>
-              ${escapeHtml(linha.tipo || '')}
-            </div>
-            ${comprimento ? `<div style="font-size:11px;color:#475569;margin-top:3px;">${comprimento}</div>` : ''}
-          </div>`);
-        infoWindow.setPosition(bounds.getCenter());
-        infoWindow.open(map);
+      const cor = linha.coordenadas?.cor || linha.cor || '#f59e0b';
+      const polyline = new google.maps.Polyline({ path: paths, strokeColor: cor, strokeOpacity: 1, strokeWeight: 3 });
+      polyline.addListener('click', () => {
+        const b = new google.maps.LatLngBounds(); paths.forEach(p => b.extend(p));
+        new google.maps.InfoWindow({ content: `<div style="padding:10px;"><strong>${linha.nome}</strong><br/><span style="color:#666;">${linha.tipo} - ${linha.comprimento_metros ? (linha.comprimento_metros / 1000).toFixed(2) + ' km' : 'N/A'}</span></div>` }).setPosition(b.getCenter()) || void 0;
+        const iw = new google.maps.InfoWindow({ content: `<div style="padding:10px;"><strong>${linha.nome}</strong><br/><span style="color:#666;">${linha.tipo}</span></div>` });
+        iw.setPosition(b.getCenter()); iw.open(map);
       });
-      core.addListener('mouseover', () => core.setOptions({ strokeWeight: 2.8 }));
-      core.addListener('mouseout', () => core.setOptions({ strokeWeight: 2.2 }));
-
-      [sombra, contorno, core].forEach(layer => layer.setMap(map));
-      polylinesRef.current.set(linha.id, { layers: [sombra, contorno, core], core, info: infoWindow, assinatura });
+      polyline.setMap(map);
+      polylinesRef.current.set(linha.id, polyline);
     });
   }, [mapInstanceRef]);
 
@@ -496,7 +436,7 @@ export default function useMapRenderer(mapInstanceRef) {
       }
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0, labelOrigin: new google.maps.Point(0, 0) }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 21, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 10) };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 18, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
       const totalAlertas = lotesNaArea.reduce((sum, l) => sum + (l.alertas?.length || 0), 0);
 
       // Helper para atualizar posição do indicador junto com o marcador
@@ -522,13 +462,13 @@ export default function useMapRenderer(mapInstanceRef) {
         });
         if (markerStateCache.get(key) !== nextState) {
           const lbl = existing.getLabel();
-          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#000000', fontSize: '11px', fontWeight: 'bold' });
+          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' });
           existing.setPosition(offsetCenter);
           existing.setTitle(area.nome);
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
           existing.setDraggable(!!canDragLotes);
           existing.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 44, true);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 38, true);
           markerStateCache.set(key, nextState);
           const ind = lotesIndicatorsRef.current.get(key);
           if (ind) { ind._pos = offsetCenter; try { ind.draw(); } catch(e) {} }
@@ -540,10 +480,10 @@ export default function useMapRenderer(mapInstanceRef) {
       } else {
         const marker = new google.maps.Marker({
           position: offsetCenter, map, icon,
-          label: { text: String(totalCabecas), color: '#000000', fontSize: '11px', fontWeight: 'bold' },
+          label: { text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 44, true);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 38, true);
         setMarkerBlink(marker, false);
         marker._lotesNaArea = lotesNaArea;
         marker._center = offsetCenter;
@@ -621,9 +561,9 @@ export default function useMapRenderer(mapInstanceRef) {
             if (!currentPos) return;
             const pos = proj.fromLatLngToDivPixel(currentPos);
             if (!pos) return;
-            // Posição personalizada do identificador em relação ao ícone (ajustado para ícone 44px)
-            div.style.left = `${pos.x + 17}px`;
-            div.style.top = `${pos.y - 22}px`;
+            // Posição personalizada do identificador em relação ao ícone
+            div.style.left = `${pos.x + 20}px`;
+            div.style.top = `${pos.y - 25}px`;
             div.style.transform = 'translate(-50%, -50%)';
           };
           indicatorOverlay.onRemove = function() { div.parentNode?.removeChild(div); };
@@ -634,7 +574,7 @@ export default function useMapRenderer(mapInstanceRef) {
         indicatorOverlay._markerRef = markersRef.current.get(key);
         indicatorOverlay._pos = offsetCenter;
         if (indicatorOverlay._state !== stateStr) {
-          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:14px;height:14px;border-radius:9999px;background:${i.cor};border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
+          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:15px;height:15px;border-radius:9999px;background:${i.cor};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
           indicatorOverlay._state = stateStr;
         }
         setOverlayBlink(indicatorOverlay, blinkAlerts && totalAlertas > 0);

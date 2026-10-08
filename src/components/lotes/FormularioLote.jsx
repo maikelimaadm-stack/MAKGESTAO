@@ -45,26 +45,18 @@ const UPPERCASE_FIELDS = [
 "observacoes"];
 
 const REQUIRED_FIELDS = [
-  "nome",
-  "quantidade_cabecas",
-  "data_entrada",
-  "categoria_manejo_id",
-  "categoria",
-  "sexo",
-  "raca_predominante",
-  "peso_medio_kg",
-  "idade_media_meses",
-  "setor_id",
-  "area_entrada_id",
-  "sistema_produtivo",
-  "motivo_entrada"];
-
-const MOTIVO_ENTRADA_MAP = {
-  "COMPRA": "Compra",
-  "AJUSTE": "Ajuste",
-  "INVENTÁRIO": "Inventário",
-  "OUTROS": "Outros"
-};
+"nome",
+"quantidade_cabecas",
+"data_entrada",
+"categoria_manejo_id",
+"categoria",
+"sexo",
+"raca_predominante",
+"peso_medio_kg",
+"idade_media_meses",
+"setor_id",
+"area_entrada_id",
+"sistema_produtivo"];
 
 const CORES_DISPONIVEIS = [
 { nome: "Branco", cor: "#f8f9fa" },
@@ -482,7 +474,6 @@ export default function FormularioLote({ onSubmit, onCancel, onSettingsClick, on
       area_atual_id: formData.area_entrada_id,
       area_atual_nome: area?.nome || "",
       categoria_manejo_nome: categoriaManejo?.nome || "",
-      motivo_entrada: MOTIVO_ENTRADA_MAP[formData.motivo_entrada] || formData.motivo_entrada || "",
       origem: formData.motivo_entrada?.toUpperCase() || "",
       observacoes: formData.observacoes?.toUpperCase() || "",
       quantidade_cabecas: quantidade,
@@ -642,7 +633,6 @@ export default function FormularioLote({ onSubmit, onCancel, onSettingsClick, on
           showEditAction={isReadOnly}
           showDeleteDuplicateActions={isEditing && !editMode && !isDuplicating}
           onCancel={onCancel}
-          onSave={() => handleSubmit({ preventDefault: () => {} })}
           onEditRecord={() => setEditMode(true)}
           onSettingsClick={onSettingsClick}
           onLayoutConfigClick={() => { if (filterOpen) onToggleFilter?.(); setLayoutConfigOpen(true); }}
