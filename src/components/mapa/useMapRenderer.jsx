@@ -6,6 +6,9 @@ const markerStateCache = new Map();
 const blinkIntervals = new Map();
 const areaPathSignature = (coords = []) => coords.map((c) => `${c[0] || c.lat},${c[1] || c.lng}`).join('|');
 
+// Cor do texto com a quantidade de animais no mapa
+const COR_TEXTO_QTD_ANIMAIS = '#6b7280';
+
 const setBlinkElement = (target, shouldBlink, applyVisibility) => {
   if (!target || typeof applyVisibility !== 'function') return;
   const targetId = target.__blinkId || `${Date.now()}_${Math.random()}`;
@@ -418,11 +421,11 @@ export default function useMapRenderer(mapInstanceRef) {
       const centroid = calcCentroid(paths);
       const centroidLat = typeof centroid.lat === 'function' ? centroid.lat() : centroid.lat;
       const centroidLng = typeof centroid.lng === 'function' ? centroid.lng() : centroid.lng;
-      // Deslocar levemente para cima para não sobrepor nome da área
+      // Posicionar abaixo do centro da área para não sobrepor o nome da área
       const bounds = new google.maps.LatLngBounds();
       paths.forEach(p => bounds.extend(p));
       const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
-      const offsetCenter = new google.maps.LatLng(centroidLat + latSpan * 0.12, centroidLng);
+      const offsetCenter = new google.maps.LatLng(centroidLat - latSpan * 0.12, centroidLng);
       const totalCabecas = lotesNaArea.reduce((sum, l) => sum + (l.quantidade_cabecas || 0), 0);
       const cats = [...new Set(lotesNaArea.map(l => l.categoria?.toUpperCase().trim()).filter(Boolean))].sort();
       const loteReferencia = lotesNaArea[0] || null;
@@ -462,7 +465,7 @@ export default function useMapRenderer(mapInstanceRef) {
         });
         if (markerStateCache.get(key) !== nextState) {
           const lbl = existing.getLabel();
-          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' });
+          if (lbl?.text !== String(totalCabecas) || lbl?.color !== COR_TEXTO_QTD_ANIMAIS) existing.setLabel({ text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' });
           existing.setPosition(offsetCenter);
           existing.setTitle(area.nome);
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
@@ -480,7 +483,7 @@ export default function useMapRenderer(mapInstanceRef) {
       } else {
         const marker = new google.maps.Marker({
           position: offsetCenter, map, icon,
-          label: { text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' },
+          label: { text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
         if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 38, true);
