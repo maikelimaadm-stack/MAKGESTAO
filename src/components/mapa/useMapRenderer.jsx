@@ -496,7 +496,7 @@ export default function useMapRenderer(mapInstanceRef) {
       }
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0, labelOrigin: new google.maps.Point(0, 0) }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 18, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 21, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
       const totalAlertas = lotesNaArea.reduce((sum, l) => sum + (l.alertas?.length || 0), 0);
 
       // Helper para atualizar posição do indicador junto com o marcador
@@ -522,13 +522,13 @@ export default function useMapRenderer(mapInstanceRef) {
         });
         if (markerStateCache.get(key) !== nextState) {
           const lbl = existing.getLabel();
-          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' });
+          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#fff', fontSize: '11px', fontWeight: 'bold' });
           existing.setPosition(offsetCenter);
           existing.setTitle(area.nome);
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
           existing.setDraggable(!!canDragLotes);
           existing.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 38, true);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 44, true);
           markerStateCache.set(key, nextState);
           const ind = lotesIndicatorsRef.current.get(key);
           if (ind) { ind._pos = offsetCenter; try { ind.draw(); } catch(e) {} }
@@ -540,10 +540,10 @@ export default function useMapRenderer(mapInstanceRef) {
       } else {
         const marker = new google.maps.Marker({
           position: offsetCenter, map, icon,
-          label: { text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' },
+          label: { text: String(totalCabecas), color: '#fff', fontSize: '11px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 38, true);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 44, true);
         setMarkerBlink(marker, false);
         marker._lotesNaArea = lotesNaArea;
         marker._center = offsetCenter;
@@ -621,9 +621,9 @@ export default function useMapRenderer(mapInstanceRef) {
             if (!currentPos) return;
             const pos = proj.fromLatLngToDivPixel(currentPos);
             if (!pos) return;
-            // Posição personalizada do identificador em relação ao ícone (ajustado para ícone 38px)
-            div.style.left = `${pos.x + 15}px`;
-            div.style.top = `${pos.y - 19}px`;
+            // Posição personalizada do identificador em relação ao ícone (ajustado para ícone 44px)
+            div.style.left = `${pos.x + 17}px`;
+            div.style.top = `${pos.y - 22}px`;
             div.style.transform = 'translate(-50%, -50%)';
           };
           indicatorOverlay.onRemove = function() { div.parentNode?.removeChild(div); };
@@ -634,7 +634,7 @@ export default function useMapRenderer(mapInstanceRef) {
         indicatorOverlay._markerRef = markersRef.current.get(key);
         indicatorOverlay._pos = offsetCenter;
         if (indicatorOverlay._state !== stateStr) {
-          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:12px;height:12px;border-radius:9999px;background:${i.cor};border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
+          indicatorOverlay._div.innerHTML = identificadores.map((i) => `<div title="${i.nome || i.sigla || ''}" style="width:14px;height:14px;border-radius:9999px;background:${i.cor};border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;line-height:1;overflow:hidden;">${i.sigla ? String(i.sigla).substring(0,2) : ''}</div>`).join('');
           indicatorOverlay._state = stateStr;
         }
         setOverlayBlink(indicatorOverlay, blinkAlerts && totalAlertas > 0);
