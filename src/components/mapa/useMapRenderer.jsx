@@ -417,12 +417,8 @@ export default function useMapRenderer(mapInstanceRef) {
       const area = areas.find(a => a.id === areaId);
       if (!area || !area.coordenadas?.coords || area.coordenadas.coords.length < 3) return;
       const paths = area.coordenadas.coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      // Centralizar na área e posicionar bem abaixo, para não sobrepor o nome da área
-      const bounds = new google.maps.LatLngBounds();
-      paths.forEach(p => bounds.extend(p));
-      const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
-      const center = calcCentroid(paths);
-      const offsetCenter = new google.maps.LatLng(center.lat() - latSpan * 0.28, center.lng());
+      // Posicionar o ícone no centro real da área, sem deslocamento vertical.
+      const offsetCenter = calcCentroid(paths);
       const totalCabecas = lotesNaArea.reduce((sum, l) => sum + (l.quantidade_cabecas || 0), 0);
       const cats = [...new Set(lotesNaArea.map(l => l.categoria?.toUpperCase().trim()).filter(Boolean))].sort();
       const loteReferencia = lotesNaArea[0] || null;
