@@ -54,7 +54,7 @@ const applyMarkerIconPreservingAspectRatio = (marker, iconUrl, baseSize = 44, wi
       url: iconUrl,
       scaledSize: new google.maps.Size(width, height),
       anchor: new google.maps.Point(width / 2, height / 2),
-      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, Math.max(9, height * 0.34)) } : {})
+      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, height * 0.5) } : {})
     });
   };
 
@@ -422,7 +422,7 @@ export default function useMapRenderer(mapInstanceRef) {
       paths.forEach(p => bounds.extend(p));
       const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
       const center = bounds.getCenter();
-      const offsetCenter = new google.maps.LatLng(center.lat() - latSpan * 0.30, center.lng());
+      const offsetCenter = new google.maps.LatLng(center.lat() - latSpan * 0.36, center.lng());
       const totalCabecas = lotesNaArea.reduce((sum, l) => sum + (l.quantidade_cabecas || 0), 0);
       const cats = [...new Set(lotesNaArea.map(l => l.categoria?.toUpperCase().trim()).filter(Boolean))].sort();
       const loteReferencia = lotesNaArea[0] || null;
@@ -436,7 +436,7 @@ export default function useMapRenderer(mapInstanceRef) {
       }
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0, labelOrigin: new google.maps.Point(0, 0) }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 22, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 26, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
       const totalAlertas = lotesNaArea.reduce((sum, l) => sum + (l.alertas?.length || 0), 0);
 
       // Helper para atualizar posição do indicador junto com o marcador
@@ -468,7 +468,7 @@ export default function useMapRenderer(mapInstanceRef) {
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
           existing.setDraggable(!!canDragLotes);
           existing.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 46, true);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 56, true);
           markerStateCache.set(key, nextState);
           const ind = lotesIndicatorsRef.current.get(key);
           if (ind) { ind._pos = offsetCenter; try { ind.draw(); } catch(e) {} }
@@ -483,7 +483,7 @@ export default function useMapRenderer(mapInstanceRef) {
           label: { text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 46, true);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 56, true);
         setMarkerBlink(marker, false);
         marker._lotesNaArea = lotesNaArea;
         marker._center = offsetCenter;
@@ -562,8 +562,8 @@ export default function useMapRenderer(mapInstanceRef) {
             const pos = proj.fromLatLngToDivPixel(currentPos);
             if (!pos) return;
             // Posição personalizada do identificador em relação ao ícone
-            div.style.left = `${pos.x + 20}px`;
-            div.style.top = `${pos.y - 25}px`;
+            div.style.left = `${pos.x + 26}px`;
+            div.style.top = `${pos.y - 32}px`;
             div.style.transform = 'translate(-50%, -50%)';
           };
           indicatorOverlay.onRemove = function() { div.parentNode?.removeChild(div); };
