@@ -384,7 +384,7 @@ export default function ConfiguracoesGerais() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
+    <div className="h-full overflow-y-auto p-4 md:p-6 space-y-4">
       <div>
         <h1 className="text-xl font-bold text-slate-900">Configurações Gerais</h1>
         <p className="text-xs text-slate-600">Personalize menus, aparência e parâmetros</p>
