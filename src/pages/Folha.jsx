@@ -1,9 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calculator, Settings2, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { Users, Calculator, Settings2 } from "lucide-react";
 import FuncionariosTable from "../components/folha/FuncionariosTable";
 import Simulador from "../components/folha/Simulador";
 import FichaFuncionario from "../components/folha/FichaFuncionario";
@@ -14,16 +12,9 @@ export default function Folha() {
     <div className="min-h-screen bg-white" translate="no">
       <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to={createPageUrl("Home")}>
-              <Button variant="outline" size="sm" className="h-8 text-xs">
-                <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Voltar
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">Folha de Pagamento</h1>
-              <p className="text-xs text-slate-600">Módulo isolado: sem menus do sistema principal</p>
-            </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Folha de Pagamento</h1>
+            <p className="text-xs text-slate-600">Módulo isolado: sem menus do sistema principal</p>
           </div>
           <div className="flex gap-2">
             <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">

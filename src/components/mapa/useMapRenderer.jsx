@@ -6,9 +6,6 @@ const markerStateCache = new Map();
 const blinkIntervals = new Map();
 const areaPathSignature = (coords = []) => coords.map((c) => `${c[0] || c.lat},${c[1] || c.lng}`).join('|');
 
-// Cor do texto com a quantidade de animais no mapa
-const COR_TEXTO_QTD_ANIMAIS = '#000000';
-
 const setBlinkElement = (target, shouldBlink, applyVisibility) => {
   if (!target || typeof applyVisibility !== 'function') return;
   const targetId = target.__blinkId || `${Date.now()}_${Math.random()}`;
@@ -54,7 +51,7 @@ const applyMarkerIconPreservingAspectRatio = (marker, iconUrl, baseSize = 44, wi
       url: iconUrl,
       scaledSize: new google.maps.Size(width, height),
       anchor: new google.maps.Point(width / 2, height / 2),
-      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, height * 0.65) } : {})
+      ...(withLabel ? { labelOrigin: new google.maps.Point(width / 2, Math.max(9, height * 0.34)) } : {})
     });
   };
 
@@ -417,8 +414,15 @@ export default function useMapRenderer(mapInstanceRef) {
       const area = areas.find(a => a.id === areaId);
       if (!area || !area.coordenadas?.coords || area.coordenadas.coords.length < 3) return;
       const paths = area.coordenadas.coords.map(c => ({ lat: c[0] || c.lat, lng: c[1] || c.lng }));
-      // Posicionar o ícone no centro real da área, sem deslocamento vertical.
-      const offsetCenter = calcCentroid(paths);
+      // Usar centróide real do polígono para centralizar melhor
+      const centroid = calcCentroid(paths);
+      const centroidLat = typeof centroid.lat === 'function' ? centroid.lat() : centroid.lat;
+      const centroidLng = typeof centroid.lng === 'function' ? centroid.lng() : centroid.lng;
+      // Deslocar levemente para cima para não sobrepor nome da área
+      const bounds = new google.maps.LatLngBounds();
+      paths.forEach(p => bounds.extend(p));
+      const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+      const offsetCenter = new google.maps.LatLng(centroidLat + latSpan * 0.12, centroidLng);
       const totalCabecas = lotesNaArea.reduce((sum, l) => sum + (l.quantidade_cabecas || 0), 0);
       const cats = [...new Set(lotesNaArea.map(l => l.categoria?.toUpperCase().trim()).filter(Boolean))].sort();
       const loteReferencia = lotesNaArea[0] || null;
@@ -432,7 +436,7 @@ export default function useMapRenderer(mapInstanceRef) {
       }
       const icon = cfg?.icone_url
         ? { path: google.maps.SymbolPath.CIRCLE, scale: 14, fillColor: 'transparent', fillOpacity: 0, strokeOpacity: 0, labelOrigin: new google.maps.Point(0, 0) }
-        : { path: google.maps.SymbolPath.CIRCLE, scale: 22, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 18, fillColor: '#10b981', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3, labelOrigin: new google.maps.Point(0, 0) };
       const totalAlertas = lotesNaArea.reduce((sum, l) => sum + (l.alertas?.length || 0), 0);
 
       // Helper para atualizar posição do indicador junto com o marcador
@@ -458,13 +462,13 @@ export default function useMapRenderer(mapInstanceRef) {
         });
         if (markerStateCache.get(key) !== nextState) {
           const lbl = existing.getLabel();
-          if (lbl?.text !== String(totalCabecas) || lbl?.color !== COR_TEXTO_QTD_ANIMAIS) existing.setLabel({ text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' });
+          if (lbl?.text !== String(totalCabecas)) existing.setLabel({ text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' });
           existing.setPosition(offsetCenter);
           existing.setTitle(area.nome);
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
           existing.setDraggable(!!canDragLotes);
           existing.setIcon(icon);
-          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 46, true);
+          if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(existing, cfg.icone_url, 38, true);
           markerStateCache.set(key, nextState);
           const ind = lotesIndicatorsRef.current.get(key);
           if (ind) { ind._pos = offsetCenter; try { ind.draw(); } catch(e) {} }
@@ -476,10 +480,10 @@ export default function useMapRenderer(mapInstanceRef) {
       } else {
         const marker = new google.maps.Marker({
           position: offsetCenter, map, icon,
-          label: { text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' },
+          label: { text: String(totalCabecas), color: '#fff', fontSize: '10px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
-        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 46, true);
+        if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 38, true);
         setMarkerBlink(marker, false);
         marker._lotesNaArea = lotesNaArea;
         marker._center = offsetCenter;
@@ -558,8 +562,8 @@ export default function useMapRenderer(mapInstanceRef) {
             const pos = proj.fromLatLngToDivPixel(currentPos);
             if (!pos) return;
             // Posição personalizada do identificador em relação ao ícone
-            div.style.left = `${pos.x + 22}px`;
-            div.style.top = `${pos.y - 27}px`;
+            div.style.left = `${pos.x + 20}px`;
+            div.style.top = `${pos.y - 25}px`;
             div.style.transform = 'translate(-50%, -50%)';
           };
           indicatorOverlay.onRemove = function() { div.parentNode?.removeChild(div); };
