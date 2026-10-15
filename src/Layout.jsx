@@ -194,6 +194,7 @@ const DEFAULT_MENU = [
   { id: "rel-estoque-depositos", title: "Estoque Depósitos Mapa", url: "RelatorioEstoqueDepositos" }]
 
 },
+{ id: "folha-pagamento", title: "Folha de Pagamento", url: "Folha", icon: "DollarSign" },
 { id: "usuarios", title: "Usuarios", url: "Usuarios", icon: "Shield" },
 { id: "editor-visual", title: "Editor Visual", url: "EditorVisualSistema", icon: "Settings" }];
 
@@ -257,7 +258,7 @@ export default function Layout({ children, currentPageName }) {
   const [menuItems, setMenuItems] = useState(() => {
     const saved = localStorage.getItem('custom_menu');
     const menuVersion = localStorage.getItem('menu_version');
-    const CURRENT_VERSION = '2026-06-17-diagnostico-deposito-v1'; // Atualizar esta versão quando adicionar novos menus
+    const CURRENT_VERSION = '2026-10-08-menu-completo-v2'; // Atualizar esta versão quando adicionar novos menus
 
     // Se não tem menu salvo ou a versão mudou, usa o DEFAULT_MENU
     if (!saved || menuVersion !== CURRENT_VERSION) {
@@ -636,9 +637,9 @@ export default function Layout({ children, currentPageName }) {
 
               {isAdminUser &&
               <Link to={createPageUrl("ConfiguracoesGerais")}>
-                  
-
-                
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Configurações">
+                    <Settings className="w-4 h-4 text-slate-600" />
+                  </Button>
                 </Link>
               }
 
@@ -668,16 +669,16 @@ export default function Layout({ children, currentPageName }) {
                   {isAdminUser &&
                   <>
                       <DropdownMenuItem asChild className="text-xs">
-                        
-
-
-                      
+                        <Link to={createPageUrl("ConfiguracoesGerais")}>
+                          <Settings className="w-3 h-3 mr-2" />
+                          Configurações
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-xs">
-                        
-
-
-                      
+                        <Link to={createPageUrl("Usuarios")}>
+                          <Users className="w-3 h-3 mr-2" />
+                          Usuários
+                        </Link>
                       </DropdownMenuItem>
                     </>
                   }
