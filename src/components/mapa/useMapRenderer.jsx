@@ -458,7 +458,7 @@ export default function useMapRenderer(mapInstanceRef) {
         });
         if (markerStateCache.get(key) !== nextState) {
           const lbl = existing.getLabel();
-          if (lbl?.text !== String(totalCabecas) || lbl?.color !== COR_TEXTO_QTD_ANIMAIS) existing.setLabel({ text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' });
+          if (lbl?.text !== String(totalCabecas) || lbl?.color !== COR_TEXTO_QTD_ANIMAIS) existing.setLabel({ text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '9px', fontWeight: 'bold' });
           existing.setPosition(offsetCenter);
           existing.setTitle(area.nome);
           existing.setZIndex(totalAlertas > 0 ? 2000 : 1000);
@@ -476,7 +476,7 @@ export default function useMapRenderer(mapInstanceRef) {
       } else {
         const marker = new google.maps.Marker({
           position: offsetCenter, map, icon,
-          label: { text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '10px', fontWeight: 'bold' },
+          label: { text: String(totalCabecas), color: COR_TEXTO_QTD_ANIMAIS, fontSize: '9px', fontWeight: 'bold' },
           title: area.nome, zIndex: totalAlertas > 0 ? 2000 : 1000, draggable: !!canDragLotes
         });
         if (cfg?.icone_url) applyMarkerIconPreservingAspectRatio(marker, cfg.icone_url, 46, true);
