@@ -8,11 +8,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ConfiguracaoColunasMapaDialog from "@/components/mapa/ConfiguracaoColunasMapaDialog";
-import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical } from "lucide-react";
+import { MoreVertical, Filter, X, ArrowDownAZ, ArrowUpZA, GripVertical, Download } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ordenarPorNomeNumerico } from "@/hooks/useSetorAreas";
 import { toast } from "sonner";
+import { buildAreasKml, downloadKml } from "@/lib/kmlExport";
 
 const COLUNAS_DISPONIVEIS = [
   { id: "selecao", label: "Seleção", default: true, fixo: true, width: 25 },
@@ -252,6 +253,22 @@ export default function TabelaAreasGeo({ areas = [], onEdit, onEditDetalhes, onD
     }
   };
 
+  const handleExportarKml = () => {
+    const alvo = selectedItems.length > 0
+      ? areasOrdenadas.filter((a) => selectedItems.includes(a.id))
+      : areasOrdenadas;
+    if (alvo.length === 0) { toast.error("Nenhuma área para exportar"); return; }
+    const { kml, exportadas, ignoradas } = buildAreasKml(alvo, { documentName: "Áreas" });
+    if (exportadas.length === 0) { toast.error("Nenhuma das áreas possui polígono cadastrado"); return; }
+    const data = new Date().toISOString().slice(0, 10);
+    downloadKml(kml, `areas_${data}.kml`);
+    if (ignoradas.length > 0) {
+      toast.warning(`${exportadas.length} área(s) exportada(s). ${ignoradas.length} sem polígono foram ignoradas.`);
+    } else {
+      toast.success(`${exportadas.length} área(s) exportada(s) em KML`);
+    }
+  };
+
   const renderCell = (item, colunaId) => {
     if (colunaId === "tamanho") return item.tamanho_hectares?.toFixed(2) || "-";
     if (colunaId === "capacidade") return item.capacidade_maxima ?? "-";
@@ -332,6 +349,10 @@ export default function TabelaAreasGeo({ areas = [], onEdit, onEditDetalhes, onD
       <div className="flex justify-between items-center px-1 gap-2 flex-wrap">
         <div className="text-xs text-slate-500">{areasFiltradas.length} de {areas.length} registros</div>
         <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={handleExportarKml} disabled={areasOrdenadas.length === 0} title={selectedItems.length > 0 ? "Exportar áreas selecionadas" : "Exportar áreas listadas"}>
+            <Download className="w-3.5 h-3.5 mr-1" />
+            Exportar KML{selectedItems.length > 0 ? ` (${selectedItems.length})` : ""}
+          </Button>
           {selectedItems.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -343,6 +364,7 @@ export default function TabelaAreasGeo({ areas = [], onEdit, onEditDetalhes, onD
                 <DropdownMenuItem onClick={() => { setBatchType("setor"); setBatchValue(""); }} className="text-xs">Definir Setor</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => { setBatchType("cor"); setBatchValue("#61aad9"); }} className="text-xs">Definir Cor</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => { setBatchType("renumerar"); setStartNumber("1"); }} className="text-xs">Reatribuir Códigos</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportarKml} className="text-xs">Exportar KML</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleExcluirSelecionados} className="text-xs text-red-600">Excluir Selecionados</DropdownMenuItem>
               </DropdownMenuContent>
